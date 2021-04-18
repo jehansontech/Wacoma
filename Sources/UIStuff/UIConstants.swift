@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct UIConstants {
+public struct UIConstants {
 
     static let buttonCornerRadius: CGFloat = 5
     
