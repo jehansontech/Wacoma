@@ -15,6 +15,14 @@ public struct UIConstants {
     
     public static let sectionSpacing: CGFloat = 20
 
+    public static let settingsGridSpacing: CGFloat = 4
+
+    public static let settingNameWidth: CGFloat = 180
+
+    public static let settingValueWidth: CGFloat = 150
+
+    public static let settingSliderWidth: CGFloat = 300
+
     public static let symbolButtonWidth: CGFloat = 45
 
     public static let symbolButtonHeight: CGFloat = 35

@@ -7,18 +7,6 @@
 
 import SwiftUI
 
-struct SettingsItemConstants {
-    
-    static let gridSpacing: CGFloat = 4
-    
-    static let settingNameWidth: CGFloat = 180
-    
-    static let settingValueWidth: CGFloat = 150
-    
-    static let sliderWidth: CGFloat = 300
-    
-}
-
 ///
 ///
 ///
@@ -30,7 +18,7 @@ struct SettingTextFieldStyle: ViewModifier {
             // .autocapitalization(.none)
             .disableAutocorrection(true)
             .padding(UIConstants.buttonPadding)
-            .frame(width: SettingsItemConstants.settingValueWidth)
+            .frame(width: UIConstants.settingValueWidth)
             .border(UIConstants.darkGray)
     }
 }
@@ -39,13 +27,13 @@ struct SettingTextFieldStyle: ViewModifier {
 ///
 ///
 ///
-struct TextSetting : View {
+public struct TextSetting : View {
     
     let value: Binding<String>
     
     @State var isEditing: Bool = false
     
-    var body: some View {
+    public var body: some View {
         
         HStack {
             TextField("",
@@ -64,7 +52,7 @@ struct TextSetting : View {
         // end HStack
     }
     
-    init(_ value: Binding<String>) {
+    public init(_ value: Binding<String>) {
         self.value = value
     }
 }
@@ -73,7 +61,7 @@ struct TextSetting : View {
 ///
 ///
 ///
-struct SteppedSetting: View {
+public struct SteppedSetting: View {
     
     let value: Binding<Int>
     
@@ -85,7 +73,7 @@ struct SteppedSetting: View {
     
     var formatter: NumberFormatter = makeDefaultNumberFormatter()
     
-    var body: some View {
+    public var body: some View {
         
         HStack {
             TextField("", value: value, formatter: formatter)
@@ -116,14 +104,14 @@ struct SteppedSetting: View {
         
     }
     
-    init(_ value: Binding<Int>, _ minimum: Int, _ maximum: Int, _ deltas: [Int]) {
+    public init(_ value: Binding<Int>, _ minimum: Int, _ maximum: Int, _ deltas: [Int]) {
         self.value = value
         self.minimum = minimum
         self.maximum = maximum
         self.deltas = Self.unpackDeltas(deltas)
     }
     
-    func formatter(_ formatter: NumberFormatter) -> Self {
+    public func formatter(_ formatter: NumberFormatter) -> Self {
         var view = self
         view.formatter = formatter
         return self
@@ -168,7 +156,7 @@ struct RangeSetting: View {
     
     var step: Double
     
-    var body: some View {
+    public var body: some View {
         
         HStack {
 
@@ -180,7 +168,7 @@ struct RangeSetting: View {
             Slider(value: value, in: range, step: step)
                 .accentColor(UIConstants.controlColor)
                 // .foregroundColor(UIConstants.controlColor)
-                .frame(minWidth: SettingsItemConstants.sliderWidth, maxWidth: .infinity)
+                .frame(minWidth: UIConstants.settingSliderWidth, maxWidth: .infinity)
             
             // Spacer()
         }
@@ -188,13 +176,13 @@ struct RangeSetting: View {
         // .border(Color.gray)
     }
     
-    init(_ value: Binding<Double>, _ minimum: Double, _ maximum: Double, _ step: Double) {
+    public init(_ value: Binding<Double>, _ minimum: Double, _ maximum: Double, _ step: Double) {
         self.value = value
         self.range = minimum...maximum
         self.step = step
     }
     
-    func formatter(_ formatter: NumberFormatter) -> Self {
+    public func formatter(_ formatter: NumberFormatter) -> Self {
         var view = self
         view.formatter = formatter
         return self
@@ -213,7 +201,7 @@ struct RangeSetting: View {
 ///
 ///
 ///
-struct ChoiceSetting: View {
+public struct ChoiceSetting: View {
     
     let value: Binding<String>
     
@@ -221,7 +209,7 @@ struct ChoiceSetting: View {
     
     @State var selectorShowing: Bool = false
     
-    var body: some View {
+    public var body: some View {
         
         HStack {
             Button(action: { selectorShowing = true }) {
@@ -235,7 +223,7 @@ struct ChoiceSetting: View {
                     Image(systemName: "chevron.right")
                 }
                 .padding(UIConstants.buttonPadding)
-                .frame(width: SettingsItemConstants.settingValueWidth, alignment: .trailing)
+                .frame(width: UIConstants.settingValueWidth, alignment: .trailing)
                 .foregroundColor(UIConstants.controlColor)
                 .background(RoundedRectangle(cornerRadius: 5)
                                 .opacity(0.05))
@@ -252,7 +240,7 @@ struct ChoiceSetting: View {
         
     }
     
-    init(_ value: Binding<String>, _ choices: [String]) {
+    public init(_ value: Binding<String>, _ choices: [String]) {
         self.value = value
         self.choices = choices
     }
@@ -297,7 +285,7 @@ struct ChoiceSettingSelector: View {
 ///
 ///
 ///
-struct TickyboxSetting: View {
+public struct TickyboxSetting: View {
 
     let value: Binding<Bool>
 
@@ -305,7 +293,7 @@ struct TickyboxSetting: View {
 
     let falseText: String
 
-    var body: some View {
+    public var body: some View {
 
         Button(action: {
             value.wrappedValue = !value.wrappedValue
@@ -315,7 +303,7 @@ struct TickyboxSetting: View {
                 Text(value.wrappedValue ? trueText : falseText)
             }
             .padding(UIConstants.buttonPadding)
-            .frame(width: SettingsItemConstants.settingValueWidth, alignment: .trailing)
+            .frame(width: UIConstants.settingValueWidth, alignment: .trailing)
             .foregroundColor(UIConstants.controlColor)
             .background(RoundedRectangle(cornerRadius: 5)
                             .opacity(0.05))
@@ -324,7 +312,7 @@ struct TickyboxSetting: View {
         // Spacer()
     }
 
-    init(_ value: Binding<Bool>, _ trueText: String, _ falseText: String) {
+    public init(_ value: Binding<Bool>, _ trueText: String, _ falseText: String) {
         self.value = value
         self.trueText = trueText
         self.falseText = falseText

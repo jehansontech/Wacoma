@@ -7,9 +7,9 @@
 
 import SwiftUI
 
-struct SymbolButtonStyle: ViewModifier {
+public struct SymbolButtonStyle: ViewModifier {
 
-    func body(content: Content) -> some View {
+    public func body(content: Content) -> some View {
         content
             .imageScale(.large)
             .padding(UIConstants.buttonPadding)
@@ -20,9 +20,9 @@ struct SymbolButtonStyle: ViewModifier {
 
 }
 
-struct TextButtonStyle: ViewModifier {
+public struct TextButtonStyle: ViewModifier {
 
-    func body(content: Content) -> some View {
+    public func body(content: Content) -> some View {
         content
             .padding(UIConstants.buttonPadding)
             .foregroundColor(UIConstants.controlColor)

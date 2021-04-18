@@ -7,10 +7,9 @@
 
 import SwiftUI
 
-struct PopStyle: ViewModifier {
+public struct PopStyle: ViewModifier {
 
-
-    func body(content: Content) -> some View {
+    public func body(content: Content) -> some View {
         ZStack {
             UIConstants.darkGray.scaleEffect(1.5)
             content
