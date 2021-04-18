@@ -3,5 +3,5 @@ import XCTest
 import UIStuffTests
 
 var tests = [XCTestCaseEntry]()
-tests += UIStuffTests.allTests()
+tests += UIStuffForSwiftTests.allTests()
 XCTMain(tests)

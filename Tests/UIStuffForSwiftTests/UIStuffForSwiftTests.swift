@@ -1,7 +1,8 @@
 import XCTest
-@testable import UIStuff
+@testable import UIStuffForSwift
 
-final class UIStuffTests: XCTestCase {
+final class UIStuffForSwiftTests: XCTestCase {
+    
     func testExample() {
         // This is an example of a functional test case.
         // Use XCTAssert and related functions to verify your tests produce the correct
