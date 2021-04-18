@@ -1,6 +1,6 @@
 import XCTest
 
-import UIStuffTests
+import UIStuffForSwiftTests
 
 var tests = [XCTestCaseEntry]()
 tests += UIStuffForSwiftTests.allTests()
