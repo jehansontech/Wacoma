@@ -23,4 +23,6 @@ public struct PopStyle: ViewModifier {
         }
     }
 
+    public init() {}
+
 }

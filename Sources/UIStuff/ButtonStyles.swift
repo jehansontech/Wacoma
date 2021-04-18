@@ -18,6 +18,8 @@ public struct SymbolButtonStyle: ViewModifier {
                             .opacity(UIConstants.buttonOpacity))
     }
 
+    public init() {}
+
 }
 
 public struct TextButtonStyle: ViewModifier {
@@ -30,5 +32,6 @@ public struct TextButtonStyle: ViewModifier {
                             .opacity(UIConstants.buttonOpacity))
     }
 
+    public init() {}
 }
 
