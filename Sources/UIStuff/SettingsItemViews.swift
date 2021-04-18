@@ -146,7 +146,7 @@ public struct SteppedSetting: View {
 ///
 ///
 ///
-struct RangeSetting: View {
+public struct RangeSetting: View {
     
     let value: Binding<Double>
     
