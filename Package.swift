@@ -4,15 +4,15 @@
 import PackageDescription
 
 let package = Package(
-    name: "UIStuff-Swift",
+    name: "UIStuff_Swift",
     platforms: [
         .macOS(.v11), .iOS(.v14)
     ],
     products: [
         // Products define the executables and libraries a package produces, and make them visible to other packages.
         .library(
-            name: "UIStuff-Swift",
-            targets: ["UIStuff-Swift"]),
+            name: "UIStuff_Swift",
+            targets: ["UIStuff_Swift"]),
     ],
     dependencies: [
         // Dependencies declare other packages that this package depends on.
@@ -22,7 +22,10 @@ let package = Package(
         // Targets are the basic building blocks of a package. A target can define a module or a test suite.
         // Targets can depend on other targets in this package, and on products in packages this package depends on.
         .target(
-            name: "UIStuff-Swift",
-            dependencies: [])
+            name: "UIStuff_Swift",
+            dependencies: []),
+        .target(
+            name: "UIStuff_SwiftTests",
+            dependencies: [UIStuff_Swift])
     ]
 )
