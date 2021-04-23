@@ -15,7 +15,7 @@ struct SettingTextFieldStyle: ViewModifier {
     func body(content: Content) -> some View {
         content
             .lineLimit(1)
-            // .autocapitalization(.none)
+            .autocapitalization(.none)
             .disableAutocorrection(true)
             .padding(UIConstants.buttonPadding)
             .frame(width: UIConstants.settingValueWidth)

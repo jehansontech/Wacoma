@@ -40,7 +40,7 @@ struct Section<Content: View> : View {
                 Button("") // (action: { selectedSection.wrappedValue = sectionID })
                 {
                     Image(systemName: "chevron.right")
-                        // .rotated(by: .degrees((sectionID == selectedSection.wrappedValue ? 90 : 0)))
+                        .rotated(by: .degrees((sectionID == selectedSection.wrappedValue ? 90 : 0)))
 
                     Text(sectionName)
                         .lineLimit(1)
@@ -94,7 +94,7 @@ struct SectionButton: View {
             selectedSection.wrappedValue = sectionID
         }) {
             Image(systemName: "chevron.right")
-                // .rotated(by: .degrees((sectionID == selectedSection.wrappedValue ? 90 : 0)))
+                .rotated(by: .degrees((sectionID == selectedSection.wrappedValue ? 90 : 0)))
 
             Text(sectionName)
                 .lineLimit(1)
