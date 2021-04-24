@@ -37,7 +37,7 @@ public struct TwistieSection<Content: View> : View {
         HStack(alignment: .top, spacing: UIConstants.sectionSpacing) {
 
             GeometryReader { geometry in
-                Button("") // (action: { selectedSection.wrappedValue = sectionID })
+                Button(action: { selectedSection.wrappedValue = sectionID })
                 {
                     Image(systemName: "chevron.right")
                         .rotated(by: .degrees((sectionID == selectedSection.wrappedValue ? 90 : 0)))
