@@ -36,7 +36,7 @@ public struct TwistieSection<Content: View> : View {
     public var body: some View {
         HStack(alignment: .top, spacing: UIConstants.sectionSpacing) {
 
-            GeometryReader { geometry in
+//            GeometryReader { geometry in
                 Button(action: { selectedSection.wrappedValue = sectionID })
                 {
                     Image(systemName: "chevron.right")
@@ -51,7 +51,7 @@ public struct TwistieSection<Content: View> : View {
 //                    value: [SectionState(nameWidth: geometry.frame(in: CoordinateSpace.global).width)]
 //                )
                 .border(Color.gray)
-            }
+//            }
 
             if sectionID == selectedSection.wrappedValue {
                 sectionContent()
