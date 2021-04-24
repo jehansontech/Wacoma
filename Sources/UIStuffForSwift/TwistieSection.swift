@@ -23,7 +23,7 @@ import SwiftUI
 //    // let selectedSection: Int
 //}
 
-struct Section<Content: View> : View {
+struct TwistieSection<Content: View> : View {
 
     let sectionName: String
 
