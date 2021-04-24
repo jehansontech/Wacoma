@@ -20,7 +20,11 @@ public struct SettingsView<Content: View>: View {
     private let content: () -> Content
 
     public var body: some View {
-        VStack {
+        let columns = [
+            GridItem(.flexible(), alignment: .leading),
+            GridItem(.flexible(), alignment: .leading)
+        ]
+        LazyVGrid(columns: columns, spacing: UIConstants.settingsGridSpacing) {
             content()
         }
     }
