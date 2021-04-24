@@ -13,13 +13,10 @@ public struct Fill<Content: View>: View {
 
     public var body: some View {
         HStack {
-            Spacer()
             VStack {
-                Spacer()
                 content()
-                Spacer()
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
             }
-            Spacer()
         }
         .foregroundColor(UIConstants.offWhite)
         .background(UIConstants.offBlack)
