@@ -55,11 +55,7 @@ public struct TwistieSection<Content: View> : View {
 
             if sectionID == selectedSection.wrappedValue {
                 sectionContent()
-                    .border(Color.gray)
             }
-//            else {
-//                Spacer()
-//            }
         }
         .animation(.easeInOut)
 
