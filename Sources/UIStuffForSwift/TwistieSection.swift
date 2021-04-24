@@ -23,7 +23,7 @@ import SwiftUI
 //    // let selectedSection: Int
 //}
 
-struct TwistieSection<Content: View> : View {
+public struct TwistieSection<Content: View> : View {
 
     let sectionName: String
 
@@ -33,7 +33,7 @@ struct TwistieSection<Content: View> : View {
 
     var sectionContent: () -> Content
 
-    var body: some View {
+    public var body: some View {
         HStack(alignment: .top, spacing: UIConstants.sectionSpacing) {
 
             GeometryReader { geometry in
@@ -60,7 +60,7 @@ struct TwistieSection<Content: View> : View {
         }
     }
 
-    init(_ sectionName: String, _ sectionID: Int, _ selectedSection: Binding<Int>, @ViewBuilder content: @escaping () -> Content) {
+    public init(_ sectionName: String, _ sectionID: Int, _ selectedSection: Binding<Int>, @ViewBuilder content: @escaping () -> Content) {
         self.sectionName = sectionName
         self.sectionID = sectionID
         self.selectedSection = selectedSection
