@@ -57,10 +57,12 @@ public struct TwistieSection<Content: View> : View {
                 sectionContent()
                     .border(Color.gray)
             }
-            else {
-                Spacer()
-            }
+//            else {
+//                Spacer()
+//            }
         }
+        .animation(.easeInOut)
+
     }
 
     public init(_ sectionName: String, _ sectionID: Int, _ selectedSection: Binding<Int>, @ViewBuilder content: @escaping () -> Content) {
