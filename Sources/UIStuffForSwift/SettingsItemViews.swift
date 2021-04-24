@@ -57,6 +57,10 @@ public struct TextSetting : View {
     }
 }
 
+// =================================================================================
+// MARK:- Stepped
+// =================================================================================
+
 
 ///
 ///
@@ -118,7 +122,7 @@ public struct SteppedSetting: View {
     }
     
     private func setValue(_ newValue: Int) {
-        value.wrappedValue = newValue //.clamp(minimum, maximum)
+        value.wrappedValue = newValue.clamp(minimum, maximum)
     }
 
     private static func makeDefaultNumberFormatter() -> NumberFormatter {
@@ -142,6 +146,10 @@ public struct SteppedSetting: View {
     }
 }
 
+
+// =================================================================================
+// MARK:- Range
+// =================================================================================
 
 ///
 ///
@@ -197,9 +205,12 @@ public struct RangeSetting: View {
 
 }
 
+// =================================================================================
+// MARK:- Choice
+// =================================================================================
 
 ///
-///
+/// ChoiceSetting: Select an item from a given list, which is presented in a popover
 ///
 public struct ChoiceSetting: View {
     
@@ -248,7 +259,7 @@ public struct ChoiceSetting: View {
 
 
 ///
-///
+/// Contents of popover in a ChoiceSetting
 ///
 struct ChoiceSettingSelector: View {
     
@@ -281,6 +292,10 @@ struct ChoiceSettingSelector: View {
     }
 }
 
+
+// =================================================================================
+// MARK:- Tickybox
+// =================================================================================
 
 ///
 ///
