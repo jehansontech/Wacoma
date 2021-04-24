@@ -54,8 +54,11 @@ public struct TwistieSection<Content: View> : View {
             }
 
             if sectionID == selectedSection.wrappedValue {
-                Group(content: sectionContent)
+                sectionContent()
                     .border(Color.gray)
+            }
+            else {
+                Spacer()
             }
         }
     }
