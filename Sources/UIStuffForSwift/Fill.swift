@@ -12,15 +12,18 @@ public struct Fill<Content: View>: View {
     private let content: () -> Content
 
     public var body: some View {
-        VStack {
+        HStack {
             Spacer()
-            HStack {
+            VStack {
                 Spacer()
                 content()
                 Spacer()
             }
             Spacer()
         }
+        .foregroundColor(UIConstants.offWhite)
+        .background(UIConstants.offBlack)
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 
     public init(@ViewBuilder _ content: @escaping () -> Content) {
