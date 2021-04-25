@@ -26,7 +26,7 @@ public struct TextSetting : View {
     
     public var body: some View {
         
-        HStack(alignment: .top, spacing: UIConstants.settingsGridSpacing) {
+        HStack(alignment: .center, spacing: UIConstants.settingsGridSpacing) {
 
             Text(settingName)
 
@@ -79,7 +79,7 @@ public struct SteppedSetting: View {
     
     public var body: some View {
         
-        HStack(alignment: .top, spacing: UIConstants.settingsGridSpacing) {
+        HStack(alignment: .center, spacing: UIConstants.settingsGridSpacing) {
 
             Text(settingName)
 
@@ -172,7 +172,7 @@ public struct RangeSetting: View {
     
     public var body: some View {
         
-        HStack(alignment: .top, spacing: UIConstants.settingsGridSpacing) {
+        HStack(alignment: .center, spacing: UIConstants.settingsGridSpacing) {
 
             Text(settingName)
 
@@ -186,10 +186,10 @@ public struct RangeSetting: View {
 
             Slider(value: value, in: range, step: step)
                 .accentColor(UIConstants.controlColor)
-                // .foregroundColor(UIConstants.controlColor)
+                .foregroundColor(UIConstants.controlColor)
                 .frame(minWidth: UIConstants.settingSliderWidth, maxWidth: .infinity)
             
-            // Spacer()
+            Spacer()
         }
         .frame(maxWidth: .infinity)
         // .border(Color.gray)
@@ -236,7 +236,7 @@ public struct ChoiceSetting: View {
     
     public var body: some View {
         
-        HStack(alignment: .top, spacing: UIConstants.settingsGridSpacing) {
+        HStack(alignment: .center, spacing: UIConstants.settingsGridSpacing) {
 
             Text(settingName)
 
@@ -327,7 +327,7 @@ public struct TickyboxSetting: View {
 
     public var body: some View {
 
-        HStack(alignment: .top, spacing: UIConstants.settingsGridSpacing) {
+        HStack(alignment: .center, spacing: UIConstants.settingsGridSpacing) {
 
             Text(settingName)
 
