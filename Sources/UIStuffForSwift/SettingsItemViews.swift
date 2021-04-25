@@ -7,8 +7,29 @@
 
 import SwiftUI
 
-protocol Setting : View {
 
+struct LabelWidthPreferenceKey: PreferenceKey {
+    typealias Value = CGFloat
+
+    static var defaultValue: CGFloat = 0
+
+    static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
+        value = nextValue()
+    }
+}
+
+public struct ItemGroup {
+
+    var labelWidth: CGFloat = 0
+
+    var fieldWidth: CGFloat = UIConstants.settingValueWidth
+
+    public init() {}
+
+    public init(_ minLabelWidth: CGFloat, _ minFieldWidth: CGFloat) {
+        self.labelWidth = minLabelWidth
+        self.fieldWidth = minFieldWidth
+    }
 }
 
 
@@ -20,19 +41,29 @@ protocol Setting : View {
 ///
 ///
 ///
-public struct TextSetting: Setting {
+public struct TextSetting: View {
 
     let settingName: String
 
     let value: Binding<String>
 
+    @Binding var group: ItemGroup
+
     @State var isEditing: Bool = false
-    
+
     public var body: some View {
         
         HStack(alignment: .center, spacing: UIConstants.settingsGridSpacing) {
 
             Text(settingName)
+                .lineLimit(1)
+                .fixedSize()
+                .overlay(GeometryReader { proxy in
+                    Color.clear.preference(key: LabelWidthPreferenceKey.self, value: proxy.size.width)
+                }).onPreferenceChange(LabelWidthPreferenceKey.self) { (value) in
+                    $group.wrappedValue.labelWidth = max(group.labelWidth, value)
+                }
+                .frame(width: group.labelWidth, alignment: .trailing)
 
             TextField("",
                       text: value,
@@ -48,12 +79,14 @@ public struct TextSetting: Setting {
                 .border(isEditing ? UIConstants.controlColor : UIConstants.darkGray)
             
         }
-        // end HStack
     }
     
-    public init(_ name: String, _ value: Binding<String>) {
+    public init(_ name: String,
+                _ value: Binding<String>,
+                _ group: Binding<ItemGroup>) {
         self.settingName = name
         self.value = value
+        self._group = group
     }
 
 }
@@ -66,12 +99,14 @@ public struct TextSetting: Setting {
 ///
 ///
 ///
-public struct SteppedSetting: Setting {
+public struct SteppedSetting: View {
     
     let settingName: String
 
     let value: Binding<Int>
     
+    @Binding var group: ItemGroup
+
     let minimum: Int
     
     let maximum: Int
@@ -85,6 +120,14 @@ public struct SteppedSetting: Setting {
         HStack(alignment: .center, spacing: UIConstants.settingsGridSpacing) {
 
             Text(settingName)
+                .lineLimit(1)
+                .fixedSize()
+                .overlay(GeometryReader { proxy in
+                    Color.clear.preference(key: LabelWidthPreferenceKey.self, value: proxy.size.width)
+                }).onPreferenceChange(LabelWidthPreferenceKey.self) { (value) in
+                    $group.wrappedValue.labelWidth = max(group.labelWidth, value)
+                }
+                .frame(width: group.labelWidth, alignment: .trailing)
 
             TextField("", value: value, formatter: formatter)
                 .lineLimit(1)
@@ -114,14 +157,21 @@ public struct SteppedSetting: Setting {
         
     }
     
-    public init(_ name: String, _ value: Binding<Int>, _ minimum: Int, _ maximum: Int, _ deltas: [Int]) {
+    public init(_ name: String,
+                _ value: Binding<Int>,
+                _ group: Binding<ItemGroup>,
+                _ minimum: Int,
+                _ maximum: Int,
+                _ deltas: [Int]) {
         self.settingName = name
         self.value = value
+        self._group = group
         self.minimum = minimum
         self.maximum = maximum
         self.deltas = Self.unpackDeltas(deltas)
     }
-    
+
+
     public func formatter(_ formatter: NumberFormatter) -> Self {
         var view = self
         view.formatter = formatter
@@ -161,12 +211,14 @@ public struct SteppedSetting: Setting {
 ///
 ///
 ///
-public struct RangeSetting: Setting {
+public struct RangeSetting: View {
     
     let settingName: String
 
     let value: Binding<Double>
     
+    @Binding var group: ItemGroup
+
     var formatter: NumberFormatter = makeDefaultNumberFormatter()
 
     var range: ClosedRange<Double>
@@ -198,13 +250,19 @@ public struct RangeSetting: Setting {
         // .border(Color.gray)
     }
     
-    public init(_ name: String, _ value: Binding<Double>, _ minimum: Double, _ maximum: Double, _ step: Double) {
+    public init(_ name: String,
+                _ value: Binding<Double>,
+                _ group: Binding<ItemGroup>,
+                _ minimum: Double,
+                _ maximum: Double,
+                _ step: Double) {
         self.settingName = name
         self.value = value
+        self._group = group
         self.range = minimum...maximum
         self.step = step
     }
-    
+
     public func formatter(_ formatter: NumberFormatter) -> Self {
         var view = self
         view.formatter = formatter
@@ -227,12 +285,14 @@ public struct RangeSetting: Setting {
 ///
 /// ChoiceSetting: Select an item from a given list, which is presented in a popover
 ///
-public struct ChoiceSetting: Setting {
+public struct ChoiceSetting: View {
     
     let settingName: String
 
     let value: Binding<String>
     
+    @Binding var group: ItemGroup
+
     let choices: [String]
     
     @State var selectorShowing: Bool = false
@@ -268,9 +328,13 @@ public struct ChoiceSetting: Setting {
         
     }
     
-    public init(_ name: String, _ value: Binding<String>, _ choices: [String]) {
+    public init(_ name: String,
+                _ value: Binding<String>,
+                _ group: Binding<ItemGroup>,
+                _ choices: [String]) {
         self.settingName = name
         self.value = value
+        self._group = group
         self.choices = choices
     }
 }
@@ -318,11 +382,13 @@ struct ChoiceSettingSelector: View {
 ///
 ///
 ///
-public struct TickyboxSetting: Setting {
+public struct TickyboxSetting: View {
 
     let settingName: String
 
     let value: Binding<Bool>
+
+    @Binding var group: ItemGroup
 
     let trueText: String
 
@@ -352,9 +418,14 @@ public struct TickyboxSetting: Setting {
         }
     }
 
-    public init(_ name: String, _ value: Binding<Bool>, _ trueText: String, _ falseText: String) {
+    public init(_ name: String,
+                _ value: Binding<Bool>,
+                _ group: Binding<ItemGroup>,
+                _ trueText: String,
+                _ falseText: String) {
         self.settingName = name
         self.value = value
+        self._group = group
         self.trueText = trueText
         self.falseText = falseText
     }
