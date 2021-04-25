@@ -23,7 +23,7 @@ import SwiftUI
 //    // let selectedSection: Int
 //}
 
-public struct TwistieGroup {
+public class TwistieGroup: ObservableObject {
 
     private var sectionCount: Int = 0
 
@@ -33,7 +33,7 @@ public struct TwistieGroup {
 
     public init() {}
 
-    mutating func nextSectionID() -> Int {
+    func nextSectionID() -> Int {
         let id = sectionCount
         sectionCount += 1
         return id
