@@ -34,7 +34,7 @@ public struct TwistieGroup {
 public struct TwistieSection<Content: View> : View {
 
     let leftInset: CGFloat = 40
-    let twistieSize: CGFloat = 25
+    let twistieSize: CGFloat = 20
 
     let sectionName: String
 
@@ -53,14 +53,10 @@ public struct TwistieSection<Content: View> : View {
                     .lineLimit(1)
             }
             .modifier(TextButtonStyle())
-            .border(Color.red)
 
             if sectionName == group.wrappedValue.selection {
-                HStack(alignment: .top, spacing: 0) {
-                    Spacer().frame(width: leftInset)
-                    sectionContent()
-                        .border(Color.red)
-                }
+                sectionContent()
+                    .padding(EdgeInsets(top: UIConstants.buttonSpacing, leading: leftInset, bottom: 0, trailing: 0))
             }
         }
     }
