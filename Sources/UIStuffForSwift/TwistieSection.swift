@@ -23,7 +23,17 @@ import SwiftUI
 //    // let selectedSection: Int
 //}
 
+fileprivate var sectionCount: Int = 0
+
+fileprivate func nextSectionID() -> Int {
+    let sectionID = sectionCount
+    sectionCount += 1
+    return sectionID
+}
+
 public struct TwistieSection<Content: View> : View {
+
+    let twistieSize: CGFloat = 40
 
     let sectionName: String
 
@@ -40,6 +50,7 @@ public struct TwistieSection<Content: View> : View {
                 Button(action: { selectedSection.wrappedValue = sectionID })
                 {
                     Image(systemName: "chevron.right")
+                        .frame(width: twistieSize, height: twistieSize)
                         .rotated(by: .degrees((sectionID == selectedSection.wrappedValue ? 90 : 0)))
 
                     Text(sectionName)
@@ -50,7 +61,6 @@ public struct TwistieSection<Content: View> : View {
 //                    key: SectionStatePreferenceKey.self,
 //                    value: [SectionState(nameWidth: geometry.frame(in: CoordinateSpace.global).width)]
 //                )
-                .border(Color.gray)
             }
 
             if sectionID == selectedSection.wrappedValue {
@@ -61,9 +71,9 @@ public struct TwistieSection<Content: View> : View {
 
     }
 
-    public init(_ sectionName: String, _ sectionID: Int, _ selectedSection: Binding<Int>, @ViewBuilder content: @escaping () -> Content) {
+    public init(_ sectionName: String, _ selectedSection: Binding<Int>, @ViewBuilder content: @escaping () -> Content) {
         self.sectionName = sectionName
-        self.sectionID = sectionID
+        self.sectionID = nextSectionID()
         self.selectedSection = selectedSection
         self.sectionContent = content
     }
