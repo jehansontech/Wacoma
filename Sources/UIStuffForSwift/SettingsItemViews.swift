@@ -7,21 +7,10 @@
 
 import SwiftUI
 
-///
-///
-///
-struct SettingTextFieldStyle: ViewModifier {
-    
-    func body(content: Content) -> some View {
-        content
-            .lineLimit(1)
-            .autocapitalization(.none)
-            .disableAutocorrection(true)
-            .padding(UIConstants.buttonPadding)
-            .frame(width: UIConstants.settingValueWidth)
-            .border(UIConstants.darkGray)
-    }
-}
+
+// =================================================================================
+// MARK:- Text
+// =================================================================================
 
 
 ///
@@ -41,8 +30,12 @@ public struct TextSetting : View {
                       onEditingChanged: { editing in
                         isEditing = editing
                       })
-                .modifier(SettingTextFieldStyle())
+                .lineLimit(1)
+                .autocapitalization(.none)
+                .disableAutocorrection(true)
                 .multilineTextAlignment(.trailing)
+                .padding(UIConstants.buttonPadding)
+                .frame(minWidth: UIConstants.settingValueWidth)
                 .border(isEditing ? UIConstants.controlColor : UIConstants.darkGray)
             
             Spacer()
@@ -81,8 +74,10 @@ public struct SteppedSetting: View {
         
         HStack {
             TextField("", value: value, formatter: formatter)
-                .modifier(SettingTextFieldStyle())
+                .lineLimit(1)
                 .multilineTextAlignment(.trailing)
+                .padding(UIConstants.buttonPadding)
+                .frame(width: UIConstants.settingValueWidth)
                 .border(UIConstants.darkGray)
                 .disabled(true)
             
@@ -169,10 +164,13 @@ public struct RangeSetting: View {
         HStack {
 
             TextField("", value: value, formatter: formatter)
-                .modifier(SettingTextFieldStyle())
+                .lineLimit(1)
                 .multilineTextAlignment(.trailing)
+                .padding(UIConstants.buttonPadding)
+                .frame(width: UIConstants.settingValueWidth)
+                .border(UIConstants.darkGray)
                 .disabled(true)
-            
+
             Slider(value: value, in: range, step: step)
                 .accentColor(UIConstants.controlColor)
                 // .foregroundColor(UIConstants.controlColor)
@@ -227,9 +225,6 @@ public struct ChoiceSetting: View {
                 HStack {
                     TextField("", text: value)
                         .lineLimit(1)
-                        // .autocapitalization(.none)
-                        .disableAutocorrection(true)
-                        // .multilineTextAlignment(.trailing)
                         .disabled(true)
                     Image(systemName: "chevron.right")
                 }
