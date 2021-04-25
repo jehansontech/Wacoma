@@ -29,6 +29,10 @@ public struct TwistieGroup {
 
     var selectedSection: Int = 0
 
+    var labelWidths = [CGFloat]()
+
+    public init() {}
+
     mutating func nextSectionID() -> Int {
         let id = sectionCount
         sectionCount += 1
