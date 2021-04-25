@@ -26,7 +26,7 @@ public struct TextSetting : View {
     
     public var body: some View {
         
-        HStack {
+        HStack(alignment: .top, spacing: UIConstants.settingsGridSpacing) {
 
             Text(settingName)
 
@@ -46,7 +46,6 @@ public struct TextSetting : View {
             Spacer()
                 .layoutPriority(1)
         }
-        .frame(maxWidth: .infinity)
         // end HStack
     }
     
@@ -80,7 +79,7 @@ public struct SteppedSetting: View {
     
     public var body: some View {
         
-        HStack {
+        HStack(alignment: .top, spacing: UIConstants.settingsGridSpacing) {
 
             Text(settingName)
 
@@ -105,11 +104,9 @@ public struct SteppedSetting: View {
                 .modifier(SymbolButtonStyle())
                 .foregroundColor(UIConstants.controlColor)
             }
-            
+
             Spacer()
         }
-        .frame(maxWidth: .infinity)
-        // .border(Color.gray)
         // end HStack
         
     }
@@ -175,7 +172,7 @@ public struct RangeSetting: View {
     
     public var body: some View {
         
-        HStack {
+        HStack(alignment: .top, spacing: UIConstants.settingsGridSpacing) {
 
             Text(settingName)
 
@@ -239,7 +236,7 @@ public struct ChoiceSetting: View {
     
     public var body: some View {
         
-        HStack {
+        HStack(alignment: .top, spacing: UIConstants.settingsGridSpacing) {
 
             Text(settingName)
 
@@ -330,7 +327,7 @@ public struct TickyboxSetting: View {
 
     public var body: some View {
 
-        HStack {
+        HStack(alignment: .top, spacing: UIConstants.settingsGridSpacing) {
 
             Text(settingName)
 
@@ -347,6 +344,8 @@ public struct TickyboxSetting: View {
                 .background(RoundedRectangle(cornerRadius: 5)
                                 .opacity(0.05))
             }
+
+            Spacer()
         }
     }
 
