@@ -23,16 +23,9 @@ import SwiftUI
 //    // let selectedSection: Int
 //}
 
-public class TwistieGroup: ObservableObject {
+public struct TwistieGroup {
 
-
-    @Published var selection: String = "" {
-        didSet {
-            print("selection = \(selection)")
-        }
-    }
-
-    var labelWidths = [CGFloat]()
+    var selection: String = ""
 
     public init() {}
 
@@ -40,40 +33,38 @@ public class TwistieGroup: ObservableObject {
 
 public struct TwistieSection<Content: View> : View {
 
+    let leftInset: CGFloat = 40
     let twistieSize: CGFloat = 40
 
     let sectionName: String
 
-    // var selectedSection: Binding<Int>
-
-    @ObservedObject var group: TwistieGroup
+    var group: Binding<TwistieGroup>
 
     var sectionContent: () -> Content
 
     public var body: some View {
-        HStack(alignment: .top, spacing: UIConstants.sectionSpacing) {
-
-            Button(action: { group.selection = sectionName }) {
+        VStack(alignment: .leading, spacing: 0) {
+            Button(action: { group.wrappedValue.selection = sectionName }) {
                 Image(systemName: "chevron.right")
                     .frame(width: twistieSize, height: twistieSize)
-                    .rotated(by: .degrees((sectionName == group.selection ? 90 : 0)))
+                    .rotated(by: .degrees((sectionName == group.wrappedValue.selection ? 90 : 0)))
 
                 Text(sectionName)
                     .lineLimit(1)
-
             }
             .modifier(TextButtonStyle())
 
-            Group {
-                if sectionName == group.selection {
+            if sectionName == group.wrappedValue.selection {
+                HStack(alignment: .top, spacing: 0) {
+                    Spacer().frame(width: leftInset)
                     sectionContent()
                 }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
             }
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
     }
 
-    public init(_ sectionName: String, _ group: TwistieGroup, @ViewBuilder content: @escaping () -> Content) {
+    public init(_ sectionName: String, _ group: Binding<TwistieGroup>, @ViewBuilder content: @escaping () -> Content) {
         self.sectionName = sectionName
         self.group = group
         self.sectionContent = content
