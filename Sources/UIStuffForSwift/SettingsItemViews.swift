@@ -38,7 +38,7 @@ public struct TextSetting : View {
                 .lineLimit(1)
                 .autocapitalization(.none)
                 .disableAutocorrection(true)
-                .multilineTextAlignment(.leading)
+                .multilineTextAlignment(.trailing)
                 .padding(UIConstants.buttonPadding)
                 .frame(minWidth: UIConstants.settingValueWidth)
                 .border(isEditing ? UIConstants.controlColor : UIConstants.darkGray)
