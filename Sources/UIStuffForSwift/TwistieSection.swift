@@ -27,7 +27,7 @@ public class TwistieGroup: ObservableObject {
 
     private var sectionCount: Int = 0
 
-    var selectedSection: Int = 0
+    @Published var selectedSection: Int = 0
 
     var labelWidths = [CGFloat]()
 
@@ -38,6 +38,7 @@ public class TwistieGroup: ObservableObject {
         sectionCount += 1
         return id
     }
+
  }
 
 public struct TwistieSection<Content: View> : View {
@@ -50,27 +51,26 @@ public struct TwistieSection<Content: View> : View {
 
     // var selectedSection: Binding<Int>
 
-    var group: Binding<TwistieGroup>
+    @ObservedObject var group: TwistieGroup
 
     var sectionContent: () -> Content
 
     public var body: some View {
         HStack(alignment: .top, spacing: UIConstants.sectionSpacing) {
 
-            Button(action: { group.wrappedValue.selectedSection = sectionID }) {
+            Button(action: { group.selectedSection = sectionID }) {
                 Image(systemName: "chevron.right")
                     .frame(width: twistieSize, height: twistieSize)
-                    .rotated(by: .degrees((sectionID == group.wrappedValue.selectedSection ? 90 : 0)))
+                    .rotated(by: .degrees((sectionID == group.selectedSection ? 90 : 0)))
 
                 Text(sectionName)
                     .lineLimit(1)
 
             }
-
-            // .modifier(TextButtonStyle())
+            .modifier(TextButtonStyle())
 
             Group {
-                if sectionID == group.wrappedValue.selectedSection {
+                if sectionID == group.selectedSection {
                     sectionContent()
                 }
             }
@@ -78,9 +78,9 @@ public struct TwistieSection<Content: View> : View {
         }
     }
 
-    public init(_ sectionName: String, _ group: Binding<TwistieGroup>, @ViewBuilder content: @escaping () -> Content) {
+    public init(_ sectionName: String, _ group: TwistieGroup, @ViewBuilder content: @escaping () -> Content) {
         self.sectionName = sectionName
-        self.sectionID = group.wrappedValue.nextSectionID()
+        self.sectionID = group.nextSectionID()
         self.group = group
         self.sectionContent = content
     }
