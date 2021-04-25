@@ -324,12 +324,8 @@ public struct ChoiceSetting: View {
                 .frame(width: group.minimumLabelWidth, alignment: .trailing)
 
             Button(action: { selectorShowing = true }) {
-                HStack {
-                    Text(value.wrappedValue)
-                        .lineLimit(1)
-                        .multilineTextAlignment(.center)
-                    Image(systemName: "chevron.right")
-                }
+                Text(value.wrappedValue)
+                    .lineLimit(1)
                 .padding(UIConstants.buttonPadding)
                 .frame(width: UIConstants.settingValueWidth, alignment: .center)
                 .foregroundColor(UIConstants.controlColor)
