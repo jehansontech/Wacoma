@@ -18,7 +18,7 @@ struct LabelWidthPreferenceKey: PreferenceKey {
     }
 }
 
-public struct ItemGroup {
+public struct SettingsGroup {
 
     var labelWidth: CGFloat = 0
 
@@ -47,7 +47,7 @@ public struct TextSetting: View {
 
     let value: Binding<String>
 
-    @Binding var group: ItemGroup
+    @Binding var group: SettingsGroup
 
     @State var isEditing: Bool = false
 
@@ -83,7 +83,7 @@ public struct TextSetting: View {
     
     public init(_ name: String,
                 _ value: Binding<String>,
-                _ group: Binding<ItemGroup>) {
+                _ group: Binding<SettingsGroup>) {
         self.settingName = name
         self.value = value
         self._group = group
@@ -105,7 +105,7 @@ public struct SteppedSetting: View {
 
     let value: Binding<Int>
     
-    @Binding var group: ItemGroup
+    @Binding var group: SettingsGroup
 
     let minimum: Int
     
@@ -159,7 +159,7 @@ public struct SteppedSetting: View {
     
     public init(_ name: String,
                 _ value: Binding<Int>,
-                _ group: Binding<ItemGroup>,
+                _ group: Binding<SettingsGroup>,
                 _ minimum: Int,
                 _ maximum: Int,
                 _ deltas: [Int]) {
@@ -217,7 +217,7 @@ public struct RangeSetting: View {
 
     let value: Binding<Double>
     
-    @Binding var group: ItemGroup
+    @Binding var group: SettingsGroup
 
     var formatter: NumberFormatter = makeDefaultNumberFormatter()
 
@@ -252,7 +252,7 @@ public struct RangeSetting: View {
     
     public init(_ name: String,
                 _ value: Binding<Double>,
-                _ group: Binding<ItemGroup>,
+                _ group: Binding<SettingsGroup>,
                 _ minimum: Double,
                 _ maximum: Double,
                 _ step: Double) {
@@ -291,7 +291,7 @@ public struct ChoiceSetting: View {
 
     let value: Binding<String>
     
-    @Binding var group: ItemGroup
+    @Binding var group: SettingsGroup
 
     let choices: [String]
     
@@ -330,7 +330,7 @@ public struct ChoiceSetting: View {
     
     public init(_ name: String,
                 _ value: Binding<String>,
-                _ group: Binding<ItemGroup>,
+                _ group: Binding<SettingsGroup>,
                 _ choices: [String]) {
         self.settingName = name
         self.value = value
@@ -388,7 +388,7 @@ public struct TickyboxSetting: View {
 
     let value: Binding<Bool>
 
-    @Binding var group: ItemGroup
+    @Binding var group: SettingsGroup
 
     let trueText: String
 
@@ -420,7 +420,7 @@ public struct TickyboxSetting: View {
 
     public init(_ name: String,
                 _ value: Binding<Bool>,
-                _ group: Binding<ItemGroup>,
+                _ group: Binding<SettingsGroup>,
                 _ trueText: String,
                 _ falseText: String) {
         self.settingName = name
