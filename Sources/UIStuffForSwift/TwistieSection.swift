@@ -27,7 +27,11 @@ public class TwistieGroup: ObservableObject {
 
     private var sectionCount: Int = 0
 
-    @Published var selectedSection: Int = 0
+    @Published var selectedSection: Int = 0 {
+        didSet {
+            print("selectedSection = \(selectedSection)")
+        }
+    }
 
     var labelWidths = [CGFloat]()
 
