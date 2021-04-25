@@ -20,39 +20,40 @@ struct LabelWidthPreferenceKey: PreferenceKey {
 
 public struct SettingsGroup {
 
-    var labelWidth: CGFloat = 0
+    var minimumLabelWidth: CGFloat = 0
 
     var fieldWidth: CGFloat = UIConstants.settingValueWidth
 
     public init() {}
 
-    public init(_ minLabelWidth: CGFloat, _ minFieldWidth: CGFloat) {
-        self.labelWidth = minLabelWidth
-        self.fieldWidth = minFieldWidth
+    public init(_ minLabelWidth: CGFloat, _ fieldWidth: CGFloat) {
+        self.minimumLabelWidth = minLabelWidth
+        self.fieldWidth = fieldWidth
     }
 }
 
 
 // =================================================================================
-// MARK:- Text
+// MARK:- Tickybox
 // =================================================================================
 
-
 ///
 ///
 ///
-public struct TextSetting: View {
+public struct TickyboxSetting: View {
 
     let settingName: String
 
-    let value: Binding<String>
+    let value: Binding<Bool>
 
     @Binding var group: SettingsGroup
 
-    @State var isEditing: Bool = false
+    let trueText: String
+
+    let falseText: String
 
     public var body: some View {
-        
+
         HStack(alignment: .center, spacing: UIConstants.settingsGridSpacing) {
 
             Text(settingName)
@@ -61,34 +62,39 @@ public struct TextSetting: View {
                 .overlay(GeometryReader { proxy in
                     Color.clear.preference(key: LabelWidthPreferenceKey.self, value: proxy.size.width)
                 }).onPreferenceChange(LabelWidthPreferenceKey.self) { (value) in
-                    $group.wrappedValue.labelWidth = max(group.labelWidth, value)
+                    $group.wrappedValue.minimumLabelWidth = max(group.minimumLabelWidth, value)
                 }
-                .frame(width: group.labelWidth, alignment: .trailing)
+                .frame(width: group.minimumLabelWidth, alignment: .trailing)
 
-            TextField("",
-                      text: value,
-                      onEditingChanged: { editing in
-                        isEditing = editing
-                      })
-                .lineLimit(1)
-                .autocapitalization(.none)
-                .disableAutocorrection(true)
-                .multilineTextAlignment(.leading)
+            Button(action: {
+                value.wrappedValue = !value.wrappedValue
+            }) {
+                HStack {
+                    Spacer()
+                    Text(value.wrappedValue ? trueText : falseText)
+                }
                 .padding(UIConstants.buttonPadding)
-                .frame(minWidth: UIConstants.settingValueWidth)
-                .border(isEditing ? UIConstants.controlColor : UIConstants.darkGray)
-            
+                .frame(width: UIConstants.settingValueWidth, alignment: .trailing)
+                .foregroundColor(UIConstants.controlColor)
+                .background(RoundedRectangle(cornerRadius: 5)
+                                .opacity(0.05))
+            }
+
+            Spacer()
         }
     }
-    
+
     public init(_ name: String,
-                _ value: Binding<String>,
-                _ group: Binding<SettingsGroup>) {
+                _ value: Binding<Bool>,
+                _ group: Binding<SettingsGroup>,
+                _ trueText: String,
+                _ falseText: String) {
         self.settingName = name
         self.value = value
         self._group = group
+        self.trueText = trueText
+        self.falseText = falseText
     }
-
 }
 
 // =================================================================================
@@ -125,9 +131,9 @@ public struct SteppedSetting: View {
                 .overlay(GeometryReader { proxy in
                     Color.clear.preference(key: LabelWidthPreferenceKey.self, value: proxy.size.width)
                 }).onPreferenceChange(LabelWidthPreferenceKey.self) { (value) in
-                    $group.wrappedValue.labelWidth = max(group.labelWidth, value)
+                    $group.wrappedValue.minimumLabelWidth = max(group.minimumLabelWidth, value)
                 }
-                .frame(width: group.labelWidth, alignment: .trailing)
+                .frame(width: group.minimumLabelWidth, alignment: .trailing)
 
             TextField("", value: value, formatter: formatter)
                 .lineLimit(1)
@@ -153,8 +159,6 @@ public struct SteppedSetting: View {
 
             Spacer()
         }
-        // end HStack
-        
     }
     
     public init(_ name: String,
@@ -230,6 +234,14 @@ public struct RangeSetting: View {
         HStack(alignment: .center, spacing: UIConstants.settingsGridSpacing) {
 
             Text(settingName)
+                .lineLimit(1)
+                .fixedSize()
+                .overlay(GeometryReader { proxy in
+                    Color.clear.preference(key: LabelWidthPreferenceKey.self, value: proxy.size.width)
+                }).onPreferenceChange(LabelWidthPreferenceKey.self) { (value) in
+                    $group.wrappedValue.minimumLabelWidth = max(group.minimumLabelWidth, value)
+                }
+                .frame(width: group.minimumLabelWidth, alignment: .trailing)
 
             TextField("", value: value, formatter: formatter)
                 .lineLimit(1)
@@ -302,6 +314,14 @@ public struct ChoiceSetting: View {
         HStack(alignment: .center, spacing: UIConstants.settingsGridSpacing) {
 
             Text(settingName)
+                .lineLimit(1)
+                .fixedSize()
+                .overlay(GeometryReader { proxy in
+                    Color.clear.preference(key: LabelWidthPreferenceKey.self, value: proxy.size.width)
+                }).onPreferenceChange(LabelWidthPreferenceKey.self) { (value) in
+                    $group.wrappedValue.minimumLabelWidth = max(group.minimumLabelWidth, value)
+                }
+                .frame(width: group.minimumLabelWidth, alignment: .trailing)
 
             Button(action: { selectorShowing = true }) {
                 HStack {
@@ -376,57 +396,60 @@ struct ChoiceSettingSelector: View {
 
 
 // =================================================================================
-// MARK:- Tickybox
+// MARK:- Text
 // =================================================================================
 
 ///
 ///
 ///
-public struct TickyboxSetting: View {
+public struct TextSetting: View {
 
     let settingName: String
 
-    let value: Binding<Bool>
+    let value: Binding<String>
 
     @Binding var group: SettingsGroup
 
-    let trueText: String
-
-    let falseText: String
+    @State var isEditing: Bool = false
 
     public var body: some View {
 
         HStack(alignment: .center, spacing: UIConstants.settingsGridSpacing) {
 
             Text(settingName)
-
-            Button(action: {
-                value.wrappedValue = !value.wrappedValue
-            }) {
-                HStack {
-                    Spacer()
-                    Text(value.wrappedValue ? trueText : falseText)
+                .lineLimit(1)
+                .fixedSize()
+                .overlay(GeometryReader { proxy in
+                    Color.clear.preference(key: LabelWidthPreferenceKey.self, value: proxy.size.width)
+                }).onPreferenceChange(LabelWidthPreferenceKey.self) { (value) in
+                    $group.wrappedValue.minimumLabelWidth = max(group.minimumLabelWidth, value)
                 }
-                .padding(UIConstants.buttonPadding)
-                .frame(width: UIConstants.settingValueWidth, alignment: .trailing)
-                .foregroundColor(UIConstants.controlColor)
-                .background(RoundedRectangle(cornerRadius: 5)
-                                .opacity(0.05))
-            }
+                .frame(width: group.minimumLabelWidth, alignment: .trailing)
 
-            Spacer()
+            TextField("",
+                      text: value,
+                      onEditingChanged: { editing in
+                        isEditing = editing
+                      })
+                .lineLimit(1)
+                .autocapitalization(.none)
+                .disableAutocorrection(true)
+                .multilineTextAlignment(.leading)
+                .padding(UIConstants.buttonPadding)
+                .frame(minWidth: UIConstants.settingValueWidth)
+                .border(isEditing ? UIConstants.controlColor : UIConstants.darkGray)
+
         }
     }
 
     public init(_ name: String,
-                _ value: Binding<Bool>,
-                _ group: Binding<SettingsGroup>,
-                _ trueText: String,
-                _ falseText: String) {
+                _ value: Binding<String>,
+                _ group: Binding<SettingsGroup>) {
         self.settingName = name
         self.value = value
         self._group = group
-        self.trueText = trueText
-        self.falseText = falseText
     }
+
 }
+
+
