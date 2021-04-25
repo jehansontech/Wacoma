@@ -38,29 +38,25 @@ public struct TwistieSection<Content: View> : View {
     public var body: some View {
         HStack(alignment: .top, spacing: UIConstants.sectionSpacing) {
 
-//            GeometryReader { geometry in
-                Button(action: { selectedSection.wrappedValue = sectionID })
-                {
-                    Image(systemName: "chevron.right")
-                        .frame(width: twistieSize, height: twistieSize)
-                        .rotated(by: .degrees((sectionID == selectedSection.wrappedValue ? 90 : 0)))
+            Button(action: { selectedSection.wrappedValue = sectionID })
+            {
+                Image(systemName: "chevron.right")
+                    .frame(width: twistieSize, height: twistieSize)
+                    .rotated(by: .degrees((sectionID == selectedSection.wrappedValue ? 90 : 0)))
 
-                    Text(sectionName)
-                        .lineLimit(1)
+                Text(sectionName)
+                    .lineLimit(1)
 
-                }
-                .padding(UIConstants.buttonPadding)
-                .border(Color.gray)
-//                .preference(
-//                    key: SectionStatePreferenceKey.self,
-//                    value: [SectionState(nameWidth: geometry.frame(in: CoordinateSpace.global).width)]
-//                )
-//            }
-
-            if sectionID == selectedSection.wrappedValue {
-                sectionContent()
-                    .border(Color.blue)
             }
+            .border(Color.blue)
+
+            Group {
+                if sectionID == selectedSection.wrappedValue {
+                    sectionContent()
+                }
+            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .border(Color.blue)
         }
     }
 
