@@ -25,7 +25,7 @@ import SwiftUI
 
 public struct TwistieGroup {
 
-    var selection: String? = nil
+    public var selection: String? = nil
 
     public init() {}
 
