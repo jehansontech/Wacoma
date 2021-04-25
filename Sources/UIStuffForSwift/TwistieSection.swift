@@ -29,6 +29,10 @@ public struct TwistieGroup {
 
     public init() {}
 
+    public init(_ selection: String) {
+        self.selection = selection
+    }
+
  }
 
 public struct TwistieSection<Content: View> : View {
