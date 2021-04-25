@@ -7,25 +7,10 @@
 
 import SwiftUI
 
+protocol Setting : View {
 
-// =================================================================================
-// MARK:- Setting name
-// =================================================================================
-
-struct SettingName: View {
-
-    var settingName: String
-
-    var body: some View {
-        GeometryReader { geometry in
-            Text(settingName)
-        }
-    }
-
-    init(_ name: String) {
-        self.settingName = name
-    }
 }
+
 
 // =================================================================================
 // MARK:- Text
@@ -35,19 +20,19 @@ struct SettingName: View {
 ///
 ///
 ///
-public struct TextSetting : View {
+public struct TextSetting: Setting {
 
     let settingName: String
 
     let value: Binding<String>
-    
+
     @State var isEditing: Bool = false
     
     public var body: some View {
         
         HStack(alignment: .center, spacing: UIConstants.settingsGridSpacing) {
 
-            SettingName(settingName)
+            Text(settingName)
 
             TextField("",
                       text: value,
@@ -70,6 +55,7 @@ public struct TextSetting : View {
         self.settingName = name
         self.value = value
     }
+
 }
 
 // =================================================================================
@@ -80,7 +66,7 @@ public struct TextSetting : View {
 ///
 ///
 ///
-public struct SteppedSetting: View {
+public struct SteppedSetting: Setting {
     
     let settingName: String
 
@@ -98,7 +84,7 @@ public struct SteppedSetting: View {
         
         HStack(alignment: .center, spacing: UIConstants.settingsGridSpacing) {
 
-            SettingName(settingName)
+            Text(settingName)
 
             TextField("", value: value, formatter: formatter)
                 .lineLimit(1)
@@ -175,7 +161,7 @@ public struct SteppedSetting: View {
 ///
 ///
 ///
-public struct RangeSetting: View {
+public struct RangeSetting: Setting {
     
     let settingName: String
 
@@ -191,7 +177,7 @@ public struct RangeSetting: View {
         
         HStack(alignment: .center, spacing: UIConstants.settingsGridSpacing) {
 
-            SettingName(settingName)
+            Text(settingName)
 
             TextField("", value: value, formatter: formatter)
                 .lineLimit(1)
@@ -241,7 +227,7 @@ public struct RangeSetting: View {
 ///
 /// ChoiceSetting: Select an item from a given list, which is presented in a popover
 ///
-public struct ChoiceSetting: View {
+public struct ChoiceSetting: Setting {
     
     let settingName: String
 
@@ -255,7 +241,7 @@ public struct ChoiceSetting: View {
         
         HStack(alignment: .center, spacing: UIConstants.settingsGridSpacing) {
 
-            SettingName(settingName)
+            Text(settingName)
 
             Button(action: { selectorShowing = true }) {
                 HStack {
@@ -332,7 +318,7 @@ struct ChoiceSettingSelector: View {
 ///
 ///
 ///
-public struct TickyboxSetting: View {
+public struct TickyboxSetting: Setting {
 
     let settingName: String
 
@@ -346,7 +332,7 @@ public struct TickyboxSetting: View {
 
         HStack(alignment: .center, spacing: UIConstants.settingsGridSpacing) {
 
-            SettingName(settingName)
+            Text(settingName)
 
             Button(action: {
                 value.wrappedValue = !value.wrappedValue
