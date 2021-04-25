@@ -23,6 +23,19 @@ import SwiftUI
 //    // let selectedSection: Int
 //}
 
+public struct TwistieGroup {
+
+    private var sectionCount: Int = 0
+
+    var selectedSection: Int = 0
+
+    mutating func nextSectionID() -> Int {
+        let id = sectionCount
+        sectionCount += 1
+        return id
+    }
+ }
+
 public struct TwistieSection<Content: View> : View {
 
     let twistieSize: CGFloat = 40
@@ -31,42 +44,42 @@ public struct TwistieSection<Content: View> : View {
 
     let sectionID: Int
 
-    var selectedSection: Binding<Int>
+    // var selectedSection: Binding<Int>
+
+    var group: Binding<TwistieGroup>
 
     var sectionContent: () -> Content
 
     public var body: some View {
         HStack(alignment: .top, spacing: UIConstants.sectionSpacing) {
 
-            Button(action: { selectedSection.wrappedValue = sectionID })
-            {
+            Button(action: { group.wrappedValue.selectedSection = sectionID }) {
                 Image(systemName: "chevron.right")
                     .frame(width: twistieSize, height: twistieSize)
-                    .rotated(by: .degrees((sectionID == selectedSection.wrappedValue ? 90 : 0)))
+                    .rotated(by: .degrees((sectionID == group.wrappedValue.selectedSection ? 90 : 0)))
 
                 Text(sectionName)
                     .lineLimit(1)
 
             }
-            .border(Color.blue)
+
+            // .modifier(TextButtonStyle())
 
             Group {
-                if sectionID == selectedSection.wrappedValue {
+                if sectionID == group.wrappedValue.selectedSection {
                     sectionContent()
                 }
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .border(Color.blue)
         }
     }
 
-    public init(_ sectionName: String, _ sectionID: Int, _ selectedSection: Binding<Int>, @ViewBuilder content: @escaping () -> Content) {
+    public init(_ sectionName: String, _ group: Binding<TwistieGroup>, @ViewBuilder content: @escaping () -> Content) {
         self.sectionName = sectionName
-        self.sectionID = sectionID
-        self.selectedSection = selectedSection
+        self.sectionID = group.wrappedValue.nextSectionID()
+        self.group = group
         self.sectionContent = content
     }
-
 }
 
 //extension VerticalAlignment {
