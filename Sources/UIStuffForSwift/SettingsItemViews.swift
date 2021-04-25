@@ -79,10 +79,7 @@ public struct TickyboxSetting: View {
             Button(action: {
                 $value.wrappedValue = !value
             }) {
-                HStack {
-                    // Spacer()
-                    Text($value.wrappedValue ? trueText : falseText)
-                }
+                Text($value.wrappedValue ? trueText : falseText)
                 .padding(UIConstants.buttonPadding)
                 .frame(width: UIConstants.settingValueWidth, alignment: .center)
                 .foregroundColor(UIConstants.controlColor)
