@@ -18,17 +18,27 @@ struct LabelWidthPreferenceKey: PreferenceKey {
     }
 }
 
+struct FieldWidthPreferenceKey: PreferenceKey {
+    typealias Value = CGFloat
+
+    static var defaultValue: CGFloat = 0
+
+    static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
+        value = nextValue()
+    }
+}
+
 public struct SettingsGroup {
 
     var minimumLabelWidth: CGFloat = 0
 
-    var fieldWidth: CGFloat = UIConstants.settingValueWidth
+    var minimumFieldWidth: CGFloat = UIConstants.settingValueWidth
 
     public init() {}
 
-    public init(_ minLabelWidth: CGFloat, _ fieldWidth: CGFloat) {
+    public init(_ minLabelWidth: CGFloat, _ minimumFieldWidth: CGFloat) {
         self.minimumLabelWidth = minLabelWidth
-        self.fieldWidth = fieldWidth
+        self.minimumFieldWidth = minimumFieldWidth
     }
 }
 
@@ -44,7 +54,7 @@ public struct TickyboxSetting: View {
 
     let settingName: String
 
-    let value: Binding<Bool>
+    @Binding var value: Bool
 
     @Binding var group: SettingsGroup
 
@@ -67,11 +77,11 @@ public struct TickyboxSetting: View {
                 .frame(width: group.minimumLabelWidth, alignment: .trailing)
 
             Button(action: {
-                value.wrappedValue = !value.wrappedValue
+                $value.wrappedValue = !value
             }) {
                 HStack {
                     // Spacer()
-                    Text(value.wrappedValue ? trueText : falseText)
+                    Text($value.wrappedValue ? trueText : falseText)
                 }
                 .padding(UIConstants.buttonPadding)
                 .frame(width: UIConstants.settingValueWidth, alignment: .center)
@@ -90,7 +100,7 @@ public struct TickyboxSetting: View {
                 _ trueText: String,
                 _ falseText: String) {
         self.settingName = name
-        self.value = value
+        self._value = value
         self._group = group
         self.trueText = trueText
         self.falseText = falseText
