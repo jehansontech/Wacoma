@@ -70,11 +70,11 @@ public struct TickyboxSetting: View {
                 value.wrappedValue = !value.wrappedValue
             }) {
                 HStack {
-                    Spacer()
+                    // Spacer()
                     Text(value.wrappedValue ? trueText : falseText)
                 }
                 .padding(UIConstants.buttonPadding)
-                .frame(width: UIConstants.settingValueWidth, alignment: .trailing)
+                .frame(width: UIConstants.settingValueWidth, alignment: .center)
                 .foregroundColor(UIConstants.controlColor)
                 .background(RoundedRectangle(cornerRadius: 5)
                                 .opacity(0.05))
@@ -327,7 +327,7 @@ public struct ChoiceSetting: View {
                 HStack {
                     Text(value.wrappedValue)
                         .lineLimit(1)
-                        .multilineTextAlignment(.trailing)
+                        .multilineTextAlignment(.center)
                     Image(systemName: "chevron.right")
                 }
                 .padding(UIConstants.buttonPadding)
