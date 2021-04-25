@@ -47,6 +47,7 @@ public struct TwistieSection<Content: View> : View {
             Button(action: toggleSelection) {
                 HStack(alignment: .center, spacing: 0) {
                     Image(systemName: "chevron.right")
+                        .foregroundColor(UIConstants.controlColor)
                         .frame(width: twistieSize, height: twistieSize)
                         .rotated(by: .degrees(isSelected() ? 90 : 0))
 
