@@ -63,7 +63,7 @@ public struct TwistieSection<Content: View> : View {
                     .frame(width: twistieSize, height: twistieSize)
                     .rotated(by: .degrees((sectionID == group.selectedSection ? 90 : 0)))
 
-                Text(sectionName)
+                Text("\(sectionName)[\(sectionID)]")
                     .lineLimit(1)
 
             }
