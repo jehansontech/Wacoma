@@ -25,23 +25,16 @@ import SwiftUI
 
 public class TwistieGroup: ObservableObject {
 
-    private var sectionCount: Int = 0
 
-    @Published var selectedSection: Int = 0 {
+    @Published var selection: String = "" {
         didSet {
-            print("selectedSection = \(selectedSection)")
+            print("selection = \(selection)")
         }
     }
 
     var labelWidths = [CGFloat]()
 
     public init() {}
-
-    func nextSectionID() -> Int {
-        let id = sectionCount
-        sectionCount += 1
-        return id
-    }
 
  }
 
@@ -50,8 +43,6 @@ public struct TwistieSection<Content: View> : View {
     let twistieSize: CGFloat = 40
 
     let sectionName: String
-
-    let sectionID: Int
 
     // var selectedSection: Binding<Int>
 
@@ -62,19 +53,19 @@ public struct TwistieSection<Content: View> : View {
     public var body: some View {
         HStack(alignment: .top, spacing: UIConstants.sectionSpacing) {
 
-            Button(action: { group.selectedSection = sectionID }) {
+            Button(action: { group.selection = sectionName }) {
                 Image(systemName: "chevron.right")
                     .frame(width: twistieSize, height: twistieSize)
-                    .rotated(by: .degrees((sectionID == group.selectedSection ? 90 : 0)))
+                    .rotated(by: .degrees((sectionName == group.selection ? 90 : 0)))
 
-                Text("\(sectionName)[\(sectionID)]")
+                Text(sectionName)
                     .lineLimit(1)
 
             }
             .modifier(TextButtonStyle())
 
             Group {
-                if sectionID == group.selectedSection {
+                if sectionName == group.selection {
                     sectionContent()
                 }
             }
@@ -84,7 +75,6 @@ public struct TwistieSection<Content: View> : View {
 
     public init(_ sectionName: String, _ group: TwistieGroup, @ViewBuilder content: @escaping () -> Content) {
         self.sectionName = sectionName
-        self.sectionID = group.nextSectionID()
         self.group = group
         self.sectionContent = content
     }
