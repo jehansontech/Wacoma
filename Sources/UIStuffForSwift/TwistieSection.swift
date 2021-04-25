@@ -65,10 +65,9 @@ public struct TwistieSection<Content: View> : View {
 
             if sectionID == selectedSection.wrappedValue {
                 sectionContent()
+                    .border(Color.blue)
             }
         }
-        .animation(.easeInOut)
-
     }
 
     public init(_ sectionName: String, _ selectedSection: Binding<Int>, @ViewBuilder content: @escaping () -> Content) {
