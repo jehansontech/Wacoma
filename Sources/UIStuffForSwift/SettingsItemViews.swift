@@ -9,6 +9,23 @@ import SwiftUI
 
 
 // =================================================================================
+// MARK:- Setting name
+// =================================================================================
+
+struct SettingName: View {
+
+    var settingName: String
+
+    var body: some View {
+        Text(settingName)
+    }
+
+    init(_ name: String) {
+        self.settingName = name
+    }
+}
+
+// =================================================================================
 // MARK:- Text
 // =================================================================================
 
@@ -28,7 +45,7 @@ public struct TextSetting : View {
         
         HStack(alignment: .center, spacing: UIConstants.settingsGridSpacing) {
 
-            Text(settingName)
+            SettingName(settingName)
 
             TextField("",
                       text: value,
@@ -79,7 +96,7 @@ public struct SteppedSetting: View {
         
         HStack(alignment: .center, spacing: UIConstants.settingsGridSpacing) {
 
-            Text(settingName)
+            SettingName(settingName)
 
             TextField("", value: value, formatter: formatter)
                 .lineLimit(1)
@@ -172,7 +189,7 @@ public struct RangeSetting: View {
         
         HStack(alignment: .center, spacing: UIConstants.settingsGridSpacing) {
 
-            Text(settingName)
+            SettingName(settingName)
 
             TextField("", value: value, formatter: formatter)
                 .lineLimit(1)
@@ -236,7 +253,7 @@ public struct ChoiceSetting: View {
         
         HStack(alignment: .center, spacing: UIConstants.settingsGridSpacing) {
 
-            Text(settingName)
+            SettingName(settingName)
 
             Button(action: { selectorShowing = true }) {
                 HStack {
@@ -327,7 +344,7 @@ public struct TickyboxSetting: View {
 
         HStack(alignment: .center, spacing: UIConstants.settingsGridSpacing) {
 
-            Text(settingName)
+            SettingName(settingName)
 
             Button(action: {
                 value.wrappedValue = !value.wrappedValue
