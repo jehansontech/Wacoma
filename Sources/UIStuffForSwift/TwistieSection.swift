@@ -25,7 +25,7 @@ import SwiftUI
 
 public struct TwistieGroup {
 
-    var selection: String = ""
+    var selection: String? = nil
 
     public init() {}
 
@@ -44,20 +44,20 @@ public struct TwistieSection<Content: View> : View {
 
     public var body: some View {
         VStack(alignment: .leading, spacing: 0) {
-            Button(action: { group.wrappedValue.selection = sectionName }) {
+            Button(action: toggleSelection) {
                 Image(systemName: "chevron.right")
                     .foregroundColor(UIConstants.controlColor)
                     .background(RoundedRectangle(cornerRadius: UIConstants.buttonCornerRadius)
                                     .opacity(UIConstants.buttonOpacity))
                     .frame(width: twistieSize, height: twistieSize)
-                    .rotated(by: .degrees((sectionName == group.wrappedValue.selection ? 90 : 0)))
+                    .rotated(by: .degrees(isSelected() ? 90 : 0))
 
                 Text(sectionName)
                     .lineLimit(1)
             }
             .padding(UIConstants.buttonPadding)
 
-            if sectionName == group.wrappedValue.selection {
+            if isSelected() {
                 sectionContent()
                     .padding(EdgeInsets(top: UIConstants.buttonSpacing, leading: leftInset, bottom: 0, trailing: 0))
             }
@@ -68,6 +68,19 @@ public struct TwistieSection<Content: View> : View {
         self.sectionName = sectionName
         self.group = group
         self.sectionContent = content
+    }
+
+    func toggleSelection() {
+        if group.wrappedValue.selection == sectionName {
+            group.wrappedValue.selection = nil
+        }
+        else {
+            group.wrappedValue.selection = sectionName
+        }
+    }
+
+    func isSelected() -> Bool {
+        return group.wrappedValue.selection == self.sectionName
     }
 }
 
