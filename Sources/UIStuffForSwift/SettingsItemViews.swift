@@ -116,7 +116,7 @@ public struct SteppedSetting: View {
     
     let settingName: String
 
-    let value: Binding<Int>
+    @Binding var value: Int
     
     @Binding var group: SettingsGroup
 
@@ -142,7 +142,7 @@ public struct SteppedSetting: View {
                 }
                 .frame(width: group.minimumLabelWidth, alignment: .trailing)
 
-            TextField("", value: value, formatter: formatter)
+            TextField("", value: $value, formatter: formatter)
                 .lineLimit(1)
                 .multilineTextAlignment(.trailing)
                 .padding(UIConstants.buttonPadding)
@@ -153,7 +153,7 @@ public struct SteppedSetting: View {
             ForEach(deltas.indices, id: \.self) { idx in
                 
                 Button (action: {
-                    setValue(value.wrappedValue + deltas[idx])
+                    setValue(value + deltas[idx])
                 }) {
                     let label = (deltas[idx] < 0) ? "\(deltas[idx])" : "+\(deltas[idx])"
                     Text(label)
@@ -175,7 +175,7 @@ public struct SteppedSetting: View {
                 _ maximum: Int,
                 _ deltas: [Int]) {
         self.settingName = name
-        self.value = value
+        self._value = value
         self._group = group
         self.minimum = minimum
         self.maximum = maximum
@@ -190,7 +190,7 @@ public struct SteppedSetting: View {
     }
     
     private func setValue(_ newValue: Int) {
-        value.wrappedValue = newValue.clamp(minimum, maximum)
+        $value.wrappedValue = newValue.clamp(minimum, maximum)
     }
 
     private static func makeDefaultNumberFormatter() -> NumberFormatter {
