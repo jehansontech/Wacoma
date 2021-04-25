@@ -331,7 +331,7 @@ public struct ChoiceSetting: View {
                     Image(systemName: "chevron.right")
                 }
                 .padding(UIConstants.buttonPadding)
-                .frame(width: UIConstants.settingValueWidth, alignment: .trailing)
+                .frame(width: UIConstants.settingValueWidth, alignment: .center)
                 .foregroundColor(UIConstants.controlColor)
                 .background(RoundedRectangle(cornerRadius: 5)
                                 .opacity(0.05))
