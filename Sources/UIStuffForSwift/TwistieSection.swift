@@ -33,8 +33,8 @@ public struct TwistieGroup {
 
 public struct TwistieSection<Content: View> : View {
 
-    let leftInset: CGFloat = 30
     let twistieSize: CGFloat = 30
+    let leftInset: CGFloat = 32
 
     let sectionName: String
 
@@ -48,9 +48,6 @@ public struct TwistieSection<Content: View> : View {
                 HStack(alignment: .center, spacing: 0) {
                     Image(systemName: "chevron.right")
                         .frame(width: twistieSize, height: twistieSize)
-                        .foregroundColor(UIConstants.controlColor)
-                        .background(RoundedRectangle(cornerRadius: UIConstants.buttonCornerRadius)
-                                        .opacity(UIConstants.buttonOpacity))
                         .rotated(by: .degrees(isSelected() ? 90 : 0))
 
                     Text(sectionName)
