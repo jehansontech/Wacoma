@@ -34,7 +34,7 @@ public struct TwistieGroup {
 public struct TwistieSection<Content: View> : View {
 
     let leftInset: CGFloat = 40
-    let twistieSize: CGFloat = 30
+    let twistieSize: CGFloat = 25
 
     let sectionName: String
 
@@ -59,9 +59,8 @@ public struct TwistieSection<Content: View> : View {
                 HStack(alignment: .top, spacing: 0) {
                     Spacer().frame(width: leftInset)
                     sectionContent()
+                        .border(Color.red)
                 }
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .border(Color.red)
             }
         }
     }
