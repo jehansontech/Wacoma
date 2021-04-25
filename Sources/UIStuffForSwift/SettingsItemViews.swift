@@ -17,7 +17,9 @@ struct SettingName: View {
     var settingName: String
 
     var body: some View {
-        Text(settingName)
+        GeometryReader { geometry in
+            Text(settingName)
+        }
     }
 
     init(_ name: String) {
@@ -55,7 +57,7 @@ public struct TextSetting : View {
                 .lineLimit(1)
                 .autocapitalization(.none)
                 .disableAutocorrection(true)
-                .multilineTextAlignment(.trailing)
+                .multilineTextAlignment(.leading)
                 .padding(UIConstants.buttonPadding)
                 .frame(minWidth: UIConstants.settingValueWidth)
                 .border(isEditing ? UIConstants.controlColor : UIConstants.darkGray)
