@@ -34,7 +34,7 @@ public struct TwistieGroup {
 public struct TwistieSection<Content: View> : View {
 
     let leftInset: CGFloat = 40
-    let twistieSize: CGFloat = 40
+    let twistieSize: CGFloat = 30
 
     let sectionName: String
 
@@ -53,6 +53,7 @@ public struct TwistieSection<Content: View> : View {
                     .lineLimit(1)
             }
             .modifier(TextButtonStyle())
+            .border(Color.red)
 
             if sectionName == group.wrappedValue.selection {
                 HStack(alignment: .top, spacing: 0) {
@@ -60,6 +61,7 @@ public struct TwistieSection<Content: View> : View {
                     sectionContent()
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .border(Color.red)
             }
         }
     }
