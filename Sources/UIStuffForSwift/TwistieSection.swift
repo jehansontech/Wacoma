@@ -34,7 +34,8 @@ public struct TwistieGroup {
 public struct TwistieSection<Content: View> : View {
 
     let twistieSize: CGFloat = 30
-    let leftInset: CGFloat = 32
+    let sectionContentLeadingInset: CGFloat = 32
+    let sectionContentTopInset: CGFloat = 0
 
     let sectionName: String
 
@@ -59,7 +60,7 @@ public struct TwistieSection<Content: View> : View {
 
             if isSelected() {
                 sectionContent()
-                    .padding(EdgeInsets(top: UIConstants.buttonSpacing, leading: leftInset, bottom: 0, trailing: 0))
+                    .padding(EdgeInsets(top: sectionContentTopInset, leading: sectionContentLeadingInset, bottom: sectionContentTopInset, trailing: 0))
             }
         }
     }
