@@ -46,16 +46,16 @@ public struct TwistieSection<Content: View> : View {
         VStack(alignment: .leading, spacing: 0) {
             Button(action: toggleSelection) {
                 Image(systemName: "chevron.right")
+                    .foregroundColor(UIConstants.controlColor)
+                    .background(RoundedRectangle(cornerRadius: UIConstants.buttonCornerRadius)
+                                    .opacity(UIConstants.buttonOpacity))
                     .frame(width: twistieSize, height: twistieSize)
                     .rotated(by: .degrees(isSelected() ? 90 : 0))
 
                 Text(sectionName)
                     .lineLimit(1)
+                    .multilineTextAlignment(.leading)
             }
-            .foregroundColor(UIConstants.controlColor)
-            .background(RoundedRectangle(cornerRadius: UIConstants.buttonCornerRadius)
-                            .opacity(UIConstants.buttonOpacity))
-            .padding(UIConstants.buttonPadding)
 
             if isSelected() {
                 sectionContent()
