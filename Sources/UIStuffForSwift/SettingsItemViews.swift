@@ -17,7 +17,9 @@ import SwiftUI
 ///
 ///
 public struct TextSetting : View {
-    
+
+    let settingName: String
+
     let value: Binding<String>
     
     @State var isEditing: Bool = false
@@ -25,6 +27,9 @@ public struct TextSetting : View {
     public var body: some View {
         
         HStack {
+
+            Text(settingName)
+
             TextField("",
                       text: value,
                       onEditingChanged: { editing in
@@ -33,19 +38,20 @@ public struct TextSetting : View {
                 .lineLimit(1)
                 .autocapitalization(.none)
                 .disableAutocorrection(true)
-                .multilineTextAlignment(.trailing)
+                .multilineTextAlignment(.leading)
                 .padding(UIConstants.buttonPadding)
                 .frame(minWidth: UIConstants.settingValueWidth)
                 .border(isEditing ? UIConstants.controlColor : UIConstants.darkGray)
             
             Spacer()
+                .layoutPriority(1)
         }
         .frame(maxWidth: .infinity)
-        // .border(Color.gray)
         // end HStack
     }
     
-    public init(_ value: Binding<String>) {
+    public init(_ name: String, _ value: Binding<String>) {
+        self.settingName = name
         self.value = value
     }
 }
@@ -60,6 +66,8 @@ public struct TextSetting : View {
 ///
 public struct SteppedSetting: View {
     
+    let settingName: String
+
     let value: Binding<Int>
     
     let minimum: Int
@@ -73,6 +81,9 @@ public struct SteppedSetting: View {
     public var body: some View {
         
         HStack {
+
+            Text(settingName)
+
             TextField("", value: value, formatter: formatter)
                 .lineLimit(1)
                 .multilineTextAlignment(.trailing)
@@ -103,7 +114,8 @@ public struct SteppedSetting: View {
         
     }
     
-    public init(_ value: Binding<Int>, _ minimum: Int, _ maximum: Int, _ deltas: [Int]) {
+    public init(_ name: String, _ value: Binding<Int>, _ minimum: Int, _ maximum: Int, _ deltas: [Int]) {
+        self.settingName = name
         self.value = value
         self.minimum = minimum
         self.maximum = maximum
@@ -151,6 +163,8 @@ public struct SteppedSetting: View {
 ///
 public struct RangeSetting: View {
     
+    let settingName: String
+
     let value: Binding<Double>
     
     var formatter: NumberFormatter = makeDefaultNumberFormatter()
@@ -162,6 +176,8 @@ public struct RangeSetting: View {
     public var body: some View {
         
         HStack {
+
+            Text(settingName)
 
             TextField("", value: value, formatter: formatter)
                 .lineLimit(1)
@@ -182,7 +198,8 @@ public struct RangeSetting: View {
         // .border(Color.gray)
     }
     
-    public init(_ value: Binding<Double>, _ minimum: Double, _ maximum: Double, _ step: Double) {
+    public init(_ name: String, _ value: Binding<Double>, _ minimum: Double, _ maximum: Double, _ step: Double) {
+        self.settingName = name
         self.value = value
         self.range = minimum...maximum
         self.step = step
@@ -212,6 +229,8 @@ public struct RangeSetting: View {
 ///
 public struct ChoiceSetting: View {
     
+    let settingName: String
+
     let value: Binding<String>
     
     let choices: [String]
@@ -221,11 +240,14 @@ public struct ChoiceSetting: View {
     public var body: some View {
         
         HStack {
+
+            Text(settingName)
+
             Button(action: { selectorShowing = true }) {
                 HStack {
-                    TextField("", text: value)
+                    Text(value.wrappedValue)
                         .lineLimit(1)
-                        .disabled(true)
+                        .multilineTextAlignment(.trailing)
                     Image(systemName: "chevron.right")
                 }
                 .padding(UIConstants.buttonPadding)
@@ -246,7 +268,8 @@ public struct ChoiceSetting: View {
         
     }
     
-    public init(_ value: Binding<String>, _ choices: [String]) {
+    public init(_ name: String, _ value: Binding<String>, _ choices: [String]) {
+        self.settingName = name
         self.value = value
         self.choices = choices
     }
@@ -259,7 +282,7 @@ public struct ChoiceSetting: View {
 struct ChoiceSettingSelector: View {
     
     @Environment(\.presentationMode) var presentationMode
-    
+
     let value: Binding<String>
     
     let choices: [String]
@@ -297,6 +320,8 @@ struct ChoiceSettingSelector: View {
 ///
 public struct TickyboxSetting: View {
 
+    let settingName: String
+
     let value: Binding<Bool>
 
     let trueText: String
@@ -305,24 +330,28 @@ public struct TickyboxSetting: View {
 
     public var body: some View {
 
-        Button(action: {
-            value.wrappedValue = !value.wrappedValue
-        }) {
-            HStack {
-                Spacer()
-                Text(value.wrappedValue ? trueText : falseText)
-            }
-            .padding(UIConstants.buttonPadding)
-            .frame(width: UIConstants.settingValueWidth, alignment: .trailing)
-            .foregroundColor(UIConstants.controlColor)
-            .background(RoundedRectangle(cornerRadius: 5)
-                            .opacity(0.05))
-        }
+        HStack {
 
-        // Spacer()
+            Text(settingName)
+
+            Button(action: {
+                value.wrappedValue = !value.wrappedValue
+            }) {
+                HStack {
+                    Spacer()
+                    Text(value.wrappedValue ? trueText : falseText)
+                }
+                .padding(UIConstants.buttonPadding)
+                .frame(width: UIConstants.settingValueWidth, alignment: .trailing)
+                .foregroundColor(UIConstants.controlColor)
+                .background(RoundedRectangle(cornerRadius: 5)
+                                .opacity(0.05))
+            }
+        }
     }
 
-    public init(_ value: Binding<Bool>, _ trueText: String, _ falseText: String) {
+    public init(_ name: String, _ value: Binding<Bool>, _ trueText: String, _ falseText: String) {
+        self.settingName = name
         self.value = value
         self.trueText = trueText
         self.falseText = falseText
