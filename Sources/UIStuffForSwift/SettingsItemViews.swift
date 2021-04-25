@@ -54,7 +54,7 @@ public struct TickyboxSetting: View {
 
     let settingName: String
 
-    @Binding var value: Bool
+    @Binding var settingValue: Bool
 
     @Binding var group: SettingsGroup
 
@@ -77,9 +77,9 @@ public struct TickyboxSetting: View {
                 .frame(width: group.minimumLabelWidth, alignment: .trailing)
 
             Button(action: {
-                $value.wrappedValue = !value
+                $settingValue.wrappedValue = !settingValue
             }) {
-                Text($value.wrappedValue ? trueText : falseText)
+                Text($settingValue.wrappedValue ? trueText : falseText)
                 .padding(UIConstants.buttonPadding)
                 .frame(width: UIConstants.settingValueWidth, alignment: .center)
                 .foregroundColor(UIConstants.controlColor)
@@ -97,7 +97,7 @@ public struct TickyboxSetting: View {
                 _ trueText: String,
                 _ falseText: String) {
         self.settingName = name
-        self._value = value
+        self._settingValue = value
         self._group = group
         self.trueText = trueText
         self.falseText = falseText
@@ -116,7 +116,7 @@ public struct SteppedSetting: View {
     
     let settingName: String
 
-    @Binding var value: Int
+    @Binding var settingValue: Int
     
     @Binding var group: SettingsGroup
 
@@ -142,7 +142,7 @@ public struct SteppedSetting: View {
                 }
                 .frame(width: group.minimumLabelWidth, alignment: .trailing)
 
-            TextField("", value: $value, formatter: formatter)
+            TextField("", value: $settingValue, formatter: formatter)
                 .lineLimit(1)
                 .multilineTextAlignment(.trailing)
                 .padding(UIConstants.buttonPadding)
@@ -153,7 +153,7 @@ public struct SteppedSetting: View {
             ForEach(deltas.indices, id: \.self) { idx in
                 
                 Button (action: {
-                    setValue(value + deltas[idx])
+                    setValue(settingValue + deltas[idx])
                 }) {
                     let label = (deltas[idx] < 0) ? "\(deltas[idx])" : "+\(deltas[idx])"
                     Text(label)
@@ -175,7 +175,7 @@ public struct SteppedSetting: View {
                 _ maximum: Int,
                 _ deltas: [Int]) {
         self.settingName = name
-        self._value = value
+        self._settingValue = value
         self._group = group
         self.minimum = minimum
         self.maximum = maximum
@@ -190,7 +190,7 @@ public struct SteppedSetting: View {
     }
     
     private func setValue(_ newValue: Int) {
-        $value.wrappedValue = newValue.clamp(minimum, maximum)
+        $settingValue.wrappedValue = newValue.clamp(minimum, maximum)
     }
 
     private static func makeDefaultNumberFormatter() -> NumberFormatter {
@@ -226,7 +226,7 @@ public struct RangeSetting: View {
     
     let settingName: String
 
-    let value: Binding<Double>
+    @Binding var settingValue: Double
     
     @Binding var group: SettingsGroup
 
@@ -250,7 +250,7 @@ public struct RangeSetting: View {
                 }
                 .frame(width: group.minimumLabelWidth, alignment: .trailing)
 
-            TextField("", value: value, formatter: formatter)
+            TextField("", value: $settingValue, formatter: formatter)
                 .lineLimit(1)
                 .multilineTextAlignment(.trailing)
                 .padding(UIConstants.buttonPadding)
@@ -258,7 +258,7 @@ public struct RangeSetting: View {
                 .border(UIConstants.darkGray)
                 .disabled(true)
 
-            Slider(value: value, in: range, step: step)
+            Slider(value: $settingValue, in: range, step: step)
                 .accentColor(UIConstants.controlColor)
                 .foregroundColor(UIConstants.controlColor)
                 .frame(minWidth: UIConstants.settingSliderWidth, maxWidth: .infinity)
@@ -276,7 +276,7 @@ public struct RangeSetting: View {
                 _ maximum: Double,
                 _ step: Double) {
         self.settingName = name
-        self.value = value
+        self._settingValue = value
         self._group = group
         self.range = minimum...maximum
         self.step = step
@@ -308,7 +308,7 @@ public struct ChoiceSetting: View {
     
     let settingName: String
 
-    let value: Binding<String>
+    @Binding var settingValue: String
     
     @Binding var group: SettingsGroup
 
@@ -331,7 +331,7 @@ public struct ChoiceSetting: View {
                 .frame(width: group.minimumLabelWidth, alignment: .trailing)
 
             Button(action: { selectorShowing = true }) {
-                Text(value.wrappedValue)
+                Text(settingValue)
                     .lineLimit(1)
                 .padding(UIConstants.buttonPadding)
                 .frame(width: UIConstants.settingValueWidth, alignment: .center)
@@ -340,15 +340,14 @@ public struct ChoiceSetting: View {
                                 .opacity(0.05))
             }
             .popover(isPresented: $selectorShowing, arrowEdge: .leading) {
-                ChoiceSettingSelector(value, choices)
+                ChoiceSettingSelector($settingValue, choices)
                     .modifier(PopStyle())
             }
             
             Spacer()
         }
         .frame(maxWidth: .infinity)
-        // .border(Color.gray)
-        
+
     }
     
     public init(_ name: String,
@@ -356,7 +355,7 @@ public struct ChoiceSetting: View {
                 _ group: Binding<SettingsGroup>,
                 _ choices: [String]) {
         self.settingName = name
-        self.value = value
+        self._settingValue = value
         self._group = group
         self.choices = choices
     }
@@ -409,7 +408,7 @@ public struct TextSetting: View {
 
     let settingName: String
 
-    let value: Binding<String>
+    @Binding var settingValue: String
 
     @Binding var group: SettingsGroup
 
@@ -430,7 +429,7 @@ public struct TextSetting: View {
                 .frame(width: group.minimumLabelWidth, alignment: .trailing)
 
             TextField("",
-                      text: value,
+                      text: $settingValue,
                       onEditingChanged: { editing in
                         isEditing = editing
                       })
@@ -449,7 +448,7 @@ public struct TextSetting: View {
                 _ value: Binding<String>,
                 _ group: Binding<SettingsGroup>) {
         self.settingName = name
-        self.value = value
+        self._settingValue = value
         self._group = group
     }
 
