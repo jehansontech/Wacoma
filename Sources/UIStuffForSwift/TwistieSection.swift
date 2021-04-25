@@ -23,14 +23,6 @@ import SwiftUI
 //    // let selectedSection: Int
 //}
 
-fileprivate var sectionCount: Int = 0
-
-fileprivate func nextSectionID() -> Int {
-    let sectionID = sectionCount
-    sectionCount += 1
-    return sectionID
-}
-
 public struct TwistieSection<Content: View> : View {
 
     let twistieSize: CGFloat = 40
@@ -70,9 +62,9 @@ public struct TwistieSection<Content: View> : View {
         }
     }
 
-    public init(_ sectionName: String, _ selectedSection: Binding<Int>, @ViewBuilder content: @escaping () -> Content) {
+    public init(_ sectionName: String, _ sectionID: Int, _ selectedSection: Binding<Int>, @ViewBuilder content: @escaping () -> Content) {
         self.sectionName = sectionName
-        self.sectionID = nextSectionID()
+        self.sectionID = sectionID
         self.selectedSection = selectedSection
         self.sectionContent = content
     }
