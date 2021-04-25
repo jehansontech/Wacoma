@@ -43,8 +43,6 @@ public struct TextSetting : View {
                 .frame(minWidth: UIConstants.settingValueWidth)
                 .border(isEditing ? UIConstants.controlColor : UIConstants.darkGray)
             
-            Spacer()
-                .layoutPriority(1)
         }
         // end HStack
     }
