@@ -49,6 +49,8 @@ public struct TwistieSection<Content: View> : View {
                         .lineLimit(1)
 
                 }
+                .padding(UIConstants.buttonPadding)
+                .border(Color.gray)
 //                .preference(
 //                    key: SectionStatePreferenceKey.self,
 //                    value: [SectionState(nameWidth: geometry.frame(in: CoordinateSpace.global).width)]
