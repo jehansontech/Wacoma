@@ -58,6 +58,7 @@ public struct TwistieSection<Content: View> : View {
                     Text(sectionName)
                         .lineLimit(1)
                         .multilineTextAlignment(.leading)
+                        .foregroundColor(UIConstants.offWhite)
                 }
             }
 
