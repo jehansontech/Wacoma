@@ -22,6 +22,20 @@ public struct SymbolButtonStyle: ViewModifier {
 
 }
 
+public struct SpanningButtonStyle: ViewModifier {
+
+    public func body(content: Content) -> some View {
+        content
+            .padding(UIConstants.buttonPadding)
+            .background(RoundedRectangle(cornerRadius: UIConstants.buttonCornerRadius)
+                            .opacity(UIConstants.buttonOpacity))
+            .frame(maxWidth: .infinity)
+    }
+
+    public init() {}
+}
+
+
 public struct TextButtonStyle: ViewModifier {
 
     public func body(content: Content) -> some View {

@@ -59,7 +59,10 @@ public struct TwistieSection<Content: View> : View {
                         .lineLimit(1)
                         .multilineTextAlignment(.leading)
                         .foregroundColor(UIConstants.offWhite)
+
+                    Spacer()
                 }
+                .modifier(SpanningButtonStyle())
             }
 
             if isSelected() {
