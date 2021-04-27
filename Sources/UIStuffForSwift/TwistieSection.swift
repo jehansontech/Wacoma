@@ -37,9 +37,6 @@ public struct TwistieGroup {
 
 public struct TwistieSection<Content: View> : View {
 
-    let twistieSize: CGFloat = 30
-    let sectionContentLeadingInset: CGFloat = 32
-
     let sectionName: String
 
     var group: Binding<TwistieGroup>
@@ -52,7 +49,7 @@ public struct TwistieSection<Content: View> : View {
                 HStack(alignment: .center, spacing: 0) {
                     Image(systemName: "chevron.right")
                         .foregroundColor(UIConstants.controlColor)
-                        .frame(width: twistieSize, height: twistieSize)
+                        .frame(width: UIConstants.twistieSize, height: UIConstants.twistieSize)
                         .rotated(by: .degrees(isSelected() ? 90 : 0))
 
                     Text(sectionName)
@@ -67,7 +64,7 @@ public struct TwistieSection<Content: View> : View {
 
             if isSelected() {
                 sectionContent()
-                    .padding(EdgeInsets(top: 0, leading: sectionContentLeadingInset, bottom: 0, trailing: 0))
+                    .padding(EdgeInsets(top: 0, leading: UIConstants.sectionContentLeadingInset, bottom: 0, trailing: 0))
             }
         }
     }

@@ -9,6 +9,10 @@ import SwiftUI
 
 public struct UIConstants {
 
+    public static let twistieSize: CGFloat = 30
+
+    public static let sectionContentLeadingInset: CGFloat = 32
+
     public static let buttonCornerRadius: CGFloat = 5
     
     public static let buttonOpacity: Double = 0.1
