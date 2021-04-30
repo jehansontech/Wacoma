@@ -56,13 +56,14 @@ public struct TwistieSection<Content: View> : View {
                         .foregroundColor(UIConstants.offWhite)
 
                 }
+                .fixedSize()
                 .overlay(GeometryReader { proxy in
                     Color.clear.preference(key: TwistieButtonWidthPreferenceKey.self, value: proxy.size.width)
                 }).onPreferenceChange(TwistieButtonWidthPreferenceKey.self) { (value) in
                     $group.wrappedValue.buttonWidth = max(group.buttonWidth, value)
                 }
-                .modifier(TextButtonStyle())
                 .frame(width: group.buttonWidth)
+                .modifier(TextButtonStyle())
 
                 Spacer()
             }
