@@ -29,6 +29,8 @@ public struct TwistieGroup {
 
     var buttonMinWidth: CGFloat = 0
 
+    var contentLeadingInset: CGFloat = UIConstants.twistieSectionContentLeadingInset
+
     var buttonMaxWidth: CGFloat {
         switch buttonStyle {
         case .fill:
@@ -49,6 +51,12 @@ public struct TwistieGroup {
     public func buttonStyle(_ style: TwistieSectionButtonStyle) -> Self {
         var view = self
         view.buttonStyle = style
+        return view
+    }
+
+    public func contentInset(leading: CGFloat) -> Self {
+        var view = self
+        view.contentLeadingInset = leading
         return view
     }
  }
@@ -93,7 +101,7 @@ public struct TwistieSection<Content: View> : View {
             if isSelected() {
                 sectionContent()
                     .padding(EdgeInsets(top: UIConstants.twistieSectionContentTopInset,
-                                        leading: UIConstants.twistieSectionContentLeadingInset,
+                                        leading: group.contentLeadingInset,
                                         bottom: 0,
                                         trailing: 0))
             }
