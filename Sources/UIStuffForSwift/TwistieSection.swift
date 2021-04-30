@@ -42,8 +42,8 @@ public struct TwistieSection<Content: View> : View {
 
     public var body: some View {
         VStack(alignment: .leading, spacing: 0) {
-            Button(action: toggleSelection) {
-                HStack(alignment: .center, spacing: 0) {
+            HStack(alignment: .center) {
+                Button(action: toggleSelection) {
                     Image(systemName: "chevron.right")
                         .foregroundColor(UIConstants.controlColor)
                         .frame(width: UIConstants.twistieChevronSize, height: UIConstants.twistieChevronSize)
@@ -54,9 +54,10 @@ public struct TwistieSection<Content: View> : View {
                         .multilineTextAlignment(.leading)
                         .foregroundColor(UIConstants.offWhite)
 
-                    Spacer()
                 }
                 .modifier(TextButtonStyle())
+
+                Spacer()
             }
             .overlay(GeometryReader { proxy in
                 Color.clear.preference(key: TwistieButtonWidthPreferenceKey.self, value: proxy.size.width)
