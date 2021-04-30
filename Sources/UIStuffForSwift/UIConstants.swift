@@ -9,15 +9,21 @@ import SwiftUI
 
 public struct UIConstants {
 
-    public static let twistieSize: CGFloat = 30
-
-    public static let sectionContentLeadingInset: CGFloat = 32
+    // Layout
 
     public static let buttonCornerRadius: CGFloat = 5
-    
+
+    public static let buttonSpacing: CGFloat = 10
+
     public static let buttonOpacity: Double = 0.1
     
-    public static let sectionSpacing: CGFloat = 20
+    public static let buttonPadding = EdgeInsets(top: 5, leading: 10, bottom: 5, trailing: 10)
+
+    public static let pageInsets: CGFloat = 10
+
+    public static let popoverCornerRadius: CGFloat = 10
+
+    public static let popoverInsets: CGFloat = 3
 
     public static let settingsGridSpacing: CGFloat = 4
 
@@ -31,18 +37,13 @@ public struct UIConstants {
 
     public static let symbolButtonHeight: CGFloat = 35
 
-    public static let symbolButtonSpacing: CGFloat = 5
+    public static let twistieChevronSize: CGFloat = 30
 
-    public static let popoverCornerRadius: CGFloat = 10
-    
-    public static let popoverInsets: CGFloat = 3
+    public static let twistieSectionContentLeadingInset: CGFloat = 30
 
-    public static let pageInsets: CGFloat = 10
 
-    public static let buttonSpacing: CGFloat = 10
+    // Colors
 
-    public static let buttonPadding = EdgeInsets(top: 5, leading: 10, bottom: 5, trailing: 10)
-    
     public static let offWhite = Color(red: 180/255, green: 180/255, blue: 180/255, opacity: 1)
 
     public static let offBlack = Color(red: 30/255, green: 30/255, blue: 30/255, opacity: 1)

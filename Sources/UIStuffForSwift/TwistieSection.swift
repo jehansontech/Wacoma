@@ -49,7 +49,7 @@ public struct TwistieSection<Content: View> : View {
                 HStack(alignment: .center, spacing: 0) {
                     Image(systemName: "chevron.right")
                         .foregroundColor(UIConstants.controlColor)
-                        .frame(width: UIConstants.twistieSize, height: UIConstants.twistieSize)
+                        .frame(width: UIConstants.twistieChevronSize, height: UIConstants.twistieChevronSize)
                         .rotated(by: .degrees(isSelected() ? 90 : 0))
 
                     Text(sectionName)
@@ -64,7 +64,7 @@ public struct TwistieSection<Content: View> : View {
 
             if isSelected() {
                 sectionContent()
-                    .padding(EdgeInsets(top: 0, leading: UIConstants.sectionContentLeadingInset, bottom: 0, trailing: 0))
+                    .padding(EdgeInsets(top: 0, leading: UIConstants.twistieSectionContentLeadingInset, bottom: 0, trailing: 0))
             }
         }
     }
