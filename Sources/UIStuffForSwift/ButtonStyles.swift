@@ -26,8 +26,7 @@ public struct SymbolButtonStyle: ViewModifier {
     public func body(content: Content) -> some View {
         content
             .imageScale(.large)
-            .padding(UIConstants.buttonPadding)
-            .frame(minWidth: UIConstants.symbolButtonWidth, minHeight: UIConstants.symbolButtonHeight)
+            .frame(width: UIConstants.symbolButtonWidth, height: UIConstants.symbolButtonHeight, alignment: .center)
             .background(RoundedRectangle(cornerRadius: UIConstants.buttonCornerRadius)
                             .opacity(UIConstants.buttonOpacity))
     }
