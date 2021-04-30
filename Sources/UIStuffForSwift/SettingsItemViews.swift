@@ -160,7 +160,7 @@ public struct SteppedSetting: View {
                         .padding(UIConstants.buttonPadding)
 
                 }
-                .modifier(SymbolButtonStyle())
+                .modifier(TextButtonStyle())
                 .foregroundColor(UIConstants.controlColor)
             }
 
