@@ -18,6 +18,11 @@ struct TwistieButtonWidthPreferenceKey: PreferenceKey {
     }
 }
 
+public enum TwistieSectionButtonStyle {
+    case fill
+    case equalWidths
+}
+
 public struct TwistieGroup {
 
     public var selection: String? = nil
@@ -25,10 +30,15 @@ public struct TwistieGroup {
     var buttonMinWidth: CGFloat = 0
 
     var buttonMaxWidth: CGFloat {
-        return _buttonFill ? .infinity : buttonMinWidth
+        switch buttonStyle {
+        case .fill:
+            return .infinity
+        case .equalWidths:
+            return buttonMinWidth
+        }
     }
 
-    var _buttonFill: Bool = false
+    var buttonStyle: TwistieSectionButtonStyle = .equalWidths
 
     public init() {}
 
@@ -36,9 +46,9 @@ public struct TwistieGroup {
         self.selection = selection
     }
 
-    func fill(_ value: Bool) -> Self {
+    public func buttonStyle(_ style: TwistieSectionButtonStyle) -> Self {
         var view = self
-        view._buttonFill = value
+        view.buttonStyle = style
         return view
     }
  }
