@@ -62,7 +62,7 @@ public struct TwistieSection<Content: View> : View {
                 }).onPreferenceChange(TwistieButtonWidthPreferenceKey.self) { (value) in
                     $group.wrappedValue.buttonWidth = max(group.buttonWidth, value)
                 }
-                .frame(width: group.buttonWidth)
+                .frame(width: group.buttonWidth, alignment: .leading)
                 .modifier(TextButtonStyle())
 
                 Spacer()
