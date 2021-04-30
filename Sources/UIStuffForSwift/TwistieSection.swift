@@ -48,6 +48,7 @@ public struct TwistieSection<Content: View> : View {
                         .foregroundColor(UIConstants.controlColor)
                         .frame(width: UIConstants.twistieChevronSize, height: UIConstants.twistieChevronSize)
                         .rotated(by: .degrees(isSelected() ? 90 : 0))
+                        .border(Color.gray)
 
                     Text(sectionName)
                         .lineLimit(1)
@@ -56,13 +57,13 @@ public struct TwistieSection<Content: View> : View {
 
                 }
                 .modifier(TextButtonStyle())
+                .overlay(GeometryReader { proxy in
+                    Color.clear.preference(key: TwistieButtonWidthPreferenceKey.self, value: proxy.size.width)
+                }).onPreferenceChange(TwistieButtonWidthPreferenceKey.self) { (value) in
+                    $group.wrappedValue.buttonWidth = max(group.buttonWidth, value)
+                }
 
                 Spacer()
-            }
-            .overlay(GeometryReader { proxy in
-                Color.clear.preference(key: TwistieButtonWidthPreferenceKey.self, value: proxy.size.width)
-            }).onPreferenceChange(TwistieButtonWidthPreferenceKey.self) { (value) in
-                $group.wrappedValue.buttonWidth = max(group.buttonWidth, value)
             }
 
 

@@ -37,7 +37,7 @@ public struct UIConstants {
 
     public static let symbolButtonHeight: CGFloat = 35
 
-    public static let twistieChevronSize: CGFloat = 30
+    public static let twistieChevronSize: CGFloat = 20
 
     public static let twistieSectionContentLeadingInset: CGFloat = 30
 
