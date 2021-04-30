@@ -64,7 +64,10 @@ public struct TwistieSection<Content: View> : View {
 
             if isSelected() {
                 sectionContent()
-                    .padding(EdgeInsets(top: 0, leading: UIConstants.twistieSectionContentLeadingInset, bottom: 0, trailing: 0))
+                    .padding(EdgeInsets(top: UIConstants.twistieSectionContentTopInset,
+                                        leading: UIConstants.twistieSectionContentLeadingInset,
+                                        bottom: 0,
+                                        trailing: 0))
             }
         }
     }

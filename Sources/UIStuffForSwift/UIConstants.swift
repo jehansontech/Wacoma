@@ -41,6 +41,7 @@ public struct UIConstants {
 
     public static let twistieSectionContentLeadingInset: CGFloat = 30
 
+    public static let twistieSectionContentTopInset: CGFloat = 5
 
     // Colors
 
