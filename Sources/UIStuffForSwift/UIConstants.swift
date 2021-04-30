@@ -19,7 +19,7 @@ public struct UIConstants {
     
     public static let buttonPadding = EdgeInsets(top: 5, leading: 10, bottom: 5, trailing: 10)
 
-    public static let pageInsets = EdgeInsets(top: 15, leading: 5, bottom: 0, trailing: 5)
+    public static let pageInsets = EdgeInsets(top: 5, leading: 5, bottom: 5, trailing: 5)
 
     public static let popoverCornerRadius: CGFloat = 10
 
