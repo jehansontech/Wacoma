@@ -22,14 +22,25 @@ public struct TwistieGroup {
 
     public var selection: String? = nil
 
-    var buttonWidth: CGFloat = 0
-    
+    var buttonMinWidth: CGFloat = 0
+
+    var buttonMaxWidth: CGFloat {
+        return _buttonFill ? .infinity : buttonMinWidth
+    }
+
+    var _buttonFill: Bool = false
+
     public init() {}
 
     public init(_ selection: String) {
         self.selection = selection
     }
 
+    func fill(_ value: Bool) -> Self {
+        var view = self
+        view._buttonFill = value
+        return view
+    }
  }
 
 public struct TwistieSection<Content: View> : View {
@@ -59,9 +70,9 @@ public struct TwistieSection<Content: View> : View {
                 .overlay(GeometryReader { proxy in
                     Color.clear.preference(key: TwistieButtonWidthPreferenceKey.self, value: proxy.size.width)
                 }).onPreferenceChange(TwistieButtonWidthPreferenceKey.self) { (value) in
-                    $group.wrappedValue.buttonWidth = max(group.buttonWidth, value)
+                    $group.wrappedValue.buttonMinWidth = max(group.buttonMinWidth, value)
                 }
-                .frame(width: group.buttonWidth, alignment: .leading)
+                .frame(width: group.buttonMinWidth, alignment: .leading)
                 .modifier(TextButtonStyle())
 
                 Spacer()
