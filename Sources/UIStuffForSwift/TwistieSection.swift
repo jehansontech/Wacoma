@@ -48,7 +48,6 @@ public struct TwistieSection<Content: View> : View {
                         .foregroundColor(UIConstants.controlColor)
                         .frame(width: UIConstants.twistieChevronSize, height: UIConstants.twistieChevronSize)
                         .rotated(by: .degrees(isSelected() ? 90 : 0))
-                        .border(Color.gray)
 
                     Text(sectionName)
                         .lineLimit(1)
