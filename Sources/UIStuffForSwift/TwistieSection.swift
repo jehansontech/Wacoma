@@ -75,6 +75,7 @@ public struct TwistieSection<Content: View> : View {
                         .multilineTextAlignment(.leading)
                         .foregroundColor(UIConstants.offWhite)
 
+                    Spacer()
                 }
                 .fixedSize()
                 .overlay(GeometryReader { proxy in
@@ -82,7 +83,7 @@ public struct TwistieSection<Content: View> : View {
                 }).onPreferenceChange(TwistieButtonWidthPreferenceKey.self) { (value) in
                     $group.wrappedValue.buttonMinWidth = max(group.buttonMinWidth, value)
                 }
-                .frame(width: group.buttonMinWidth, alignment: .leading)
+                .frame(minWidth: group.buttonMinWidth, maxWidth: group.buttonMaxWidth, alignment: .leading)
                 .modifier(TextButtonStyle())
 
                 Spacer()
