@@ -8,25 +8,22 @@
 import SwiftUI
 
 
-//struct SectionStatePreferenceKey: PreferenceKey {
-//    typealias Value = [SectionState]
-//
-//    static var defaultValue: [SectionState] = []
-//
-//    static func reduce(value: inout [SectionState], nextValue: () -> [SectionState]) {
-//        value.append(contentsOf: nextValue())
-//    }
-//}
-//
-//struct SectionState: Equatable {
-//    let nameWidth: CGFloat
-//    // let selectedSection: Int
-//}
+struct TwistieButtonWidthPreferenceKey: PreferenceKey {
+    typealias Value = CGFloat
+
+    static var defaultValue: CGFloat = 0
+
+    static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
+        value = nextValue()
+    }
+}
 
 public struct TwistieGroup {
 
     public var selection: String? = nil
 
+    var buttonWidth: CGFloat = 0
+    
     public init() {}
 
     public init(_ selection: String) {
@@ -39,7 +36,7 @@ public struct TwistieSection<Content: View> : View {
 
     let sectionName: String
 
-    var group: Binding<TwistieGroup>
+    @Binding var group: TwistieGroup
 
     var sectionContent: () -> Content
 
@@ -59,8 +56,14 @@ public struct TwistieSection<Content: View> : View {
 
                     Spacer()
                 }
-                .modifier(SpanningButtonStyle())
+                .modifier(TextButtonStyle())
             }
+            .overlay(GeometryReader { proxy in
+                Color.clear.preference(key: TwistieButtonWidthPreferenceKey.self, value: proxy.size.width)
+            }).onPreferenceChange(TwistieButtonWidthPreferenceKey.self) { (value) in
+                $group.wrappedValue.buttonWidth = max(group.buttonWidth, value)
+            }
+
 
             if isSelected() {
                 sectionContent()
@@ -74,62 +77,20 @@ public struct TwistieSection<Content: View> : View {
 
     public init(_ sectionName: String, _ group: Binding<TwistieGroup>, @ViewBuilder content: @escaping () -> Content) {
         self.sectionName = sectionName
-        self.group = group
+        self._group = group
         self.sectionContent = content
     }
 
     func toggleSelection() {
-        if group.wrappedValue.selection == sectionName {
-            group.wrappedValue.selection = nil
+        if group.selection == sectionName {
+            $group.wrappedValue.selection = nil
         }
         else {
-            group.wrappedValue.selection = sectionName
+            $group.wrappedValue.selection = sectionName
         }
     }
 
     func isSelected() -> Bool {
-        return group.wrappedValue.selection == self.sectionName
-    }
-}
-
-//extension VerticalAlignment {
-//
-//    enum SectionName: AlignmentID {
-//        static func defaultValue(in d: ViewDimensions) -> CGFloat {
-//            d[.top]
-//        }
-//    }
-//
-//    static let sectionName = VerticalAlignment(SectionName.self)
-//}
-
-struct SectionButton: View {
-
-    var sectionName: String
-
-    var sectionID: Int
-
-    var selectedSection: Binding<Int>
-
-    var body: some View {
-
-        Button(action: {
-            selectedSection.wrappedValue = sectionID
-        }) {
-            Image(systemName: "chevron.right")
-                .rotated(by: .degrees((sectionID == selectedSection.wrappedValue ? 90 : 0)))
-
-            Text(sectionName)
-                .lineLimit(1)
-
-            Spacer()
-
-        }
-    }
-
-    init(_ name: String, _ id: Int, _ selectedSection: Binding<Int>) {
-        self.sectionName = name
-        self.sectionID = id
-        self.selectedSection = selectedSection
+        return group.selection == self.sectionName
     }
 }
