@@ -331,8 +331,13 @@ public struct ChoiceSetting: View {
                 .frame(width: group.minimumLabelWidth, alignment: .trailing)
 
             Button(action: { selectorShowing = true }) {
-                Text(settingValue)
-                    .lineLimit(1)
+                HStack(alignment: .center, spacing: 0) {
+                    Text(settingValue)
+                        .lineLimit(1)
+                        .frame(maxWidth: .infinity, alignment: .center)
+                    Image(systemName: "arrowtriangle.down.fill")
+                        .imageScale(.small)
+                }
                 .padding(UIConstants.buttonPadding)
                 .frame(width: UIConstants.settingValueWidth, alignment: .center)
                 .foregroundColor(UIConstants.controlColor)
