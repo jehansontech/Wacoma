@@ -77,7 +77,6 @@ public struct TickyboxSetting: View {
 
     public var body: some View {
 
-
         HStack(alignment: .center, spacing: UIConstants.settingsGridSpacing) {
 
             Text(settingName)
@@ -183,7 +182,7 @@ public struct SteppedSetting: View {
                 Spacer()
             }
             HStack(alignment: .center, spacing: UIConstants.settingsGridSpacing) {
-                Spacer().frame(width: group.minimumLabelWidth)
+                Spacer().frame(width: UIConstants.indentedContentLeadingInset)
                 stepButtons()
                 Spacer()
             }
@@ -311,6 +310,7 @@ public struct RangeSetting: View {
                 Spacer()
             }
             HStack(alignment: .center, spacing: UIConstants.settingsGridSpacing) {
+                Spacer().frame(width: UIConstants.indentedContentLeadingInset)
                 slider()
                 Spacer()
             }
