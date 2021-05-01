@@ -93,6 +93,7 @@ public struct TickyboxSetting: View {
                 $settingValue.wrappedValue = !settingValue
             }) {
                 Text($settingValue.wrappedValue ? trueText : falseText)
+                    .font(.system(size: UIConstants.settingValueFontSize))
                 .padding(UIConstants.buttonPadding)
                 .frame(width: UIConstants.settingValueWidth, alignment: .center)
                 .foregroundColor(UIConstants.controlColor)
@@ -224,7 +225,7 @@ public struct SteppedSetting: View {
 
     func value() -> some View {
         TextField("", value: $settingValue, formatter: formatter)
-            .font(.system(.body, design: .monospaced))
+            .font(.system(size: UIConstants.settingValueFontSize, design: .monospaced))
             .lineLimit(1)
             .multilineTextAlignment(.trailing)
             .padding(UIConstants.buttonPadding)
@@ -240,7 +241,7 @@ public struct SteppedSetting: View {
                 setValue(settingValue + decrements[idx])
             }) {
                 Text("\(decrements[idx])")
-                    .font(.system(.body, design: .monospaced))
+                    .font(.system(size: UIConstants.settingValueFontSize, design: .monospaced))
             }
             .modifier(TextButtonStyle())
             .foregroundColor(UIConstants.controlColor)
@@ -254,7 +255,7 @@ public struct SteppedSetting: View {
                 setValue(settingValue + decrements[revIdx])
             }) {
                 Text("\(decrements[revIdx])")
-                    .font(.system(.body, design: .monospaced))
+                    .font(.system(size: UIConstants.settingValueFontSize, design: .monospaced))
             }
             .modifier(TextButtonStyle())
             .foregroundColor(UIConstants.controlColor)
@@ -268,7 +269,7 @@ public struct SteppedSetting: View {
                 setValue(settingValue + increments[idx])
             }) {
                 Text("+\(increments[idx])")
-                    .font(.system(.body, design: .monospaced))
+                    .font(.system(size: UIConstants.settingValueFontSize, design: .monospaced))
             }
             .modifier(TextButtonStyle())
             .foregroundColor(UIConstants.controlColor)
@@ -383,7 +384,7 @@ public struct RangeSetting: View {
 
     public func value() -> some View {
         TextField("", value: $settingValue, formatter: formatter)
-            .font(.system(.body, design: .monospaced))
+            .font(.system(size: UIConstants.settingValueFontSize, design: .monospaced))
             .lineLimit(1)
             .multilineTextAlignment(.trailing)
             .padding(UIConstants.buttonPadding)
@@ -463,6 +464,7 @@ public struct ChoiceSetting: View {
             Button(action: { selectorShowing = true }) {
                 HStack(alignment: .center, spacing: 0) {
                     Text(settingValue)
+                        .font(.system(size: UIConstants.settingValueFontSize))
                         .lineLimit(1)
                         .frame(maxWidth: .infinity, alignment: .center)
                     Image(systemName: "arrowtriangle.down.fill")
@@ -568,6 +570,7 @@ public struct TextSetting: View {
                       onEditingChanged: { editing in
                         isEditing = editing
                       })
+                .font(.system(size: UIConstants.settingValueFontSize))
                 .lineLimit(1)
                 .autocapitalization(.none)
                 .disableAutocorrection(true)
