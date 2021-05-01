@@ -28,17 +28,30 @@ struct FieldWidthPreferenceKey: PreferenceKey {
     }
 }
 
+public enum SettingsItemStyle {
+    case wide
+    case narrow
+}
+
 public struct SettingsGroup {
 
     var minimumLabelWidth: CGFloat = 0
 
     var minimumFieldWidth: CGFloat = UIConstants.settingValueWidth
 
+    var itemStyle: SettingsItemStyle = .wide
+
     public init() {}
 
     public init(_ minLabelWidth: CGFloat, _ minimumFieldWidth: CGFloat) {
         self.minimumLabelWidth = minLabelWidth
         self.minimumFieldWidth = minimumFieldWidth
+    }
+
+    public func itemStyle(_ style: SettingsItemStyle) -> Self {
+        var view = self
+        view.itemStyle = style
+        return view
     }
 }
 
@@ -48,7 +61,7 @@ public struct SettingsGroup {
 // =================================================================================
 
 ///
-///
+/// wide & narrow are the same
 ///
 public struct TickyboxSetting: View {
 
@@ -63,6 +76,7 @@ public struct TickyboxSetting: View {
     let falseText: String
 
     public var body: some View {
+
 
         HStack(alignment: .center, spacing: UIConstants.settingsGridSpacing) {
 
@@ -110,7 +124,7 @@ public struct TickyboxSetting: View {
 
 
 ///
-///
+/// narrow puts the buttons in a 2nd row
 ///
 public struct SteppedSetting: View {
     
@@ -129,45 +143,14 @@ public struct SteppedSetting: View {
     var formatter: NumberFormatter = makeDefaultNumberFormatter()
     
     public var body: some View {
-        
-        HStack(alignment: .center, spacing: UIConstants.settingsGridSpacing) {
-
-            Text(settingName)
-                .lineLimit(1)
-                .fixedSize()
-                .overlay(GeometryReader { proxy in
-                    Color.clear.preference(key: LabelWidthPreferenceKey.self, value: proxy.size.width)
-                }).onPreferenceChange(LabelWidthPreferenceKey.self) { (value) in
-                    $group.wrappedValue.minimumLabelWidth = max(group.minimumLabelWidth, value)
-                }
-                .frame(width: group.minimumLabelWidth, alignment: .trailing)
-
-            TextField("", value: $settingValue, formatter: formatter)
-                .lineLimit(1)
-                .multilineTextAlignment(.trailing)
-                .padding(UIConstants.buttonPadding)
-                .frame(width: UIConstants.settingValueWidth)
-                .border(UIConstants.darkGray)
-                .disabled(true)
-            
-            ForEach(deltas.indices, id: \.self) { idx in
-                
-                Button (action: {
-                    setValue(settingValue + deltas[idx])
-                }) {
-                    let label = (deltas[idx] < 0) ? "\(deltas[idx])" : "+\(deltas[idx])"
-                    Text(label)
-                        .padding(UIConstants.buttonPadding)
-
-                }
-                .modifier(TextButtonStyle())
-                .foregroundColor(UIConstants.controlColor)
-            }
-
-            Spacer()
+        switch group.itemStyle {
+        case .wide:
+            wide()
+        case .narrow:
+            narrow()
         }
     }
-    
+
     public init(_ name: String,
                 _ value: Binding<Int>,
                 _ group: Binding<SettingsGroup>,
@@ -182,6 +165,101 @@ public struct SteppedSetting: View {
         self.deltas = Self.unpackDeltas(deltas)
     }
 
+    func wide() -> some View {
+        HStack(alignment: .center, spacing: UIConstants.settingsGridSpacing) {
+            name()
+            value()
+            stepButtons()
+        }
+    }
+
+//        HStack(alignment: .center, spacing: UIConstants.settingsGridSpacing) {
+//
+//            Text(settingName)
+//                .lineLimit(1)
+//                .fixedSize()
+//                .overlay(GeometryReader { proxy in
+//                    Color.clear.preference(key: LabelWidthPreferenceKey.self, value: proxy.size.width)
+//                }).onPreferenceChange(LabelWidthPreferenceKey.self) { (value) in
+//                    $group.wrappedValue.minimumLabelWidth = max(group.minimumLabelWidth, value)
+//                }
+//                .frame(width: group.minimumLabelWidth, alignment: .trailing)
+//
+//            TextField("", value: $settingValue, formatter: formatter)
+//                .lineLimit(1)
+//                .multilineTextAlignment(.trailing)
+//                .padding(UIConstants.buttonPadding)
+//                .frame(width: UIConstants.settingValueWidth)
+//                .border(UIConstants.darkGray)
+//                .disabled(true)
+//
+//            ForEach(deltas.indices, id: \.self) { idx in
+//
+//                Button (action: {
+//                    setValue(settingValue + deltas[idx])
+//                }) {
+//                    let label = (deltas[idx] < 0) ? "\(deltas[idx])" : "+\(deltas[idx])"
+//                    Text(label)
+//                        .padding(UIConstants.buttonPadding)
+//
+//                }
+//                .modifier(TextButtonStyle())
+//                .foregroundColor(UIConstants.controlColor)
+//            }
+//
+//            Spacer()
+//        }
+//    }
+
+    func narrow() -> some View {
+        VStack {
+            HStack(alignment: .center, spacing: UIConstants.settingsGridSpacing) {
+                name()
+                value()
+            }
+            HStack(alignment: .center, spacing: UIConstants.settingsGridSpacing) {
+                stepButtons()
+            }
+        }
+    }
+
+    func name() -> some View {
+        Text(settingName)
+            .lineLimit(1)
+            .fixedSize()
+            .overlay(GeometryReader { proxy in
+                Color.clear.preference(key: LabelWidthPreferenceKey.self, value: proxy.size.width)
+            }).onPreferenceChange(LabelWidthPreferenceKey.self) { (value) in
+                $group.wrappedValue.minimumLabelWidth = max(group.minimumLabelWidth, value)
+            }
+            .frame(width: group.minimumLabelWidth, alignment: .trailing)
+    }
+
+    func value() -> some View {
+        TextField("", value: $settingValue, formatter: formatter)
+            .lineLimit(1)
+            .multilineTextAlignment(.trailing)
+            .padding(UIConstants.buttonPadding)
+            .frame(width: UIConstants.settingValueWidth)
+            .border(UIConstants.darkGray)
+            .disabled(true)
+    }
+
+    func stepButtons() -> some View {
+        ForEach(deltas.indices, id: \.self) { idx in
+
+            Button (action: {
+                setValue(settingValue + deltas[idx])
+            }) {
+                let label = (deltas[idx] < 0) ? "\(deltas[idx])" : "+\(deltas[idx])"
+                Text(label)
+                    .padding(UIConstants.buttonPadding)
+
+            }
+            .modifier(TextButtonStyle())
+            .foregroundColor(UIConstants.controlColor)
+        }
+    }
 
     public func formatter(_ formatter: NumberFormatter) -> Self {
         var view = self
