@@ -168,7 +168,7 @@ public struct SteppedSetting: View {
         HStack(alignment: .center, spacing: UIConstants.settingsGridSpacing) {
             name()
             value()
-            stepButtons()
+            stepButtons(1)
             Spacer()
         }
         .frame(maxWidth: .infinity)
@@ -183,7 +183,7 @@ public struct SteppedSetting: View {
             }
             HStack(alignment: .center, spacing: UIConstants.settingsGridSpacing) {
                 Spacer().frame(width: UIConstants.indentedContentLeadingInset)
-                stepButtons()
+                stepButtons(deltas.count / 4)
                 Spacer()
             }
         }
@@ -213,7 +213,7 @@ public struct SteppedSetting: View {
             .disabled(true)
     }
 
-    func stepButtons() -> some View {
+    func stepButtons(_ rows: Int) -> some View {
         ForEach(deltas.indices, id: \.self) { idx in
 
             Button (action: {
@@ -221,7 +221,7 @@ public struct SteppedSetting: View {
             }) {
                 let label = (deltas[idx] < 0) ? "\(deltas[idx])" : "+\(deltas[idx])"
                 Text(label)
-
+                    // .frame(height: UIConstants.buttonHeight)
             }
             .modifier(TextButtonStyle())
             .foregroundColor(UIConstants.controlColor)
