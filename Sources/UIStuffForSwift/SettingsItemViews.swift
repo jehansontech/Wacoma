@@ -196,7 +196,7 @@ public struct SteppedSetting: View {
             else {
                 HStack(alignment: .center, spacing: UIConstants.settingsGridSpacing) {
                     Spacer().frame(width: UIConstants.indentedContentLeadingInset)
-                    decrementButtons()
+                    reversedDecrementButtons()
                     Spacer()
                 }
                 HStack(alignment: .center, spacing: UIConstants.settingsGridSpacing) {
@@ -239,6 +239,19 @@ public struct SteppedSetting: View {
                 setValue(settingValue + decrements[idx])
             }) {
                 Text("\(decrements[idx])")
+            }
+            .modifier(TextButtonStyle())
+            .foregroundColor(UIConstants.controlColor)
+        }
+    }
+
+    func reversedDecrementButtons() -> some View {
+        ForEach(decrements.indices, id: \.self) { idx in
+            let revIdx = decrements.indices.count - idx - 1
+            Button (action: {
+                setValue(settingValue + decrements[revIdx])
+            }) {
+                Text("\(decrements[revIdx])")
             }
             .modifier(TextButtonStyle())
             .foregroundColor(UIConstants.controlColor)
