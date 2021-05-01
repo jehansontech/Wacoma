@@ -196,12 +196,12 @@ public struct SteppedSetting: View {
             else {
                 HStack(alignment: .center, spacing: UIConstants.settingsGridSpacing) {
                     Spacer().frame(width: group.minimumLabelWidth)
-                    reversedDecrementButtons()
+                    incrementButtons()
                     Spacer()
                 }
                 HStack(alignment: .center, spacing: UIConstants.settingsGridSpacing) {
                     Spacer().frame(width: group.minimumLabelWidth)
-                    incrementButtons()
+                    reversedDecrementButtons()
                     Spacer()
                 }
             }
