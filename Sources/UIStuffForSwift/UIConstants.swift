@@ -37,7 +37,7 @@ public struct UIConstants {
 
     public static let settingValueWidth: CGFloat = 150
 
-    public static let settingSliderWidth: CGFloat = 300
+    public static let settingSliderWidth: CGFloat = 250
 
     public static let symbolButtonWidth: CGFloat = 45
 
