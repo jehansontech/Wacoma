@@ -183,6 +183,7 @@ public struct SteppedSetting: View {
                 Spacer()
             }
             HStack(alignment: .center, spacing: UIConstants.settingsGridSpacing) {
+                Spacer().frame(width: group.minimumLabelWidth)
                 stepButtons()
                 Spacer()
             }
@@ -221,7 +222,6 @@ public struct SteppedSetting: View {
             }) {
                 let label = (deltas[idx] < 0) ? "\(deltas[idx])" : "+\(deltas[idx])"
                 Text(label)
-                    .padding(UIConstants.buttonPadding)
 
             }
             .modifier(TextButtonStyle())

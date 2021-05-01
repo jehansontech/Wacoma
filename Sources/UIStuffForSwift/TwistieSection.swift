@@ -29,9 +29,9 @@ public struct TwistieGroup {
 
     var buttonMinWidth: CGFloat = 0
 
-    var contentInsets = EdgeInsets(top: UIConstants.twistieSectionContentTopInset,
-                                   leading: UIConstants.twistieSectionContentLeadingInset,
-                                   bottom: 0,
+    var contentInsets = EdgeInsets(top: UIConstants.indentedContentTopInset,
+                                   leading: UIConstants.indentedContentLeadingInset,
+                                   bottom: UIConstants.indentedContentBottomInset,
                                    trailing: 0)
 
     var buttonMaxWidth: CGFloat {

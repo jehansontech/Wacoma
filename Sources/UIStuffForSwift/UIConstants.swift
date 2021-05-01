@@ -19,6 +19,12 @@ public struct UIConstants {
     
     public static let buttonPadding = EdgeInsets(top: 5, leading: 10, bottom: 5, trailing: 10)
 
+    public static let indentedContentBottomInset: CGFloat = 0
+
+    public static let indentedContentLeadingInset: CGFloat = 30
+
+    public static let indentedContentTopInset: CGFloat = 5
+
     public static let pageInsets = EdgeInsets(top: 5, leading: 5, bottom: 5, trailing: 5)
 
     public static let popoverCornerRadius: CGFloat = 10
@@ -39,9 +45,6 @@ public struct UIConstants {
 
     public static let twistieChevronSize: CGFloat = 12
 
-    public static let twistieSectionContentLeadingInset: CGFloat = 30
-
-    public static let twistieSectionContentTopInset: CGFloat = 5
 
     // Colors
 
