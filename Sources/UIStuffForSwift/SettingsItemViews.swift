@@ -187,7 +187,7 @@ public struct SteppedSetting: View {
 
             if (decrements.count <= 2) {
                 HStack(alignment: .center, spacing: UIConstants.settingsGridSpacing) {
-                    Spacer().frame(width: UIConstants.indentedContentLeadingInset)
+                    Spacer().frame(width: group.minimumLabelWidth)
                     decrementButtons()
                     incrementButtons()
                     Spacer()
@@ -195,12 +195,12 @@ public struct SteppedSetting: View {
             }
             else {
                 HStack(alignment: .center, spacing: UIConstants.settingsGridSpacing) {
-                    Spacer().frame(width: UIConstants.indentedContentLeadingInset)
+                    Spacer().frame(width: group.minimumLabelWidth)
                     reversedDecrementButtons()
                     Spacer()
                 }
                 HStack(alignment: .center, spacing: UIConstants.settingsGridSpacing) {
-                    Spacer().frame(width: UIConstants.indentedContentLeadingInset)
+                    Spacer().frame(width: group.minimumLabelWidth)
                     incrementButtons()
                     Spacer()
                 }
@@ -357,7 +357,7 @@ public struct RangeSetting: View {
                 Spacer()
             }
             HStack(alignment: .center, spacing: UIConstants.settingsGridSpacing) {
-                Spacer().frame(width: UIConstants.indentedContentLeadingInset)
+                Spacer().frame(width: group.minimumLabelWidth)
                 slider()
                 Spacer()
             }
