@@ -170,57 +170,25 @@ public struct SteppedSetting: View {
             name()
             value()
             stepButtons()
+            Spacer()
         }
+        .frame(maxWidth: .infinity)
     }
 
-//        HStack(alignment: .center, spacing: UIConstants.settingsGridSpacing) {
-//
-//            Text(settingName)
-//                .lineLimit(1)
-//                .fixedSize()
-//                .overlay(GeometryReader { proxy in
-//                    Color.clear.preference(key: LabelWidthPreferenceKey.self, value: proxy.size.width)
-//                }).onPreferenceChange(LabelWidthPreferenceKey.self) { (value) in
-//                    $group.wrappedValue.minimumLabelWidth = max(group.minimumLabelWidth, value)
-//                }
-//                .frame(width: group.minimumLabelWidth, alignment: .trailing)
-//
-//            TextField("", value: $settingValue, formatter: formatter)
-//                .lineLimit(1)
-//                .multilineTextAlignment(.trailing)
-//                .padding(UIConstants.buttonPadding)
-//                .frame(width: UIConstants.settingValueWidth)
-//                .border(UIConstants.darkGray)
-//                .disabled(true)
-//
-//            ForEach(deltas.indices, id: \.self) { idx in
-//
-//                Button (action: {
-//                    setValue(settingValue + deltas[idx])
-//                }) {
-//                    let label = (deltas[idx] < 0) ? "\(deltas[idx])" : "+\(deltas[idx])"
-//                    Text(label)
-//                        .padding(UIConstants.buttonPadding)
-//
-//                }
-//                .modifier(TextButtonStyle())
-//                .foregroundColor(UIConstants.controlColor)
-//            }
-//
-//            Spacer()
-//        }
-//    }
-
     func narrow() -> some View {
-        VStack {
+        VStack(alignment: .leading) {
             HStack(alignment: .center, spacing: UIConstants.settingsGridSpacing) {
                 name()
                 value()
+                Spacer()
             }
             HStack(alignment: .center, spacing: UIConstants.settingsGridSpacing) {
                 stepButtons()
+                Spacer()
             }
         }
+        .frame(maxWidth: .infinity)
+
     }
 
     func name() -> some View {
@@ -298,7 +266,7 @@ public struct SteppedSetting: View {
 // =================================================================================
 
 ///
-///
+/// narrow puts slider in 2nd row
 ///
 public struct RangeSetting: View {
     
@@ -315,38 +283,70 @@ public struct RangeSetting: View {
     var step: Double
     
     public var body: some View {
-        
+        Group {
+            switch group.itemStyle {
+            case .wide:
+                wide()
+            case .narrow:
+                narrow()
+            }
+        }
+    }
+
+    func wide() -> some View {
         HStack(alignment: .center, spacing: UIConstants.settingsGridSpacing) {
-
-            Text(settingName)
-                .lineLimit(1)
-                .fixedSize()
-                .overlay(GeometryReader { proxy in
-                    Color.clear.preference(key: LabelWidthPreferenceKey.self, value: proxy.size.width)
-                }).onPreferenceChange(LabelWidthPreferenceKey.self) { (value) in
-                    $group.wrappedValue.minimumLabelWidth = max(group.minimumLabelWidth, value)
-                }
-                .frame(width: group.minimumLabelWidth, alignment: .trailing)
-
-            TextField("", value: $settingValue, formatter: formatter)
-                .lineLimit(1)
-                .multilineTextAlignment(.trailing)
-                .padding(UIConstants.buttonPadding)
-                .frame(width: UIConstants.settingValueWidth)
-                .border(UIConstants.darkGray)
-                .disabled(true)
-
-            Slider(value: $settingValue, in: range, step: step)
-                .accentColor(UIConstants.controlColor)
-                .foregroundColor(UIConstants.controlColor)
-                .frame(minWidth: UIConstants.settingSliderWidth, maxWidth: .infinity)
-            
+            name()
+            value()
+            slider()
             Spacer()
         }
         .frame(maxWidth: .infinity)
-        // .border(Color.gray)
     }
-    
+
+    func narrow() -> some View {
+        VStack(alignment: .leading) {
+            HStack(alignment: .center, spacing: UIConstants.settingsGridSpacing) {
+                name()
+                value()
+                Spacer()
+            }
+            HStack(alignment: .center, spacing: UIConstants.settingsGridSpacing) {
+                slider()
+                Spacer()
+            }
+        }
+        .frame(maxWidth: .infinity)
+    }
+
+    public func name() -> some View {
+        Text(settingName)
+            .lineLimit(1)
+            .fixedSize()
+            .overlay(GeometryReader { proxy in
+                Color.clear.preference(key: LabelWidthPreferenceKey.self, value: proxy.size.width)
+            }).onPreferenceChange(LabelWidthPreferenceKey.self) { (value) in
+                $group.wrappedValue.minimumLabelWidth = max(group.minimumLabelWidth, value)
+            }
+            .frame(width: group.minimumLabelWidth, alignment: .trailing)
+    }
+
+    public func value() -> some View {
+        TextField("", value: $settingValue, formatter: formatter)
+            .lineLimit(1)
+            .multilineTextAlignment(.trailing)
+            .padding(UIConstants.buttonPadding)
+            .frame(width: UIConstants.settingValueWidth)
+            .border(UIConstants.darkGray)
+            .disabled(true)
+    }
+
+    public func slider() -> some View {
+        Slider(value: $settingValue, in: range, step: step)
+            .accentColor(UIConstants.controlColor)
+            .foregroundColor(UIConstants.controlColor)
+            .frame(minWidth: UIConstants.settingSliderWidth, maxWidth: .infinity)
+    }
+
     public init(_ name: String,
                 _ value: Binding<Double>,
                 _ group: Binding<SettingsGroup>,
