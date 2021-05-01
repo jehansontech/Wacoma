@@ -224,6 +224,7 @@ public struct SteppedSetting: View {
 
     func value() -> some View {
         TextField("", value: $settingValue, formatter: formatter)
+            .font(.system(.body, design: .monospaced))
             .lineLimit(1)
             .multilineTextAlignment(.trailing)
             .padding(UIConstants.buttonPadding)
@@ -239,6 +240,7 @@ public struct SteppedSetting: View {
                 setValue(settingValue + decrements[idx])
             }) {
                 Text("\(decrements[idx])")
+                    .font(.system(.body, design: .monospaced))
             }
             .modifier(TextButtonStyle())
             .foregroundColor(UIConstants.controlColor)
@@ -252,6 +254,7 @@ public struct SteppedSetting: View {
                 setValue(settingValue + decrements[revIdx])
             }) {
                 Text("\(decrements[revIdx])")
+                    .font(.system(.body, design: .monospaced))
             }
             .modifier(TextButtonStyle())
             .foregroundColor(UIConstants.controlColor)
@@ -265,6 +268,7 @@ public struct SteppedSetting: View {
                 setValue(settingValue + increments[idx])
             }) {
                 Text("+\(increments[idx])")
+                    .font(.system(.body, design: .monospaced))
             }
             .modifier(TextButtonStyle())
             .foregroundColor(UIConstants.controlColor)
@@ -379,6 +383,7 @@ public struct RangeSetting: View {
 
     public func value() -> some View {
         TextField("", value: $settingValue, formatter: formatter)
+            .font(.system(.body, design: .monospaced))
             .lineLimit(1)
             .multilineTextAlignment(.trailing)
             .padding(UIConstants.buttonPadding)
