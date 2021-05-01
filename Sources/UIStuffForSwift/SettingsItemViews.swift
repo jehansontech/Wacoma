@@ -136,9 +136,11 @@ public struct SteppedSetting: View {
     let minimum: Int
     
     let maximum: Int
-    
-    let deltas: [Int]
-    
+
+    let decrements: [Int]
+
+    let increments: [Int]
+
     var formatter: NumberFormatter = makeDefaultNumberFormatter()
     
     public var body: some View {
@@ -161,14 +163,15 @@ public struct SteppedSetting: View {
         self._group = group
         self.minimum = minimum
         self.maximum = maximum
-        self.deltas = Self.unpackDeltas(deltas)
+        (self.decrements, self.increments) = Self.unpackDeltas(deltas)
     }
 
     func wide() -> some View {
         HStack(alignment: .center, spacing: UIConstants.settingsGridSpacing) {
             name()
             value()
-            stepButtons(1)
+            decrementButtons()
+            incrementButtons()
             Spacer()
         }
         .frame(maxWidth: .infinity)
@@ -181,10 +184,26 @@ public struct SteppedSetting: View {
                 value()
                 Spacer()
             }
-            HStack(alignment: .center, spacing: UIConstants.settingsGridSpacing) {
-                Spacer().frame(width: UIConstants.indentedContentLeadingInset)
-                stepButtons(deltas.count / 4)
-                Spacer()
+
+            if (decrements.count <= 2) {
+                HStack(alignment: .center, spacing: UIConstants.settingsGridSpacing) {
+                    Spacer().frame(width: UIConstants.indentedContentLeadingInset)
+                    decrementButtons()
+                    incrementButtons()
+                    Spacer()
+                }
+            }
+            else {
+                HStack(alignment: .center, spacing: UIConstants.settingsGridSpacing) {
+                    Spacer().frame(width: UIConstants.indentedContentLeadingInset)
+                    decrementButtons()
+                    Spacer()
+                }
+                HStack(alignment: .center, spacing: UIConstants.settingsGridSpacing) {
+                    Spacer().frame(width: UIConstants.indentedContentLeadingInset)
+                    incrementButtons()
+                    Spacer()
+                }
             }
         }
         .frame(maxWidth: .infinity)
@@ -213,15 +232,26 @@ public struct SteppedSetting: View {
             .disabled(true)
     }
 
-    func stepButtons(_ rows: Int) -> some View {
-        ForEach(deltas.indices, id: \.self) { idx in
+    func decrementButtons() -> some View {
+        ForEach(decrements.indices, id: \.self) { idx in
 
             Button (action: {
-                setValue(settingValue + deltas[idx])
+                setValue(settingValue + decrements[idx])
             }) {
-                let label = (deltas[idx] < 0) ? "\(deltas[idx])" : "+\(deltas[idx])"
-                Text(label)
-                    // .frame(height: UIConstants.buttonHeight)
+                Text("\(decrements[idx])")
+            }
+            .modifier(TextButtonStyle())
+            .foregroundColor(UIConstants.controlColor)
+        }
+    }
+
+    func incrementButtons() -> some View {
+        ForEach(increments.indices, id: \.self) { idx in
+
+            Button (action: {
+                setValue(settingValue + increments[idx])
+            }) {
+                Text("+\(increments[idx])")
             }
             .modifier(TextButtonStyle())
             .foregroundColor(UIConstants.controlColor)
@@ -244,18 +274,22 @@ public struct SteppedSetting: View {
         return formatter
     }
 
-    private static func unpackDeltas(_ deltas: [Int]) -> [Int] {
-        var set = Set<Int>()
+    private static func unpackDeltas(_ deltas: [Int]) -> ([Int], [Int]) {
+        var incrementSet = Set<Int>()
+        var decrementSet = Set<Int>()
         for d in deltas {
             if (d != 0) {
-                set.insert(d)
-                set.insert(-d)
+                incrementSet.insert(d)
+                decrementSet.insert(-d)
             }
         }
 
-        var unpacked = [Int]()
-        unpacked.append(contentsOf: set.sorted())
-        return unpacked
+        var decrements = [Int]()
+        decrements.append(contentsOf: decrementSet.sorted())
+
+        var increments = [Int]()
+        increments.append(contentsOf: incrementSet.sorted())
+        return (decrements, increments)
     }
 }
 
