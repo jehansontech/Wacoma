@@ -60,6 +60,5 @@ public struct UIConstants {
     
     public static let darkGray = Color(red: 80/255, green: 80/255, blue: 80/255, opacity: 1)
     
-    public static let controlColor = Color(red: 0/255, green: 180/255, blue: 255/255, opacity: 1)
-
+    public static let controlColor = Color(red: 0/255, green: 127/255, blue: 255/255, opacity: 1)
 }
