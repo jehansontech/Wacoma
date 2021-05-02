@@ -229,7 +229,8 @@ public struct SteppedSetting: View {
         TextField("", value: $settingValue, formatter: formatter,
                   onEditingChanged: { editing in
                     isEditing = editing
-                  })
+                  },
+                  onCommit: fixValue)
             .font(.system(size: UIConstants.settingValueFontSize, design: .monospaced))
             .lineLimit(1)
             .autocapitalization(.none)
@@ -290,6 +291,13 @@ public struct SteppedSetting: View {
     
     private func setValue(_ newValue: Int) {
         $settingValue.wrappedValue = newValue.clamp(minimum, maximum)
+    }
+
+    private func fixValue() {
+        let fixedValue = settingValue.clamp(minimum, maximum)
+        if fixedValue != settingValue {
+            $settingValue.wrappedValue = fixedValue
+        }
     }
 
     private static func makeDefaultNumberFormatter() -> NumberFormatter {
@@ -394,7 +402,8 @@ public struct RangeSetting: View {
         TextField("", value: $settingValue, formatter: formatter,
                   onEditingChanged: { editing in
                     isEditing = editing
-                  })
+                  },
+                  onCommit: fixValue)
             .font(.system(size: UIConstants.settingValueFontSize, design: .monospaced))
             .lineLimit(1)
             .autocapitalization(.none)
@@ -423,6 +432,13 @@ public struct RangeSetting: View {
         self._group = group
         self.range = minimum...maximum
         self.step = step
+    }
+
+    private func fixValue() {
+        let fixedValue = settingValue.clamp(range)
+        if fixedValue != settingValue {
+            $settingValue.wrappedValue = fixedValue
+        }
     }
 
     public func formatter(_ formatter: NumberFormatter) -> Self {
