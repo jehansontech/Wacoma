@@ -27,11 +27,11 @@ public struct TwistieGroup {
 
     public var selection: String? = nil
 
-    var _autoCollapse: Bool = true
+    var autoCollapseEnabled: Bool = true
 
-    var _headerStyle: TwistieSectionHeaderStyle = .equalWidths
+    var currentHeaderStyle: TwistieSectionHeaderStyle = .equalWidths
 
-    var _contentInsets = EdgeInsets(top: UIConstants.indentedContentTopInset,
+    var currentContentInserts = EdgeInsets(top: UIConstants.indentedContentTopInset,
                                    leading: UIConstants.indentedContentLeadingInset,
                                    bottom: UIConstants.indentedContentBottomInset,
                                    trailing: 0)
@@ -39,7 +39,7 @@ public struct TwistieGroup {
     var buttonMinWidth: CGFloat = 0
 
     var buttonMaxWidth: CGFloat {
-        switch _headerStyle {
+        switch currentHeaderStyle {
         case .fill:
             return .infinity
         case .equalWidths:
@@ -55,19 +55,19 @@ public struct TwistieGroup {
 
     public func autoCollapse(_ enabled: Bool) -> Self {
         var view = self
-        view._autoCollapse = enabled
+        view.autoCollapseEnabled = enabled
         return view
     }
 
     public func headerStyle(_ style: TwistieSectionHeaderStyle) -> Self {
         var view = self
-        view._headerStyle = style
+        view.currentHeaderStyle = style
         return view
     }
 
     public func contentInsets(_ insets: EdgeInsets) -> Self {
         var view = self
-        view._contentInsets = insets
+        view.currentContentInserts = insets
         return view
     }
  }
@@ -78,12 +78,14 @@ public struct TwistieSection<Content: View> : View {
 
     @Binding var group: TwistieGroup
 
+    @State var expanded = false
+
     var sectionContent: () -> Content
 
     public var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             HStack(alignment: .center) {
-                Button(action: toggleSelection) {
+                Button(action: headerClicked) {
                     Image(systemName: "chevron.right")
                         .foregroundColor(UIConstants.controlColor)
                         .frame(width: UIConstants.twistieChevronSize, height: UIConstants.twistieChevronSize)
@@ -110,7 +112,7 @@ public struct TwistieSection<Content: View> : View {
 
             if shouldShowContent() {
                 sectionContent()
-                    .padding(group._contentInsets)
+                    .padding(group.currentContentInserts)
             }
         }
     }
@@ -121,11 +123,12 @@ public struct TwistieSection<Content: View> : View {
         self.sectionContent = content
     }
 
-    func toggleSelection() {
+    func headerClicked() {
         if group.selection == sectionName {
-            $group.wrappedValue.selection = nil
+            expanded = !expanded
         }
         else {
+            expanded = true
             $group.wrappedValue.selection = sectionName
         }
     }
@@ -135,6 +138,6 @@ public struct TwistieSection<Content: View> : View {
     }
 
     func shouldShowContent() -> Bool {
-        return !group._autoCollapse || group.selection == self.sectionName
+        return group.autoCollapseEnabled ? isSelected() : expanded
     }
 }
