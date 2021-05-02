@@ -130,6 +130,8 @@ public struct SteppedSetting: View {
     
     let settingName: String
 
+    @State var isEditing: Bool = false
+
     @Binding var settingValue: Int
     
     @Binding var group: SettingsGroup
@@ -224,14 +226,18 @@ public struct SteppedSetting: View {
     }
 
     func value() -> some View {
-        TextField("", value: $settingValue, formatter: formatter)
+        TextField("", value: $settingValue, formatter: formatter,
+                  onEditingChanged: { editing in
+                    isEditing = editing
+                  })
             .font(.system(size: UIConstants.settingValueFontSize, design: .monospaced))
             .lineLimit(1)
+            .autocapitalization(.none)
+            .disableAutocorrection(true)
             .multilineTextAlignment(.trailing)
             .padding(UIConstants.buttonPadding)
             .frame(width: UIConstants.settingValueWidth)
-            .border(UIConstants.darkGray)
-            .disabled(true)
+            .border(isEditing ? UIConstants.controlColor : UIConstants.darkGray)
     }
 
     func decrementButtons() -> some View {
@@ -323,6 +329,8 @@ public struct RangeSetting: View {
     
     let settingName: String
 
+    @State var isEditing: Bool = false
+
     @Binding var settingValue: Double
     
     @Binding var group: SettingsGroup
@@ -383,14 +391,18 @@ public struct RangeSetting: View {
     }
 
     public func value() -> some View {
-        TextField("", value: $settingValue, formatter: formatter)
+        TextField("", value: $settingValue, formatter: formatter,
+                  onEditingChanged: { editing in
+                    isEditing = editing
+                  })
             .font(.system(size: UIConstants.settingValueFontSize, design: .monospaced))
             .lineLimit(1)
+            .autocapitalization(.none)
+            .disableAutocorrection(true)
             .multilineTextAlignment(.trailing)
             .padding(UIConstants.buttonPadding)
             .frame(width: UIConstants.settingValueWidth)
-            .border(UIConstants.darkGray)
-            .disabled(true)
+            .border(isEditing ? UIConstants.controlColor : UIConstants.darkGray)
     }
 
     public func slider() -> some View {

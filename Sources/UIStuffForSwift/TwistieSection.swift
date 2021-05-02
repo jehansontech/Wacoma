@@ -27,15 +27,19 @@ public struct TwistieGroup {
 
     public var selection: String? = nil
 
-    var buttonMinWidth: CGFloat = 0
+    var _autoCollapse: Bool = true
 
-    var contentInsets = EdgeInsets(top: UIConstants.indentedContentTopInset,
+    var _buttonStyle: TwistieSectionButtonStyle = .equalWidths
+
+    var _contentInsets = EdgeInsets(top: UIConstants.indentedContentTopInset,
                                    leading: UIConstants.indentedContentLeadingInset,
                                    bottom: UIConstants.indentedContentBottomInset,
                                    trailing: 0)
 
+    var buttonMinWidth: CGFloat = 0
+
     var buttonMaxWidth: CGFloat {
-        switch buttonStyle {
+        switch _buttonStyle {
         case .fill:
             return .infinity
         case .equalWidths:
@@ -43,23 +47,27 @@ public struct TwistieGroup {
         }
     }
 
-    var buttonStyle: TwistieSectionButtonStyle = .equalWidths
-
     public init() {}
 
     public init(_ selection: String) {
         self.selection = selection
     }
 
+    public func autoCollapse(_ enabled: Bool) -> Self {
+        var view = self
+        view._autoCollapse = enabled
+        return view
+    }
+
     public func buttonStyle(_ style: TwistieSectionButtonStyle) -> Self {
         var view = self
-        view.buttonStyle = style
+        view._buttonStyle = style
         return view
     }
 
     public func contentInsets(_ insets: EdgeInsets) -> Self {
         var view = self
-        view.contentInsets = insets
+        view._contentInsets = insets
         return view
     }
  }
@@ -100,10 +108,9 @@ public struct TwistieSection<Content: View> : View {
                 Spacer()
             }
 
-
-            if isSelected() {
+            if shouldShowContent() {
                 sectionContent()
-                    .padding(group.contentInsets)
+                    .padding(group._contentInsets)
             }
         }
     }
@@ -125,5 +132,9 @@ public struct TwistieSection<Content: View> : View {
 
     func isSelected() -> Bool {
         return group.selection == self.sectionName
+    }
+
+    func shouldShowContent() -> Bool {
+        return !group._autoCollapse || group.selection == self.sectionName
     }
 }
