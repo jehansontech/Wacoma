@@ -134,6 +134,8 @@ public struct TwistieSection<Content: View> : View {
     }
 
     func isExpanded() -> Bool {
-        return group.autoCollapseEnabled ? group.selection == self.sectionName : expandRequested
+        return group.autoCollapseEnabled
+            ? expandRequested && group.selection == self.sectionName
+            : expandRequested
     }
 }
