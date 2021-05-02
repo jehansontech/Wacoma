@@ -18,7 +18,7 @@ struct TwistieButtonWidthPreferenceKey: PreferenceKey {
     }
 }
 
-public enum TwistieSectionButtonStyle {
+public enum TwistieSectionHeaderStyle {
     case fill
     case equalWidths
 }
@@ -29,7 +29,7 @@ public struct TwistieGroup {
 
     var _autoCollapse: Bool = true
 
-    var _buttonStyle: TwistieSectionButtonStyle = .equalWidths
+    var _headerStyle: TwistieSectionHeaderStyle = .equalWidths
 
     var _contentInsets = EdgeInsets(top: UIConstants.indentedContentTopInset,
                                    leading: UIConstants.indentedContentLeadingInset,
@@ -39,7 +39,7 @@ public struct TwistieGroup {
     var buttonMinWidth: CGFloat = 0
 
     var buttonMaxWidth: CGFloat {
-        switch _buttonStyle {
+        switch _headerStyle {
         case .fill:
             return .infinity
         case .equalWidths:
@@ -59,9 +59,9 @@ public struct TwistieGroup {
         return view
     }
 
-    public func buttonStyle(_ style: TwistieSectionButtonStyle) -> Self {
+    public func headerStyle(_ style: TwistieSectionHeaderStyle) -> Self {
         var view = self
-        view._buttonStyle = style
+        view._headerStyle = style
         return view
     }
 
