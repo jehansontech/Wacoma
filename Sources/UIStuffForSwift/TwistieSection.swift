@@ -78,7 +78,7 @@ public struct TwistieSection<Content: View> : View {
 
     @Binding var group: TwistieGroup
 
-    @State var expanded = false
+    @State var expandRequested = false
 
     var sectionContent: () -> Content
 
@@ -89,7 +89,7 @@ public struct TwistieSection<Content: View> : View {
                     Image(systemName: "chevron.right")
                         .foregroundColor(UIConstants.controlColor)
                         .frame(width: UIConstants.twistieChevronSize, height: UIConstants.twistieChevronSize)
-                        .rotated(by: .degrees(isSelected() ? 90 : 0))
+                        .rotated(by: .degrees(isExpanded() ? 90 : 0))
 
                     Text(sectionName)
                         .lineLimit(1)
@@ -110,7 +110,7 @@ public struct TwistieSection<Content: View> : View {
                 Spacer()
             }
 
-            if shouldShowContent() {
+            if isExpanded() {
                 sectionContent()
                     .padding(group.currentContentInserts)
             }
@@ -125,19 +125,15 @@ public struct TwistieSection<Content: View> : View {
 
     func headerClicked() {
         if group.selection == sectionName {
-            expanded = !expanded
+            expandRequested = !expandRequested
         }
         else {
-            expanded = true
+            expandRequested = true
             $group.wrappedValue.selection = sectionName
         }
     }
 
-    func isSelected() -> Bool {
-        return group.selection == self.sectionName
-    }
-
-    func shouldShowContent() -> Bool {
-        return group.autoCollapseEnabled ? isSelected() : expanded
+    func isExpanded() -> Bool {
+        return group.autoCollapseEnabled ? group.selection == self.sectionName : expandRequested
     }
 }
