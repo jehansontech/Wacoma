@@ -99,16 +99,17 @@ public struct TwistieSection<Content: View> : View {
 
                         Spacer()
                     }
+                    .border(Color.blue)
                 }
                 .fixedSize()
-                .modifier(TextButtonStyle())
                 .overlay(GeometryReader { proxy in
                     Color.clear.preference(key: TwistieButtonWidthPreferenceKey.self, value: proxy.size.width)
                 }).onPreferenceChange(TwistieButtonWidthPreferenceKey.self) { (value) in
-                    group.buttonMinWidth = max(group.buttonMinWidth, value)
+                    $group.wrappedValue.buttonMinWidth = max(group.buttonMinWidth, value)
                 }
                 .frame(minWidth: group.buttonMinWidth, maxWidth: group.buttonMaxWidth, alignment: .leading)
-
+                .modifier(TextButtonStyle())
+                .border(Color.gray)
                 Spacer()
             }
 
