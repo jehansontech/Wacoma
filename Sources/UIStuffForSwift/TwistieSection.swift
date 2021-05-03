@@ -102,7 +102,7 @@ public struct TwistieSection<Content: View> : View {
                 .overlay(GeometryReader { proxy in
                     Color.clear.preference(key: TwistieButtonWidthPreferenceKey.self, value: proxy.size.width)
                 }).onPreferenceChange(TwistieButtonWidthPreferenceKey.self) { (value) in
-                    $group.wrappedValue.buttonMinWidth = max(group.buttonMinWidth, value)
+                    group.buttonMinWidth = max(group.buttonMinWidth, value)
                 }
                 .frame(minWidth: group.buttonMinWidth, maxWidth: group.buttonMaxWidth, alignment: .leading)
                 .modifier(TextButtonStyle())
@@ -124,15 +124,19 @@ public struct TwistieSection<Content: View> : View {
     }
 
     func headerClicked() {
-        print("\(sectionName) headerClicked: entered. selected=\(group.selection == sectionName) expandRequested=\(expandRequested)")
-        if group.selection != sectionName {
+        print("\(sectionName) headerClicked: entered. selected=\(isSelected()) expandRequested=\(expandRequested)")
+        if isSelected() {
             expandRequested = !expandRequested
         }
         else {
             expandRequested = true
             group.selection = sectionName
         }
-        print("\(sectionName) headerClicked: exiting. selected=\(group.selection == sectionName) expandRequested=\(expandRequested)")
+        print("\(sectionName) headerClicked: exiting. selected=\(isSelected()) expandRequested=\(expandRequested)")
+    }
+
+    func isSelected() -> Bool {
+        return group.selection == sectionName
     }
 
     func isExpanded() -> Bool {
