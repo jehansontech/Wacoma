@@ -1,3 +1,3 @@
 # UIStuffForSwift
 
-Constants and stylings for SwiftUI
+Constants and stylings for SwiftUI apps

@@ -124,7 +124,7 @@ public struct TwistieSection<Content: View> : View {
     }
 
     func headerClicked() {
-        print("\(sectionName) headerClicked: entered. selected=\(isSelected()) expandRequested=\(expandRequested)")
+        // print("\(sectionName) headerClicked: entered. selected=\(isSelected()) expandRequested=\(expandRequested)")
         if isSelected() {
             expandRequested = !expandRequested
         }
@@ -132,7 +132,7 @@ public struct TwistieSection<Content: View> : View {
             expandRequested = true
             group.selection = sectionName
         }
-        print("\(sectionName) headerClicked: exiting. selected=\(isSelected()) expandRequested=\(expandRequested)")
+        // print("\(sectionName) headerClicked: exiting. selected=\(isSelected()) expandRequested=\(expandRequested)")
     }
 
     func isSelected() -> Bool {
