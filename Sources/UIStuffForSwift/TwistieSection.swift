@@ -106,10 +106,8 @@ public struct TwistieSection<Content: View> : View {
                         $group.wrappedValue.buttonMinWidth = max(group.buttonMinWidth, value)
                     }
                     .frame(minWidth: group.buttonMinWidth, maxWidth: group.buttonMaxWidth, alignment: .leading)
-                    .border(Color.blue)
                 }
                 .modifier(TextButtonStyle())
-                .border(Color.gray)
                 Spacer()
             }
 
