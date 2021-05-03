@@ -124,6 +124,7 @@ public struct TwistieSection<Content: View> : View {
     }
 
     func headerClicked() {
+        print("headerClicked: selected=\(group.selection == selectionName) expandRequested=\(expandRequested)")
         if group.selection != sectionName {
             expandRequested = !expandRequested
         }
