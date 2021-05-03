@@ -32,9 +32,9 @@ public struct TwistieGroup {
     var currentHeaderStyle: TwistieSectionHeaderStyle = .equalWidths
 
     var currentContentInserts = EdgeInsets(top: UIConstants.indentedContentTopInset,
-                                   leading: UIConstants.indentedContentLeadingInset,
-                                   bottom: UIConstants.indentedContentBottomInset,
-                                   trailing: 0)
+                                           leading: UIConstants.indentedContentLeadingInset,
+                                           bottom: UIConstants.indentedContentBottomInset,
+                                           trailing: 0)
 
     var buttonMinWidth: CGFloat = 0
 
@@ -70,7 +70,7 @@ public struct TwistieGroup {
         view.currentContentInserts = insets
         return view
     }
- }
+}
 
 public struct TwistieSection<Content: View> : View {
 
@@ -86,17 +86,19 @@ public struct TwistieSection<Content: View> : View {
         VStack(alignment: .leading, spacing: 0) {
             HStack(alignment: .center) {
                 Button(action: headerClicked) {
-                    Image(systemName: "chevron.right")
-                        .foregroundColor(UIConstants.controlColor)
-                        .frame(width: UIConstants.twistieChevronSize, height: UIConstants.twistieChevronSize)
-                        .rotated(by: .degrees(isExpanded() ? 90 : 0))
+                    HStack {
+                        Image(systemName: "chevron.right")
+                            .foregroundColor(UIConstants.controlColor)
+                            .frame(width: UIConstants.twistieChevronSize, height: UIConstants.twistieChevronSize)
+                            .rotated(by: .degrees(isExpanded() ? 90 : 0))
 
-                    Text(sectionName)
-                        .lineLimit(1)
-                        .multilineTextAlignment(.leading)
-                        .foregroundColor(UIConstants.offWhite)
+                        Text(sectionName)
+                            .lineLimit(1)
+                            .multilineTextAlignment(.leading)
+                            .foregroundColor(UIConstants.offWhite)
 
-                    Spacer()
+                        Spacer()
+                    }
                 }
                 .fixedSize()
                 .modifier(TextButtonStyle())
