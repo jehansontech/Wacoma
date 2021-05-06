@@ -9,7 +9,7 @@ import Foundation
 
 extension Int {
 
-    func clamp(_ min: Self, _ max: Self) -> Self {
+    public func clamp(_ min: Self, _ max: Self) -> Self {
         return self < min ? min : (self > max ? max : self)
     }
 }

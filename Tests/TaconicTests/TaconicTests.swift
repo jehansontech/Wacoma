@@ -1,8 +1,8 @@
 import XCTest
-@testable import UIStuffForSwift
+@testable import Taconic
 
-final class UIStuffForSwiftTests: XCTestCase {
-    
+final class TaconicTests: XCTestCase {
+
     func testExample() {
     }
 
