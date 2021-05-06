@@ -14,12 +14,12 @@ public func setDebug(enabled: Bool) {
 
 public func debug(_ message: String) {
     if debugEnabled {
-        print("[\(Thread.current.isMainThread ? "main" : "back")] \(message)")
+        print("[\(Thread.current.isMainThread ? "main" : "background")] \(message)")
     }
 }
 
 public func debug(_ context: String, _ message: String) {
     if debugEnabled {
-        print("[\(Thread.current.isMainThread ? "main" : "back")] \(context): \(message)")
+        print("[\(Thread.current.isMainThread ? "main" : "background"), \(context)] \(message)")
     }
 }
