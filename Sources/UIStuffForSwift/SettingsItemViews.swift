@@ -79,7 +79,7 @@ public struct TickyboxSetting: View {
 
         HStack(alignment: .center, spacing: UIConstants.settingsGridSpacing) {
 
-            Text(settingName)
+            Text(settingName + ":")
                 .lineLimit(1)
                 .fixedSize()
                 .overlay(GeometryReader { proxy in
@@ -214,7 +214,7 @@ public struct SteppedSetting: View {
     }
 
     func name() -> some View {
-        Text(settingName)
+        Text(settingName + ":")
             .lineLimit(1)
             .fixedSize()
             .overlay(GeometryReader { proxy in
@@ -387,7 +387,7 @@ public struct RangeSetting: View {
     }
 
     public func name() -> some View {
-        Text(settingName)
+        Text(settingName + ":")
             .lineLimit(1)
             .fixedSize()
             .overlay(GeometryReader { proxy in
@@ -479,7 +479,7 @@ public struct ChoiceSetting: View {
         
         HStack(alignment: .center, spacing: UIConstants.settingsGridSpacing) {
 
-            Text(settingName)
+            Text(settingName + ":")
                 .lineLimit(1)
                 .fixedSize()
                 .overlay(GeometryReader { proxy in
@@ -583,7 +583,7 @@ public struct TextSetting: View {
 
         HStack(alignment: .center, spacing: UIConstants.settingsGridSpacing) {
 
-            Text(settingName)
+            Text(settingName + ":")
                 .lineLimit(1)
                 .fixedSize()
                 .overlay(GeometryReader { proxy in
