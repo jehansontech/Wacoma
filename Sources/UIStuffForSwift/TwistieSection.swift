@@ -127,12 +127,13 @@ public struct TwistieSection<Content: View> : View {
     func headerClicked() {
         // print("\(sectionName) headerClicked: entered. selected=\(isSelected()) expandRequested=\(expandRequested)")
         if isSelected() {
-            // expandRequested = !expandRequested
+            // this section is already selected, so all we do is toggle expanded state
             expandRequested = !isExpanded()
         }
         else {
-            expandRequested = true
+            // some other section was selected, so we want to select this one and expand it
             group.selection = sectionName
+            expandRequested = true
         }
         // print("\(sectionName) headerClicked: exiting. selected=\(isSelected()) expandRequested=\(expandRequested)")
     }
