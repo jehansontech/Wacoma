@@ -78,7 +78,7 @@ public struct TwistieSection<Content: View> : View {
 
     @Binding var group: TwistieGroup
 
-    @State var expandRequested = false
+    @State var expandRequested: Bool
 
     var sectionContent: () -> Content
 
@@ -122,6 +122,7 @@ public struct TwistieSection<Content: View> : View {
         self.sectionName = sectionName
         self._group = group
         self.sectionContent = content
+        self._expandRequested = State(initialValue: (group.wrappedValue.selection == sectionName))
     }
 
     func headerClicked() {
