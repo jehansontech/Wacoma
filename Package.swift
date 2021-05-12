@@ -4,7 +4,7 @@
 import PackageDescription
 
 let package = Package(
-    name: "UIStuffForSwift",
+    name: "Wacoma",
     platforms: [
         .macOS(.v11), .iOS(.v14)
     ],
