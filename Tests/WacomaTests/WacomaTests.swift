@@ -1,7 +1,7 @@
 import XCTest
-@testable import Taconic
+@testable import Wacoma
 
-final class TaconicTests: XCTestCase {
+final class WacomaTests: XCTestCase {
 
     func testExample() {
     }

@@ -1,7 +1,7 @@
 import XCTest
-@testable import UIStuffForSwift
+@testable import WacomaUI
 
-final class UIStuffForSwiftTests: XCTestCase {
+final class WacomaUITests: XCTestCase {
     
     func testExample() {
     }

@@ -1,5 +1,5 @@
 //
-//  DebugHelper.swift
+//  Debug.swift
 //
 //  Created by Jim Hanson on 5/6/21.
 //

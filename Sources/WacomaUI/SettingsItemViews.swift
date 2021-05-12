@@ -6,7 +6,7 @@
 //
 
 import SwiftUI
-import Taconic
+import Wacoma
 
 struct LabelWidthPreferenceKey: PreferenceKey {
     typealias Value = CGFloat

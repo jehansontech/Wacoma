@@ -10,27 +10,27 @@ let package = Package(
     ],
     products: [
         .library(
-            name: "Taconic",
-            targets: ["Taconic"]),
+            name: "Wacoma",
+            targets: ["Wacoma"]),
         .library(
-            name: "UIStuffForSwift",
-            targets: ["UIStuffForSwift"]),
+            name: "WacomaUI",
+            targets: ["WacomaUI"]),
     ],
     dependencies: [
         // .package(url: /* package url */, from: "1.0.0"),
     ],
     targets: [
         .target(
-            name: "Taconic",
+            name: "Wacoma",
             dependencies: []),
+        .testTarget(
+            name: "WacomaTests",
+            dependencies: ["Wacoma"]),
         .target(
-            name: "UIStuffForSwift",
-            dependencies: ["Taconic"]),
+            name: "WacomaUI",
+            dependencies: ["Wacoma"]),
         .testTarget(
-            name: "TaconicTests",
-            dependencies: ["Taconic"]),
-        .testTarget(
-            name: "UIStuffForSwiftTests",
-            dependencies: ["UIStuffForSwift"])
+            name: "WacomaUITests",
+            dependencies: ["WacomaUI"])
     ]
 )
