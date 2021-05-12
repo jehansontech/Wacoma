@@ -20,24 +20,24 @@ fileprivate func makeDecimalFormatter() -> NumberFormatter {
 
 fileprivate let decimalFormatter = makeDecimalFormatter()
 
-func stringify(_ x: Float) -> String {
+public func stringify(_ x: Float) -> String {
     return decimalFormatter.string(from: NSNumber(value: x))!
 }
 
-func stringify(_ point: SIMD2<Float>) -> String {
+public func stringify(_ point: SIMD2<Float>) -> String {
     let x = decimalFormatter.string(from: NSNumber(value: point.x))!
     let y = decimalFormatter.string(from: NSNumber(value: point.y))!
     return "(\(x), \(y)"
 }
 
-func stringify(_ point: SIMD3<Float>) -> String {
+public func stringify(_ point: SIMD3<Float>) -> String {
     let x = decimalFormatter.string(from: NSNumber(value: point.x))!
     let y = decimalFormatter.string(from: NSNumber(value: point.y))!
     let z = decimalFormatter.string(from: NSNumber(value: point.z))!
     return "(\(x), \(y), \(z))"
 }
 
-func stringify(_ point: SIMD4<Float>) -> String {
+public func stringify(_ point: SIMD4<Float>) -> String {
     let x = decimalFormatter.string(from: NSNumber(value: point.x))!
     let y = decimalFormatter.string(from: NSNumber(value: point.y))!
     let z = decimalFormatter.string(from: NSNumber(value: point.z))!
@@ -45,24 +45,24 @@ func stringify(_ point: SIMD4<Float>) -> String {
     return "(\(x), \(y), \(z), \(w)"
 }
 
-func stringify(_ x: Double) -> String {
+public func stringify(_ x: Double) -> String {
     return decimalFormatter.string(from: NSNumber(value: x))!
 }
 
-func stringify(_ point: SIMD2<Double>) -> String {
+public func stringify(_ point: SIMD2<Double>) -> String {
     let x = decimalFormatter.string(from: NSNumber(value: point.x))!
     let y = decimalFormatter.string(from: NSNumber(value: point.y))!
     return "(\(x), \(y)"
 }
 
-func stringify(_ point: SIMD3<Double>) -> String {
+public func stringify(_ point: SIMD3<Double>) -> String {
     let x = decimalFormatter.string(from: NSNumber(value: point.x))!
     let y = decimalFormatter.string(from: NSNumber(value: point.y))!
     let z = decimalFormatter.string(from: NSNumber(value: point.z))!
     return "(\(x), \(y), \(z))"
 }
 
-func stringify(_ point: SIMD4<Double>) -> String {
+public func stringify(_ point: SIMD4<Double>) -> String {
     let x = decimalFormatter.string(from: NSNumber(value: point.x))!
     let y = decimalFormatter.string(from: NSNumber(value: point.y))!
     let z = decimalFormatter.string(from: NSNumber(value: point.z))!

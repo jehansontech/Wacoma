@@ -10,7 +10,7 @@ import Foundation
 
 extension SIMD3 {
 
-    var xy: SIMD2<Scalar> {
+    public var xy: SIMD2<Scalar> {
         return SIMD2<Scalar>(self.x, self.y)
     }
 
@@ -18,11 +18,11 @@ extension SIMD3 {
 
 extension SIMD4 {
 
-    var xy: SIMD2<Scalar> {
+    public var xy: SIMD2<Scalar> {
         return SIMD2<Scalar>(self.x, self.y)
     }
 
-    var xyz: SIMD3<Scalar> {
+    public var xyz: SIMD3<Scalar> {
         return SIMD3<Scalar>(self.x, self.y, self.z)
     }
 }

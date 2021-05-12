@@ -32,7 +32,7 @@ public func sphericalToCartesian(rtp: SIMD3<Float>) -> SIMD3<Float> {
 
 extension float3x3 {
 
-    init(rotateFrom v1: SIMD3<Float>, to v2: SIMD3<Float>) {
+    public init(rotateFrom v1: SIMD3<Float>, to v2: SIMD3<Float>) {
 
         let axis = cross(v1, v2)
         let cosA = dot(v1, v2)
@@ -59,7 +59,7 @@ extension float3x3 {
 
 extension float4x4 {
 
-    init(rotationAround axis: SIMD3<Float>, by angle: Float) {
+    public init(rotationAround axis: SIMD3<Float>, by angle: Float) {
 
         // from MetalPicking
 
@@ -74,7 +74,7 @@ extension float4x4 {
                            SIMD4<Float>(                  0,                   0,                   0, 1)))
     }
 
-    init(translationBy v: SIMD3<Float>) {
+    public init(translationBy v: SIMD3<Float>) {
 
         // from MetalPicking
 
@@ -84,7 +84,7 @@ extension float4x4 {
                            SIMD4<Float>(v.x, v.y, v.z,   1)))
     }
 
-    init(perspectiveProjectionRHFovY fovy: Float, aspectRatio: Float, nearZ: Float, farZ: Float) {
+    public init(perspectiveProjectionRHFovY fovy: Float, aspectRatio: Float, nearZ: Float, farZ: Float) {
 
         // from MetalPicking
 
@@ -97,7 +97,7 @@ extension float4x4 {
                            SIMD4<Float>( 0,  0, zs * nearZ,  0)))
     }
 
-    init(lookAt center: SIMD3<Float>, eye: SIMD3<Float>, up: SIMD3<Float>) {
+    public init(lookAt center: SIMD3<Float>, eye: SIMD3<Float>, up: SIMD3<Float>) {
 
         // https://stackoverflow.com/questions/9053377/ios-questions-about-camera-information-within-glkmatrix4makelookat-result
         // https://gist.github.com/CaptainRedmuff/5673450
