@@ -18,7 +18,7 @@ public struct PresetColorSequence: ColorSequence {
 
     var colors: [Color]
 
-    init() {
+    public init() {
         self.colors = Self.makeDefaultColors()
     }
 
