@@ -91,7 +91,6 @@ public struct ReadOnlySetting: View {
                 .multilineTextAlignment(.trailing)
                 .padding(UIConstants.buttonPadding)
                 .frame(width: UIConstants.settingValueWidth)
-            // .border(UIConstants.darkGray)
 
             // Spacer()
         }
@@ -222,13 +221,9 @@ public struct SteppedSetting: View {
     func wide() -> some View {
         HStack(alignment: .center, spacing: UIConstants.settingsGridSpacing) {
             name()
-                .border(Color.green)
             value()
-                .border(Color.green)
             decrementButtons()
-                .border(Color.green)
             incrementButtons()
-                .border(Color.green)
             // Spacer()
         }
         // .frame(maxWidth: .infinity)
