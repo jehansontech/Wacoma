@@ -222,7 +222,9 @@ public struct SteppedSetting: View {
     func wide() -> some View {
         HStack(alignment: .center, spacing: UIConstants.settingsGridSpacing) {
             name()
+                .border(Color.red)
             value()
+                .border(Color.green)
             decrementButtons()
             incrementButtons()
             // Spacer()
