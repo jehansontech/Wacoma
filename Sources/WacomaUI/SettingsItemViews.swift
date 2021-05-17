@@ -57,13 +57,13 @@ public struct SettingsGroup {
 
 
 // =================================================================================
-// MARK:- Constant
+// MARK:- ReadOnly
 // =================================================================================
 
 ///
 /// wide & narrow are the same
 ///
-public struct ConstantSetting: View {
+public struct ReadOnlySetting: View {
 
     let settingName: String
 
