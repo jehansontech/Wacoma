@@ -93,7 +93,7 @@ public struct ReadOnlySetting: View {
                 .frame(width: UIConstants.settingValueWidth)
                 // .border(UIConstants.darkGray)
 
-            Spacer()
+            // Spacer()
         }
     }
 
@@ -151,7 +151,7 @@ public struct TickyboxSetting: View {
                                 .opacity(0.05))
             }
 
-            Spacer()
+            // Spacer()
         }
     }
 
@@ -225,7 +225,7 @@ public struct SteppedSetting: View {
             value()
             decrementButtons()
             incrementButtons()
-            Spacer()
+            // Spacer()
         }
         .frame(maxWidth: .infinity)
     }
@@ -235,7 +235,7 @@ public struct SteppedSetting: View {
             HStack(alignment: .center, spacing: UIConstants.settingsGridSpacing) {
                 name()
                 value()
-                Spacer()
+                // Spacer()
             }
 
             if (decrements.count <= 2) {
@@ -243,19 +243,19 @@ public struct SteppedSetting: View {
                     // Spacer().frame(width: group.minimumLabelWidth)
                     decrementButtons()
                     incrementButtons()
-                    Spacer()
+                    // Spacer()
                 }
             }
             else {
                 HStack(alignment: .center, spacing: UIConstants.settingsGridSpacing) {
                     // Spacer().frame(width: group.minimumLabelWidth)
                     incrementButtons()
-                    Spacer()
+                    // Spacer()
                 }
                 HStack(alignment: .center, spacing: UIConstants.settingsGridSpacing) {
                     // Spacer().frame(width: group.minimumLabelWidth)
                     reversedDecrementButtons()
-                    Spacer()
+                    // Spacer()
                 }
             }
         }
@@ -415,7 +415,7 @@ public struct RangeSetting: View {
             name()
             value()
             slider()
-            Spacer()
+            // Spacer()
         }
         .frame(maxWidth: .infinity)
     }
@@ -425,12 +425,12 @@ public struct RangeSetting: View {
             HStack(alignment: .center, spacing: UIConstants.settingsGridSpacing) {
                 name()
                 value()
-                Spacer()
+                // Spacer()
             }
             HStack(alignment: .center, spacing: UIConstants.settingsGridSpacing) {
                 // Spacer().frame(width: group.minimumLabelWidth)
                 slider()
-                Spacer()
+                // Spacer()
             }
         }
         .frame(maxWidth: .infinity)
@@ -559,7 +559,7 @@ public struct ChoiceSetting: View {
                     .modifier(PopStyle())
             }
             
-            Spacer()
+            // Spacer()
         }
         .frame(maxWidth: .infinity)
 
