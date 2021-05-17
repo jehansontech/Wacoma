@@ -299,6 +299,7 @@ public struct SteppedSetting: View {
                     Text("\(decrements[idx])")
                         .font(.system(size: UIConstants.settingValueFontSize, design: .monospaced))
                 }
+                .fixedSize()
                 .modifier(TextButtonStyle())
                 .foregroundColor(UIConstants.controlColor)
             }
@@ -313,6 +314,7 @@ public struct SteppedSetting: View {
                     Text("\(decrements[revIdx])")
                         .font(.system(size: UIConstants.settingValueFontSize, design: .monospaced))
                 }
+                .fixedSize()
                 .modifier(TextButtonStyle())
                 .foregroundColor(UIConstants.controlColor)
             }
@@ -327,6 +329,7 @@ public struct SteppedSetting: View {
                     Text("+\(increments[idx])")
                         .font(.system(size: UIConstants.settingValueFontSize, design: .monospaced))
                 }
+                .fixedSize()
                 .modifier(TextButtonStyle())
                 .foregroundColor(UIConstants.controlColor)
             }
