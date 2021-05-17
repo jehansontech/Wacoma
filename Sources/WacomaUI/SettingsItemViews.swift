@@ -231,7 +231,7 @@ public struct SteppedSetting: View {
                 .border(Color.green)
             // Spacer()
         }
-        .frame(maxWidth: .infinity)
+        // .frame(maxWidth: .infinity)
     }
 
     func narrow() -> some View {
@@ -263,7 +263,7 @@ public struct SteppedSetting: View {
                 }
             }
         }
-        .frame(maxWidth: .infinity)
+        // .frame(maxWidth: .infinity)
 
     }
 
@@ -296,7 +296,6 @@ public struct SteppedSetting: View {
     }
 
     func decrementButtons() -> some View {
-        HStack {
             ForEach(decrements.indices, id: \.self) { idx in
 
                 Button (action: {
@@ -308,11 +307,9 @@ public struct SteppedSetting: View {
                 .modifier(TextButtonStyle())
                 .foregroundColor(UIConstants.controlColor)
             }
-        }
     }
 
     func reversedDecrementButtons() -> some View {
-        HStack {
             ForEach(decrements.indices, id: \.self) { idx in
                 let revIdx = decrements.indices.count - idx - 1
                 Button (action: {
@@ -325,10 +322,8 @@ public struct SteppedSetting: View {
                 .foregroundColor(UIConstants.controlColor)
             }
         }
-    }
 
     func incrementButtons() -> some View {
-        HStack {
             ForEach(increments.indices, id: \.self) { idx in
 
                 Button (action: {
@@ -340,7 +335,6 @@ public struct SteppedSetting: View {
                 .modifier(TextButtonStyle())
                 .foregroundColor(UIConstants.controlColor)
             }
-        }
     }
 
     public func formatter(_ formatter: NumberFormatter) -> Self {
@@ -427,7 +421,7 @@ public struct RangeSetting: View {
             slider()
             // Spacer()
         }
-        .frame(maxWidth: .infinity)
+        // .frame(maxWidth: .infinity)
     }
 
     func narrow() -> some View {
@@ -443,7 +437,7 @@ public struct RangeSetting: View {
                 // Spacer()
             }
         }
-        .frame(maxWidth: .infinity)
+        // .frame(maxWidth: .infinity)
     }
 
     public func name() -> some View {
@@ -549,7 +543,10 @@ public struct ChoiceSetting: View {
                 }
                 .frame(width: group.minimumLabelWidth, alignment: .trailing)
 
-            Button(action: { selectorShowing = true }) {
+            Button(action: {
+                    selectorShowing = true
+
+            }) {
                 HStack(alignment: .center, spacing: 0) {
                     Text(settingValue)
                         .font(.system(size: UIConstants.settingValueFontSize))
@@ -571,7 +568,7 @@ public struct ChoiceSetting: View {
             
             // Spacer()
         }
-        .frame(maxWidth: .infinity)
+        // .frame(maxWidth: .infinity)
 
     }
     
