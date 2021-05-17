@@ -296,7 +296,7 @@ public struct SteppedSetting: View {
     }
 
     func decrementButtons() -> some View {
-        Group {
+        HStack {
             ForEach(decrements.indices, id: \.self) { idx in
 
                 Button (action: {
@@ -312,7 +312,7 @@ public struct SteppedSetting: View {
     }
 
     func reversedDecrementButtons() -> some View {
-        Group {
+        HStack {
             ForEach(decrements.indices, id: \.self) { idx in
                 let revIdx = decrements.indices.count - idx - 1
                 Button (action: {
@@ -328,7 +328,7 @@ public struct SteppedSetting: View {
     }
 
     func incrementButtons() -> some View {
-        Group {
+        HStack {
             ForEach(increments.indices, id: \.self) { idx in
 
                 Button (action: {
