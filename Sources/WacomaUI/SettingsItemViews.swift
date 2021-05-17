@@ -57,6 +57,56 @@ public struct SettingsGroup {
 
 
 // =================================================================================
+// MARK:- Constant
+// =================================================================================
+
+///
+/// wide & narrow are the same
+///
+public struct ConstantSetting: View {
+
+    let settingName: String
+
+    @Binding var settingValue: String
+
+    @Binding var group: SettingsGroup
+
+    public var body: some View {
+
+        HStack(alignment: .center, spacing: UIConstants.settingsGridSpacing) {
+
+            Text(settingName + ":")
+                .lineLimit(1)
+                .fixedSize()
+                .overlay(GeometryReader { proxy in
+                    Color.clear.preference(key: LabelWidthPreferenceKey.self, value: proxy.size.width)
+                }).onPreferenceChange(LabelWidthPreferenceKey.self) { (value) in
+                    $group.wrappedValue.minimumLabelWidth = max(group.minimumLabelWidth, value)
+                }
+                .frame(width: group.minimumLabelWidth, alignment: .trailing)
+
+            Text(settingValue)
+                .font(.system(size: UIConstants.settingValueFontSize, design: .monospaced))
+                .lineLimit(1)
+                .multilineTextAlignment(.trailing)
+                .padding(UIConstants.buttonPadding)
+                .frame(width: UIConstants.settingValueWidth)
+                // .border(UIConstants.darkGray)
+
+            Spacer()
+        }
+    }
+
+    public init(_ name: String,
+                _ value: Binding<String>,
+                _ group: Binding<SettingsGroup>) {
+        self.settingName = name
+        self._settingValue = value
+        self._group = group
+    }
+}
+
+// =================================================================================
 // MARK:- Tickybox
 // =================================================================================
 
