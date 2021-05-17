@@ -91,7 +91,7 @@ public struct ReadOnlySetting: View {
                 .multilineTextAlignment(.trailing)
                 .padding(UIConstants.buttonPadding)
                 .frame(width: UIConstants.settingValueWidth)
-                // .border(UIConstants.darkGray)
+            // .border(UIConstants.darkGray)
 
             // Spacer()
         }
@@ -144,11 +144,11 @@ public struct TickyboxSetting: View {
             }) {
                 Text($settingValue.wrappedValue ? trueText : falseText)
                     .font(.system(size: UIConstants.settingValueFontSize))
-                .padding(UIConstants.buttonPadding)
-                .frame(width: UIConstants.settingValueWidth, alignment: .center)
-                .foregroundColor(UIConstants.controlColor)
-                .background(RoundedRectangle(cornerRadius: 5)
-                                .opacity(0.05))
+                    .padding(UIConstants.buttonPadding)
+                    .frame(width: UIConstants.settingValueWidth, alignment: .center)
+                    .foregroundColor(UIConstants.controlColor)
+                    .background(RoundedRectangle(cornerRadius: 5)
+                                    .opacity(0.05))
             }
 
             // Spacer()
@@ -222,11 +222,13 @@ public struct SteppedSetting: View {
     func wide() -> some View {
         HStack(alignment: .center, spacing: UIConstants.settingsGridSpacing) {
             name()
-                .border(Color.red)
+                .border(Color.green)
             value()
                 .border(Color.green)
             decrementButtons()
+                .border(Color.green)
             incrementButtons()
+                .border(Color.green)
             // Spacer()
         }
         .frame(maxWidth: .infinity)
@@ -294,44 +296,50 @@ public struct SteppedSetting: View {
     }
 
     func decrementButtons() -> some View {
-        ForEach(decrements.indices, id: \.self) { idx in
+        Group {
+            ForEach(decrements.indices, id: \.self) { idx in
 
-            Button (action: {
-                setValue(settingValue + decrements[idx])
-            }) {
-                Text("\(decrements[idx])")
-                    .font(.system(size: UIConstants.settingValueFontSize, design: .monospaced))
+                Button (action: {
+                    setValue(settingValue + decrements[idx])
+                }) {
+                    Text("\(decrements[idx])")
+                        .font(.system(size: UIConstants.settingValueFontSize, design: .monospaced))
+                }
+                .modifier(TextButtonStyle())
+                .foregroundColor(UIConstants.controlColor)
             }
-            .modifier(TextButtonStyle())
-            .foregroundColor(UIConstants.controlColor)
         }
     }
 
     func reversedDecrementButtons() -> some View {
-        ForEach(decrements.indices, id: \.self) { idx in
-            let revIdx = decrements.indices.count - idx - 1
-            Button (action: {
-                setValue(settingValue + decrements[revIdx])
-            }) {
-                Text("\(decrements[revIdx])")
-                    .font(.system(size: UIConstants.settingValueFontSize, design: .monospaced))
+        Group {
+            ForEach(decrements.indices, id: \.self) { idx in
+                let revIdx = decrements.indices.count - idx - 1
+                Button (action: {
+                    setValue(settingValue + decrements[revIdx])
+                }) {
+                    Text("\(decrements[revIdx])")
+                        .font(.system(size: UIConstants.settingValueFontSize, design: .monospaced))
+                }
+                .modifier(TextButtonStyle())
+                .foregroundColor(UIConstants.controlColor)
             }
-            .modifier(TextButtonStyle())
-            .foregroundColor(UIConstants.controlColor)
         }
     }
 
     func incrementButtons() -> some View {
-        ForEach(increments.indices, id: \.self) { idx in
+        Group {
+            ForEach(increments.indices, id: \.self) { idx in
 
-            Button (action: {
-                setValue(settingValue + increments[idx])
-            }) {
-                Text("+\(increments[idx])")
-                    .font(.system(size: UIConstants.settingValueFontSize, design: .monospaced))
+                Button (action: {
+                    setValue(settingValue + increments[idx])
+                }) {
+                    Text("+\(increments[idx])")
+                        .font(.system(size: UIConstants.settingValueFontSize, design: .monospaced))
+                }
+                .modifier(TextButtonStyle())
+                .foregroundColor(UIConstants.controlColor)
             }
-            .modifier(TextButtonStyle())
-            .foregroundColor(UIConstants.controlColor)
         }
     }
 
