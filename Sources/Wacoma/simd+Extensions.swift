@@ -14,46 +14,46 @@ extension SIMD3 {
     public var xy: SIMD2<Scalar> {
         return SIMD2<Scalar>(self.x, self.y)
     }
+}
 
-    public static func cartesianToSpherical(xyz: SIMD3<Float>) -> SIMD3<Float> {
-        var r = sqrt( xyz.x * xyz.x + xyz.y * xyz.y + xyz.z * xyz.z)
-        if (r < .epsilon) {
-            r = .epsilon
-        }
-        let theta =  acos(xyz.z/r)
-        var phi = atan2(xyz.y, xyz.x)
-        if (phi < 0) {
-            phi += .twoPi
-        }
-        return SIMD3<Float>(r, theta, phi)
+public func cartesianToSpherical(xyz: SIMD3<Float>) -> SIMD3<Float> {
+    var r = sqrt( xyz.x * xyz.x + xyz.y * xyz.y + xyz.z * xyz.z)
+    if (r < .epsilon) {
+        r = .epsilon
     }
+    let theta =  acos(xyz.z/r)
+    var phi = atan2(xyz.y, xyz.x)
+    if (phi < 0) {
+        phi += .twoPi
+    }
+    return SIMD3<Float>(r, theta, phi)
+}
 
-    public static func cartesianToSpherical(xyz: SIMD3<Double>) -> SIMD3<Double> {
-        var r = sqrt( xyz.x * xyz.x + xyz.y * xyz.y + xyz.z * xyz.z)
-        if (r < .epsilon) {
-            r = .epsilon
-        }
-        let theta =  acos(xyz.z/r)
-        var phi = atan2(xyz.y, xyz.x)
-        if (phi < 0) {
-            phi += .twoPi
-        }
-        return SIMD3<Double>(r, theta, phi)
+public func cartesianToSpherical(xyz: SIMD3<Double>) -> SIMD3<Double> {
+    var r = sqrt( xyz.x * xyz.x + xyz.y * xyz.y + xyz.z * xyz.z)
+    if (r < .epsilon) {
+        r = .epsilon
     }
+    let theta =  acos(xyz.z/r)
+    var phi = atan2(xyz.y, xyz.x)
+    if (phi < 0) {
+        phi += .twoPi
+    }
+    return SIMD3<Double>(r, theta, phi)
+}
 
-    public static func sphericalToCartesian(rtp: SIMD3<Float>) -> SIMD3<Float> {
-        let x = rtp.x * sin(rtp.y) * cos(rtp.z)
-        let y = rtp.x * sin(rtp.y) * sin(rtp.z)
-        let z = rtp.x * cos(rtp.y)
-        return SIMD3<Float>(x, y, z)
-    }
+public func sphericalToCartesian(rtp: SIMD3<Float>) -> SIMD3<Float> {
+    let x = rtp.x * sin(rtp.y) * cos(rtp.z)
+    let y = rtp.x * sin(rtp.y) * sin(rtp.z)
+    let z = rtp.x * cos(rtp.y)
+    return SIMD3<Float>(x, y, z)
+}
 
-    public static func sphericalToCartesian(rtp: SIMD3<Double>) -> SIMD3<Double> {
-        let x = rtp.x * sin(rtp.y) * cos(rtp.z)
-        let y = rtp.x * sin(rtp.y) * sin(rtp.z)
-        let z = rtp.x * cos(rtp.y)
-        return SIMD3<Double>(x, y, z)
-    }
+public func sphericalToCartesian(rtp: SIMD3<Double>) -> SIMD3<Double> {
+    let x = rtp.x * sin(rtp.y) * cos(rtp.z)
+    let y = rtp.x * sin(rtp.y) * sin(rtp.z)
+    let z = rtp.x * cos(rtp.y)
+    return SIMD3<Double>(x, y, z)
 }
 
 extension SIMD4 {
