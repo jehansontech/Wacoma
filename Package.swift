@@ -16,9 +16,7 @@ let package = Package(
             name: "WacomaUI",
             targets: ["WacomaUI"]),
     ],
-    dependencies: [
-        // .package(url: /* package url */, from: "1.0.0"),
-    ],
+    dependencies: [],
     targets: [
         .target(
             name: "Wacoma",
@@ -28,9 +26,6 @@ let package = Package(
             dependencies: ["Wacoma"]),
         .target(
             name: "WacomaUI",
-            dependencies: ["Wacoma"]),
-        .testTarget(
-            name: "WacomaUITests",
-            dependencies: ["WacomaUI"])
+            dependencies: ["Wacoma"])
     ]
 )

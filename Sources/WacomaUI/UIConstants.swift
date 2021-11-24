@@ -11,13 +11,38 @@ public struct UIConstants {
 
     // Layout
 
-    public static let buttonCornerRadius: CGFloat = 5
+#if os(iOS)
 
+    public static let buttonCornerRadius: CGFloat = 5
+    public static let buttonOpacity: Double = 0.1
+    public static let buttonPadding = EdgeInsets(top: 5, leading: 10, bottom: 5, trailing: 10)
     public static let buttonSpacing: CGFloat = 10
 
+    public static let settingNameFontSize: CGFloat = 11
+    public static let settingValueFontSize: CGFloat = 15
+    public static let settingValueWidth: CGFloat = 150
+
+    public static let symbolButtonWidth: CGFloat = 45
+    public static let symbolButtonHeight: CGFloat = 35
+    public static let symbolButtonImageScale: Image.Scale = .large
+
+#elseif os(macOS)
+
+    public static let buttonCornerRadius: CGFloat = 5
     public static let buttonOpacity: Double = 0.1
-    
-    public static let buttonPadding = EdgeInsets(top: 5, leading: 10, bottom: 5, trailing: 10)
+    public static let buttonPadding = EdgeInsets(top: 1, leading: 2, bottom: 1, trailing: 2)
+    public static let buttonSpacing: CGFloat = 10
+
+    public static let settingNameFontSize: CGFloat = 11
+    public static let settingValueFontSize: CGFloat = 11
+    public static let settingValueWidth: CGFloat = 100
+
+    public static let symbolButtonWidth: CGFloat = 35
+    public static let symbolButtonHeight: CGFloat = 25
+    public static let symbolButtonImageScale: Image.Scale = .medium
+
+#endif
+
 
     public static let indentedContentBottomInset: CGFloat = 0
 
@@ -35,15 +60,7 @@ public struct UIConstants {
 
     public static let settingNameWidth: CGFloat = 180
 
-    public static let settingValueWidth: CGFloat = 150
-
-    public static let settingValueFontSize: CGFloat = 15
-    
     public static let settingSliderWidth: CGFloat = 200
-
-    public static let symbolButtonWidth: CGFloat = 45
-
-    public static let symbolButtonHeight: CGFloat = 35
 
     public static let twistieChevronSize: CGFloat = 12
 

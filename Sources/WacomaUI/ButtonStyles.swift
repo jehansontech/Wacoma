@@ -10,6 +10,7 @@ import SwiftUI
 public struct SpanningButtonStyle: ViewModifier {
 
     public func body(content: Content) -> some View {
+
         content
             .padding(UIConstants.buttonPadding)
             .frame(maxWidth: .infinity)
@@ -25,7 +26,8 @@ public struct SymbolButtonStyle: ViewModifier {
 
     public func body(content: Content) -> some View {
         content
-            .imageScale(.large)
+            .imageScale(UIConstants.symbolButtonImageScale)
+            // .padding(UIConstants.buttonPadding)
             .frame(width: UIConstants.symbolButtonWidth, height: UIConstants.symbolButtonHeight, alignment: .center)
             .background(RoundedRectangle(cornerRadius: UIConstants.buttonCornerRadius)
                             .opacity(UIConstants.buttonOpacity))
