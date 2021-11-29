@@ -12,9 +12,9 @@ let package = Package(
         .library(
             name: "Wacoma",
             targets: ["Wacoma"]),
-        .library(
-            name: "WacomaUI",
-            targets: ["WacomaUI"]),
+//        .library(
+//            name: "WacomaUI",
+//            targets: ["WacomaUI"]),
     ],
     dependencies: [],
     targets: [
@@ -24,8 +24,8 @@ let package = Package(
         .testTarget(
             name: "WacomaTests",
             dependencies: ["Wacoma"]),
-        .target(
-            name: "WacomaUI",
-            dependencies: ["Wacoma"])
+//        .target(
+//            name: "WacomaUI",
+//            dependencies: ["Wacoma"])
     ]
 )

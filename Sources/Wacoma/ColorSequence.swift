@@ -1,6 +1,6 @@
 //
 //  ColorSequence.swift
-//  
+//  WacomaUI
 //
 //  Created by Jim Hanson on 5/12/21.
 //
