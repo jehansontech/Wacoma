@@ -16,7 +16,7 @@ public struct PresetColorSequence: ColorSequence {
     public typealias Element = Color
     public typealias Iterator = PresetColorIterator
 
-    var colors: [Color]
+    public var colors: [Color]
 
     public init() {
         self.colors = Self.makeDefaultColors()
