@@ -1,5 +1,4 @@
 // swift-tools-version:5.3
-// The swift-tools-version declares the minimum version of Swift required to build this package.
 
 import PackageDescription
 
@@ -12,9 +11,6 @@ let package = Package(
         .library(
             name: "Wacoma",
             targets: ["Wacoma"]),
-//        .library(
-//            name: "WacomaUI",
-//            targets: ["WacomaUI"]),
     ],
     dependencies: [],
     targets: [
@@ -24,8 +20,5 @@ let package = Package(
         .testTarget(
             name: "WacomaTests",
             dependencies: ["Wacoma"]),
-//        .target(
-//            name: "WacomaUI",
-//            dependencies: ["Wacoma"])
     ]
 )
