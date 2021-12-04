@@ -11,22 +11,22 @@ import WebKit
 
 #if os(iOS)
 
-struct WKWebViewWrapper: UIViewRepresentable {
+public struct WKWebViewWrapper: UIViewRepresentable {
 
-    typealias UIViewType = WKWebView
+    public typealias UIViewType = WKWebView
 
-    private let pageName: String
+    public let pageName: String
 
-    private let location: String?
+    public let location: String?
 
-    init(_ pageName: String, _ location: String? = nil) {
+    public init(_ pageName: String, _ location: String? = nil) {
         debug("WKWebViewWrapper", "init pageName=\(pageName), location=\(location ?? "nil")")
 
         self.pageName = pageName
         self.location = location
     }
 
-    func makeUIView(context: Context) -> WKWebView {
+    public func makeUIView(context: Context) -> WKWebView {
         let wkWebView = WKWebView()
         // wkWebView.navigationDelegate = context.coordinator
 
@@ -40,15 +40,15 @@ struct WKWebViewWrapper: UIViewRepresentable {
         return wkWebView
     }
 
-    func updateUIView(_ uiView: WKWebView, context: Context) {
+    public func updateUIView(_ uiView: WKWebView, context: Context) {
         // print("updateUIView uiView=\(uiView)")
     }
 
-    func makeCoordinator() -> Coordinator {
+    public func makeCoordinator() -> Coordinator {
         return Coordinator(self)
     }
 
-    class Coordinator: NSObject, WKNavigationDelegate {
+    public class Coordinator: NSObject, WKNavigationDelegate {
 
         let parent: WKWebViewWrapper
 
@@ -65,15 +65,15 @@ struct WKWebViewWrapper: UIViewRepresentable {
 
 #elseif os(macOS)
 
-struct WKWebViewWrapper: NSViewRepresentable {
+public struct WKWebViewWrapper: NSViewRepresentable {
 
     public typealias NSViewType = WKWebView
 
-    private let pageName: String
+    public let pageName: String
 
-    private let location: String?
+    public let location: String?
 
-    init(_ pageName: String, _ location: String? = nil) {
+    public init(_ pageName: String, _ location: String? = nil) {
         debug("WKWebViewWrapper", "init pageName=\(pageName), location=\(location ?? "nil")")
 
         self.pageName = pageName
@@ -94,15 +94,15 @@ struct WKWebViewWrapper: NSViewRepresentable {
         return wkWebView
     }
 
-    func updateNSView(_ nsView: WKWebView, context: Context) {
+    public func updateNSView(_ nsView: WKWebView, context: Context) {
         // TODO
     }
 
-    func makeCoordinator() -> Coordinator {
+    public func makeCoordinator() -> Coordinator {
         return Coordinator(self)
     }
 
-    class Coordinator: NSObject, WKNavigationDelegate {
+    public class Coordinator: NSObject, WKNavigationDelegate {
 
         let parent: WKWebViewWrapper
 
@@ -124,7 +124,7 @@ struct WKWebViewWrapper: NSViewRepresentable {
 ///
 extension WKWebViewWrapper {
 
-    func loadPage(_ webView: WKWebView) {
+    public func loadPage(_ webView: WKWebView) {
         do {
             guard let filePath = Bundle.main.path(forResource: pageName, ofType: "html")
             else {
