@@ -6,15 +6,7 @@
 //  Copyright © 2020 J.E. Hanson Technologies LLC. All rights reserved.
 //
 
-// import Foundation
 import simd
-
-extension SIMD3 {
-
-    public var xy: SIMD2<Scalar> {
-        return SIMD2<Scalar>(self.x, self.y)
-    }
-}
 
 public func cartesianToSpherical(xyz: SIMD3<Float>) -> SIMD3<Float> {
     var r = sqrt( xyz.x * xyz.x + xyz.y * xyz.y + xyz.z * xyz.z)
@@ -56,7 +48,30 @@ public func sphericalToCartesian(rtp: SIMD3<Double>) -> SIMD3<Double> {
     return SIMD3<Double>(x, y, z)
 }
 
+extension SIMD2 {
+
+    public var prettyString: String {
+        "(\(self.x), \(self.y))"
+    }
+}
+
+extension SIMD3 {
+
+    public var prettyString: String {
+        "(\(self.x), \(self.y), \(self.z))"
+    }
+
+    public var xy: SIMD2<Scalar> {
+        return SIMD2<Scalar>(self.x, self.y)
+    }
+}
+
+
 extension SIMD4 {
+
+    public var prettyString: String {
+        "(\(self.x), \(self.y), \(self.z), \(self.w))"
+    }
 
     public var xy: SIMD2<Scalar> {
         return SIMD2<Scalar>(self.x, self.y)
