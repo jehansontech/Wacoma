@@ -1,6 +1,6 @@
 //
 //  View+Extensions.swift
-//  WacomaUI
+//  Wacoma
 //
 //  Created by Jim Hanson on 4/9/21.
 //

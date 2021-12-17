@@ -1,6 +1,6 @@
 //
 //  SIMD+Extensions.swift
-//  ArcWorld
+//  Wacoma
 //
 //  Created by Jim Hanson on 10/17/20.
 //  Copyright © 2020 J.E. Hanson Technologies LLC. All rights reserved.

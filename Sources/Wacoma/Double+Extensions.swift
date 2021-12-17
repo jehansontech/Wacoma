@@ -1,6 +1,6 @@
 //
-//  File.swift
-//  
+//  Double+Extensions.swift
+//  Wacoma
 //
 //  Created by Jim Hanson on 5/2/21.
 //

@@ -1,5 +1,5 @@
 //
-//  WebBrowserView.swift
+//  WKWebViewWrapper.swift
 //  Wacoma
 //
 //  Created by Jim Hanson on 12/4/21.
