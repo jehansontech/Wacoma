@@ -6,7 +6,22 @@
 //  Copyright © 2020 J.E. Hanson Technologies LLC. All rights reserved.
 //
 
+import Foundation
 import simd
+
+fileprivate let scalarFormatter = makeScalarFormatter()
+
+fileprivate func makeScalarFormatter() -> Formatter {
+    let formatter = NumberFormatter()
+    formatter.numberStyle = .decimal
+    formatter.usesSignificantDigits = true
+    formatter.maximumSignificantDigits = 3
+    return formatter
+}
+
+fileprivate func format<S>(_ x: S) -> String where S: SIMDScalar {
+    return scalarFormatter.string(for: x) ?? "\(x)"
+}
 
 public func cartesianToSpherical(xyz: SIMD3<Float>) -> SIMD3<Float> {
     var r = sqrt( xyz.x * xyz.x + xyz.y * xyz.y + xyz.z * xyz.z)
@@ -51,27 +66,22 @@ public func sphericalToCartesian(rtp: SIMD3<Double>) -> SIMD3<Double> {
 extension SIMD2 {
 
     public var prettyString: String {
-        "(\(self.x), \(self.y))"
+        "(\(format(self.x)), \(format(self.y)))"
     }
 }
 
 extension SIMD3 {
 
-    public var prettyString: String {
-        "(\(self.x), \(self.y), \(self.z))"
-    }
-
     public var xy: SIMD2<Scalar> {
         return SIMD2<Scalar>(self.x, self.y)
     }
-}
-
-
-extension SIMD4 {
 
     public var prettyString: String {
-        "(\(self.x), \(self.y), \(self.z), \(self.w))"
+        "(\(format(self.x)), \(format(self.y)), \(format(self.z)))"
     }
+}
+
+extension SIMD4 {
 
     public var xy: SIMD2<Scalar> {
         return SIMD2<Scalar>(self.x, self.y)
@@ -79,6 +89,10 @@ extension SIMD4 {
 
     public var xyz: SIMD3<Scalar> {
         return SIMD3<Scalar>(self.x, self.y, self.z)
+    }
+
+    public var prettyString: String {
+        "(\(format(self.x)), \(format(self.y)), \(format(self.z)), \(format(self.w)))"
     }
 }
 
