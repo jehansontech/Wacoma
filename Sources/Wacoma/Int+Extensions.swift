@@ -7,6 +7,14 @@
 
 import Foundation
 
+public func pow(_ base: Int, _ exponent: Int) -> Int {
+    var t = 1
+    for _ in 0..<exponent {
+        t = base * t
+    }
+    return t
+}
+
 extension Int {
 
     public func clamp(_ min: Self, _ max: Self) -> Self {
