@@ -59,6 +59,26 @@ public struct CenteredPOV: POV, Codable, Hashable, Equatable, CustomStringConver
         self.trueUp =  normalize(up - (dot(delta, up) / dot(delta, delta)) * delta)
     }
 
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        self.init(location: try container.decode(SIMD3<Float>.self, forKey: .location),
+             center: try container.decode(SIMD3<Float>.self, forKey: .center),
+             up: try container.decode(SIMD3<Float>.self, forKey: .up))
+    }
+
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(location, forKey: .location)
+        try container.encode(center, forKey: .center)
+        try container.encode(trueUp, forKey: .up)
+    }
+
+    private enum CodingKeys: String, CodingKey {
+        case location
+        case center
+        case up
+    }
+
 }
 
 /// POV whose forward vector is directly settable.
@@ -95,6 +115,20 @@ public struct FlyingPOV: POV, Codable, Hashable, Equatable, CustomStringConverti
                   trueUp: normalize(up - (dot(forward, up) / dot(forward, forward)) * forward))
     }
 
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        self.init(location: try container.decode(SIMD3<Float>.self, forKey: .location),
+             forward: try container.decode(SIMD3<Float>.self, forKey: .forward),
+             up: try container.decode(SIMD3<Float>.self, forKey: .up))
+    }
+
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(location, forKey: .location)
+        try container.encode(trueForward, forKey: .forward)
+        try container.encode(trueUp, forKey: .up)
+    }
+
     /// location: any point
     /// trueForward: unit vector
     /// trueUp: unit vector orthogonal to trueForward
@@ -124,6 +158,14 @@ public struct FlyingPOV: POV, Codable, Hashable, Equatable, CustomStringConverti
             throw POVError.notOrthogonal("forward", "up", dotProduct: dot(forward, up))
         }
     }
+
+    private enum CodingKeys: String, CodingKey {
+        case forward
+        case location
+        case up
+    }
+
+
 }
 
 public struct POVControllerConstants {
