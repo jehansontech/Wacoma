@@ -20,4 +20,11 @@ extension Int {
     public func clamp(_ min: Self, _ max: Self) -> Self {
         return self < min ? min : (self > max ? max : self)
     }
+
+    public func fuzz(_ fuzzFactor: Double) -> Self {
+        let lo = Int((1 - fuzzFactor) * Double(self))
+        let hi = Int((1 + fuzzFactor) * Double(self))
+        return (lo < hi) ? Int.random(in: lo...hi) : lo
+    }
+
 }
