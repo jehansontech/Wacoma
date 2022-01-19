@@ -326,7 +326,7 @@ public class OrbitingPOVController: ObservableObject, POVController, DragHandler
         }
     }
 
-    public func turnToward(_ newCenter: SIMD3<Float>, _ callback: (() -> ())? = nil) {
+    public func centerOn(_ newCenter: SIMD3<Float>, _ callback: (() -> ())? = nil) {
         flyTo(pov: CenteredPOV(location: pov.location, center: newCenter, up: pov.up), callback)
     }
 
@@ -409,7 +409,10 @@ public class OrbitingPOVController: ObservableObject, POVController, DragHandler
         if let t0 = _lastUpdateTimestamp, orbitEnabled {
             // Multiply by -1 so that positive speed looks like earth's direction of rotation
             let dPhi = -1 * orbitSpeed * Float(timestamp.timeIntervalSince(t0))
-            let newLocation = (float4x4(rotationAround: updatedPOV.up, by: dPhi) * SIMD4<Float>(updatedPOV.location, 1)).xyz
+            let transform = float4x4(translationBy: updatedPOV.center)
+                * float4x4(rotationAround: updatedPOV.up, by: dPhi)
+                * float4x4(translationBy: -updatedPOV.center)
+            let newLocation = (transform * SIMD4<Float>(updatedPOV.location, 1)).xyz
             updatedPOV = CenteredPOV(location: newLocation, center: updatedPOV.center, up: updatedPOV.up)
         }
         _lastUpdateTimestamp = timestamp
