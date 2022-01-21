@@ -32,9 +32,19 @@ extension Double {
     }
 
     public func fuzz(_ fuzzFactor: Self) -> Self {
-        let lo = (1 - fuzzFactor) * self
-        let hi = (1 + fuzzFactor) * self
-        return Double.random(in: lo...hi)
+        if self > 0 {
+            let lo = (1 - fuzzFactor) * self
+            let hi = (1 + fuzzFactor) * self
+            return Double.random(in: lo...hi)
+        }
+        else if self < 0 {
+            let hi = (1 - fuzzFactor) * self
+            let lo = (1 + fuzzFactor) * self
+            return Double.random(in: lo...hi)
+        }
+        else {
+            return self
+        }
     }
 
     public func differentFrom(_ x: Self) -> Bool {
