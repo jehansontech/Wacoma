@@ -33,10 +33,10 @@ public struct RenderSettings {
 
 public protocol Renderable {
 
-    // Called at the beginning of every rendering cycle.
+    /// Called at the beginning of every rendering cycle.
     mutating func prepareToDraw(_ mtkView: MTKView, _ renderSettings: RenderSettings)
 
-    // Called on every rendering cycle. Should execute as quickly as possible.
+    /// Called on every rendering cycle. Should execute as quickly as possible.
     func encodeDrawCommands(_ encoder: MTLRenderCommandEncoder)
 }
 

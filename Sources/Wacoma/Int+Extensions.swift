@@ -22,9 +22,19 @@ extension Int {
     }
 
     public func fuzz(_ fuzzFactor: Double) -> Self {
-        let lo = Int((1 - fuzzFactor) * Double(self))
-        let hi = Int((1 + fuzzFactor) * Double(self))
-        return (lo < hi) ? Int.random(in: lo...hi) : lo
+        if self > 0 {
+            let lo = Int((1 - fuzzFactor) * Double(self))
+            let hi = Int((1 + fuzzFactor) * Double(self))
+            return (lo < hi) ? Int.random(in: lo...hi) : lo
+        }
+        else if self < 0 {
+            let hi = Int((1 - fuzzFactor) * Double(self))
+            let lo = Int((1 + fuzzFactor) * Double(self))
+            return (lo < hi) ? Int.random(in: lo...hi) : lo
+        }
+        else {
+            return 0
+        }
     }
 
 }
