@@ -270,6 +270,10 @@ public class OrbitingPOVController: ObservableObject, POVController, DragHandler
         return flightInProgress != nil
     }
 
+    public var getureInProgress: Bool {
+        return dragInProgress != nil || pinchInProgress != nil || rotationInProgress != nil
+    }
+
     private var constants = POVControllerConstants()
 
     private var _lastUpdateTimestamp: Date? = nil
@@ -352,6 +356,7 @@ public class OrbitingPOVController: ObservableObject, POVController, DragHandler
     }
 
     public func dragEnded() {
+        // print("dragEnded")
         self.dragInProgress = nil
     }
 
@@ -370,6 +375,7 @@ public class OrbitingPOVController: ObservableObject, POVController, DragHandler
     }
 
     public func pinchEnded() {
+        // print("pinchEnded")
         pinchInProgress = nil
     }
 
@@ -388,6 +394,7 @@ public class OrbitingPOVController: ObservableObject, POVController, DragHandler
     }
 
     public func rotationEnded() {
+        // print("rotationEnded")
         self.rotationInProgress = nil
     }
 
@@ -401,12 +408,17 @@ public class OrbitingPOVController: ObservableObject, POVController, DragHandler
             updatedPOV = self.currentPOV
         }
 
-        // =======================================
-        // Q: orbital motion even if we're flying or handling a gesture?
-        // A: Sure, what could go wrong?
-        // =======================================
+        // ==================================================================
+        // Q: orbital motion even if we're flying?
+        // A: No, it's confusing
+        // Q: how about if we're handling a gesture?
+        // A: I'd rather not because it looks jerky. But on iOS we never
+        // get notified when drag ends, so if I check for gesture in progress
+        // after dragging it always returns true.
+        // ==================================================================
 
-        if let t0 = _lastUpdateTimestamp, orbitEnabled {
+        if orbitEnabled && !flying,
+           let t0 = _lastUpdateTimestamp {
             // Multiply by -1 so that positive speed looks like earth's direction of rotation
             let dPhi = -1 * orbitSpeed * Float(timestamp.timeIntervalSince(t0))
             let transform = float4x4(translationBy: updatedPOV.center)

@@ -71,6 +71,8 @@ public protocol RotationHandler {
 
 #if os(iOS) // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
+// MARK: - iOS
+
 public class GestureHandlers: NSObject, UIGestureRecognizerDelegate {
 
     public var tapHandler: TapHandler?
@@ -170,20 +172,10 @@ public class GestureHandlers: NSObject, UIGestureRecognizerDelegate {
             debug("GestureHandlers(iOS)", "tap at \(gesture.location(ofTouch: 0, in: view)) -> \(clipPoint(gesture.location(ofTouch: 0, in: view), view.bounds).prettyString)")
 
             switch gesture.state {
-            case .possible:
-                break
-            case .began:
-                break
-            case .changed:
-                break
             case .ended:
                 tapHandler.tap(at: clipPoint(gesture.location(ofTouch: 0, in: view), view.bounds),
                                mode: getMode(forGesture: gesture))
-            case .cancelled:
-                break
-            case .failed:
-                break
-            @unknown default:
+            default:
                 break
             }
         }
@@ -195,21 +187,12 @@ public class GestureHandlers: NSObject, UIGestureRecognizerDelegate {
            gesture.numberOfTouches > 0  {
 
             switch gesture.state {
-            case .possible:
-                break
             case .began:
                 longPressHandler.longPressBegan(at: clipPoint(gesture.location(ofTouch: 0, in: view), view.bounds),
                                                 mode: getMode(forGesture: gesture))
-            case .changed:
-                longPressHandler.longPressEnded()
-                break
             case .ended:
                 longPressHandler.longPressEnded()
-            case .cancelled:
-                break
-            case .failed:
-                break
-            @unknown default:
+            default:
                 break
             }
         }
@@ -231,14 +214,8 @@ public class GestureHandlers: NSObject, UIGestureRecognizerDelegate {
                 // NOTE that factor on -1 on scroll
                 dragHandler.dragChanged(pan: Float(translation.x / view.bounds.width),
                                         scroll: Float(-translation.y / view.bounds.height))
-            case .ended:
+            default:
                 dragHandler.dragEnded()
-            case .cancelled:
-                dragHandler.dragEnded()
-            case .failed:
-                dragHandler.dragEnded()
-            @unknown default:
-                break
             }
         }
     }
@@ -258,14 +235,8 @@ public class GestureHandlers: NSObject, UIGestureRecognizerDelegate {
                                         mode: getMode(forGesture: gesture))
             case .changed:
                 pinchHandler.pinchChanged(by: Float(gesture.scale))
-            case .ended:
+            default:
                 pinchHandler.pinchEnded()
-            case .cancelled:
-                break
-            case .failed:
-                break
-            @unknown default:
-                break
             }
         }
     }
@@ -285,26 +256,21 @@ public class GestureHandlers: NSObject, UIGestureRecognizerDelegate {
                                               mode: getMode(forGesture: gesture))
             case .changed:
                 rotationHandler.rotationChanged(by: Float(gesture.rotation))
-            case .ended:
+            default:
                 rotationHandler.rotationEnded()
-            case .cancelled:
-                break
-            case .failed:
-                break
-            @unknown default:
-                break
             }
         }
     }
 
-    /// needed in order to do simultaneous gestures
+    /// needed in order to do  simultaneous pan & other gestures
     public func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldRecognizeSimultaneouslyWith: UIGestureRecognizer) -> Bool {
+        // Disallow combos that include dragging, but allow anything else.
         if gestureRecognizer is UIPanGestureRecognizer || shouldRecognizeSimultaneouslyWith is UIPanGestureRecognizer {
             return false
         }
-
         return true
     }
+
     private func getMode(forGesture gesture: UIGestureRecognizer) -> GestureMode {
         switch gesture.numberOfTouches {
         case 1:
@@ -334,6 +300,8 @@ public class GestureHandlers: NSObject, UIGestureRecognizerDelegate {
 }
 
 #elseif os(macOS) // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+// MARK: - macOS
 
 public class GestureHandlers: NSObject, NSGestureRecognizerDelegate {
 
@@ -430,19 +398,9 @@ public class GestureHandlers: NSObject, NSGestureRecognizerDelegate {
         if var tapHandler = self.tapHandler,
            let view = gesture.view {
             switch gesture.state {
-            case .possible:
-                break
-            case .began:
-                break
-            case .changed:
-                break
             case .ended:
                 tapHandler.tap(at: clipPoint(gesture.location(in: view), view.bounds), mode: getMode(forGesture: gesture))
-            case .cancelled:
-                break
-            case .failed:
-                break
-            @unknown default:
+            default:
                 break
             }
         }
@@ -453,21 +411,12 @@ public class GestureHandlers: NSObject, NSGestureRecognizerDelegate {
            let view = gesture.view  {
 
             switch gesture.state {
-            case .possible:
-                break
             case .began:
                 longPressHandler.longPressBegan(at: clipPoint(gesture.location(in: view), view.bounds),
                                                 mode: getMode(forGesture: gesture))
-            case .changed:
-                longPressHandler.longPressEnded()
-                break
             case .ended:
                 longPressHandler.longPressEnded()
-            case .cancelled:
-                break
-            case .failed:
-                break
-            @unknown default:
+            default:
                 break
             }
         }
@@ -488,14 +437,8 @@ public class GestureHandlers: NSObject, NSGestureRecognizerDelegate {
                 // macOS uses upside-down clip coords, so the scroll value is the opposite of that on iOS
                 dragHandler.dragChanged(pan: Float(translation.x / view.bounds.width),
                                         scroll: Float(translation.y / view.bounds.height))
-            case .ended:
+            default:
                 dragHandler.dragEnded()
-            case .cancelled:
-                break
-            case .failed:
-                break
-            @unknown default:
-                break
             }
         }
     }
@@ -513,14 +456,8 @@ public class GestureHandlers: NSObject, NSGestureRecognizerDelegate {
             case .changed:
                 // macOS gesture's magnification=0 corresponds to iOS gesture's scale=1
                 pinchHandler.pinchChanged(by: Float(1 + gesture.magnification))
-            case .ended:
+            default:
                 pinchHandler.pinchEnded()
-            case .cancelled:
-                break
-            case .failed:
-                break
-            @unknown default:
-                break
             }
         }
     }
@@ -538,24 +475,18 @@ public class GestureHandlers: NSObject, NSGestureRecognizerDelegate {
             case .changed:
                 // multiply by -1 because macOS gestures use upside-down clip space
                 rotationHandler.rotationChanged(by: Float(-gesture.rotation))
-            case .ended:
+            default:
                 rotationHandler.rotationEnded()
-            case .cancelled:
-                break
-            case .failed:
-                break
-            @unknown default:
-                break
             }
         }
     }
 
     /// needed in order to do simultaneous gestures
     public func gestureRecognizer(_ gestureRecognizer: NSGestureRecognizer, shouldRecognizeSimultaneouslyWith: NSGestureRecognizer) -> Bool {
+        // Disallow combos that include dragging, but allow anything else.
         if gestureRecognizer is NSPanGestureRecognizer || shouldRecognizeSimultaneouslyWith is NSPanGestureRecognizer {
             return false
         }
-
         return true
     }
 
