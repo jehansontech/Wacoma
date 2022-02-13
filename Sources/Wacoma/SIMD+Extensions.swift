@@ -120,6 +120,7 @@ extension simd_float3x3 {
                             SIMD3<Float>(d,e,f),
                             SIMD3<Float>(g,h,i)))
     }
+
 }
 
 extension simd_float4x4 {
