@@ -29,6 +29,8 @@ public struct RenderSettings {
     public var fadeoutDistance: Float
 
     public var projectionMatrix: float4x4
+
+    public var preferredFramesPerSecond: Int
 }
 
 public protocol Renderable {
@@ -143,7 +145,8 @@ public class Renderer: NSObject, MTKViewDelegate {
                                             viewMatrix: controller.povController.viewMatrix,
                                             fadeoutOnset: controller.fovController.fadeoutOnset,
                                             fadeoutDistance: controller.fovController.fadeoutDistance,
-                                            projectionMatrix: controller.fovController.projectionMatrix)
+                                            projectionMatrix: controller.fovController.projectionMatrix,
+                                            preferredFramesPerSecond: view.preferredFramesPerSecond)
 
         for var renderable in controller.renderables {
             renderable.prepareToDraw(view, renderSettings)
