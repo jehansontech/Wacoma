@@ -289,7 +289,6 @@ public class OrbitingPOVController: ObservableObject, POVController, DragHandler
     public init(pov: CenteredPOV = CenteredPOV(),
                 orbitEnabled: Bool = true,
                 orbitSpeed: Float = .pi/30) {
-        print("OrbitingPOVController.init pov: \(pov)")
         self.currentPOV = pov
         self.defaultPOV = pov
         self.orbitEnabled = orbitEnabled
