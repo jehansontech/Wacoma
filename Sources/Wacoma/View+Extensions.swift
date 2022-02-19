@@ -7,6 +7,10 @@
 
 import SwiftUI
 
+// ============================================================================
+// MARK: - Rotated text
+// ============================================================================
+
 ///
 /// cf. https://stackoverflow.com/questions/58494193/swiftui-rotationeffect-framing-and-offsetting
 ///
