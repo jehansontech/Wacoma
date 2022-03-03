@@ -19,7 +19,9 @@ extension UIImage {
 extension CGImage {
 
     public func save() {
+        let timestamp: String = makeTimestamp()
         UIImage(cgImage: self).save()
+        print("Image saved to Photos. timestamp: \(timestamp)")
     }
 }
 
@@ -29,10 +31,11 @@ extension NSImage {
 
     public func save() {
         let timestamp: String = makeTimestamp()
-        let desktopURL = FileManager.default.urls(for: .picturesDirectory, in: .userDomainMask).first!
-        let destinationURL = desktopURL.appendingPathComponent("snapshot.\(timestamp).png")
+        let filename = "snapshot.\(timestamp).png"
+        let picturesURL = FileManager.default.urls(for: .picturesDirectory, in: .userDomainMask).first!
+        let destinationURL = picturesURL.appendingPathComponent(filename)
         if pngWrite(to: destinationURL, options: .withoutOverwriting) {
-            print("Image saved to \(destinationURL)")
+            print("Image saved to Pictures/\(destinationURL)")
         }
     }
 
