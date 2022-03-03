@@ -21,7 +21,13 @@ extension CGImage {
     public func save() {
         let timestamp: String = makeTimestamp()
         UIImage(cgImage: self).save()
-        print("Image saved to Photos. timestamp: \(timestamp)")
+        print("Image saved to Photos @ timestamp: \(timestamp)")
+    }
+
+    public func makeTimestamp() -> String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd-HHmmss"
+        return formatter.string(from: Date())
     }
 }
 
