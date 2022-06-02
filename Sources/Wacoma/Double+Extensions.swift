@@ -23,6 +23,15 @@ extension Double {
 
     public static let logTwo: Double = log(2)
 
+    public func nonNegative() -> Self {
+        return self > 0 ? self : 0
+    }
+
+    public func fuzz(_ scale: Double, _ variability: Double) -> Self {
+        let width = variability * scale
+        return Double.random(in: self-width...self+width)
+    }
+
     public func clamp(_ min: Self, _ max: Self) -> Self {
         return self < min ? min : (self > max ? max : self)
     }
