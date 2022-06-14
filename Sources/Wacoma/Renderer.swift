@@ -43,7 +43,11 @@ public protocol Renderable {
 }
 
 
-public class RenderController {
+public class RenderController: ObservableObject {
+
+    public static let defaultDarkBackground = SIMD4<Double>(0.025, 0.025, 0.025, 1)
+
+    public static let defaultLightBackground = SIMD4<Double>(0.975, 0.975, 0.975, 1)
 
     public var renderables = [Renderable]()
 
@@ -51,13 +55,20 @@ public class RenderController {
 
     public var fovController: FOVController
 
-    public var backgroundColor: SIMD4<Double> = SIMD4<Double>(0.02, 0.02, 0.02, 1)
+    @Published public var backgroundColor: SIMD4<Double> {
+        didSet {
+            print("backgroundColor didSet")
+        }
+    }
 
     internal var snapshotRequested: Bool = false
 
-    public init(_ povController: POVController, _ fovController: FOVController) {
+    public init(_ povController: POVController,
+                _ fovController: FOVController,
+                _ backgroundColor: SIMD4<Double> = RenderController.defaultDarkBackground) {
         self.povController = povController
         self.fovController = fovController
+        self.backgroundColor = backgroundColor
     }
 
     public func requestSnapshot() {
@@ -191,7 +202,7 @@ public class Renderer: NSObject, MTKViewDelegate {
 
 public struct RendererView {
 
-    var controller: RenderController
+    @ObservedObject var controller: RenderController
 
     var gestureHandlers: GestureHandlers?
 
