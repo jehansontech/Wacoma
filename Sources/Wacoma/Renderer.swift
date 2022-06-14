@@ -55,11 +55,7 @@ public class RenderController: ObservableObject {
 
     public var fovController: FOVController
 
-    @Published public var backgroundColor: SIMD4<Double> {
-        didSet {
-            print("backgroundColor didSet")
-        }
-    }
+    @Published public var backgroundColor: SIMD4<Double>
 
     internal var snapshotRequested: Bool = false
 
