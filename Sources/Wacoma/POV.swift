@@ -246,10 +246,10 @@ extension POVController {
 
 public class OrbitingPOVController: ObservableObject, POVController, DragHandler, PinchHandler, RotationHandler {
 
-    @Published public var orbitEnabled: Bool = false
+    @Published public var orbitEnabled: Bool
 
     /// angular rotation rate in radians per second
-    @Published public var orbitSpeed: Float = .pi/30
+    @Published public var orbitSpeed: Float
 
     public var pov: POV {
         currentPOV
@@ -288,7 +288,7 @@ public class OrbitingPOVController: ObservableObject, POVController, DragHandler
 
     public init(pov: CenteredPOV = CenteredPOV(),
                 orbitEnabled: Bool = true,
-                orbitSpeed: Float = .pi/30) {
+                orbitSpeed: Float = 1/8) {
         self.currentPOV = pov
         self.defaultPOV = pov
         self.orbitEnabled = orbitEnabled
