@@ -255,6 +255,8 @@ public class OrbitingPOVController: ObservableObject, POVController, DragHandler
         currentPOV
     }
 
+    public var frozen: Bool = false
+
     /// User-settable but not published because it changes too frequently
     public var currentPOV = CenteredPOV()
 
@@ -304,23 +306,28 @@ public class OrbitingPOVController: ObservableObject, POVController, DragHandler
     }
 
     public func jumpToDefault() {
-        currentPOV = defaultPOV
+        if !frozen {
+            currentPOV = defaultPOV
+        }
     }
 
     public func jumpToMark() {
+        if !frozen {
         if let mark = markedPOV {
             currentPOV = mark
+        }
         }
     }
 
     public func jumpTo(pov: CenteredPOV) {
+        if !frozen {
+        // print("OrbitingPOVController.jumpTo -- new pov: \(pov)")
         currentPOV = pov
-        print("OrbitingPOVController.jumpTo -- new pov: \(pov)")
+        }
     }
 
     public func flyToDefault(_ callback: (() -> ())? = nil) {
         flyTo(pov: defaultPOV, callback)
-
     }
 
     public func flyToMark(_ callback: (() -> ())? = nil) {
@@ -329,19 +336,26 @@ public class OrbitingPOVController: ObservableObject, POVController, DragHandler
         }
     }
 
-    public func centerOn(_ newCenter: SIMD3<Float>, _ callback: (() -> ())? = nil) {
-        flyTo(pov: CenteredPOV(location: pov.location, center: newCenter, up: pov.up), callback)
-    }
-
     public func flyTo(pov destination: CenteredPOV, _ callback: (() -> ())? = nil) {
-        if !flying {
+        if !frozen && !flying {
             self.flightInProgress = CenteredPOVFlight(self.currentPOV, destination, constants, callback: callback)
         }
     }
 
+    public func centerOn(_ newCenter: SIMD3<Float>, _ callback: (() -> ())? = nil) {
+        flyTo(pov: CenteredPOV(location: currentPOV.location, center: newCenter, up: currentPOV.up), callback)
+    }
+
+    public func hoverOver(_ point: SIMD3<Float>, _ distance: Float, _ callback: (() -> ())? = nil) {
+        self.orbitEnabled = false
+        var displacementRTP = cartesianToSpherical(xyz: point - currentPOV.center)
+        displacementRTP.x += distance
+        let destination = sphericalToCartesian(rtp: displacementRTP)
+        flyTo(pov: CenteredPOV(location: destination, center: currentPOV.center, up: currentPOV.up), callback)
+    }
 
     public func dragBegan(at location: SIMD2<Float>, mode: GestureMode) {
-        if !flying {
+        if !frozen && !flying {
             self.dragInProgress = CenteredPOVTurn(self.currentPOV, location, constants)
         }
     }
@@ -360,7 +374,7 @@ public class OrbitingPOVController: ObservableObject, POVController, DragHandler
     }
 
     public func pinchBegan(at touchLocation: SIMD2<Float>, mode: GestureMode) {
-        if !flying {
+        if !frozen && !flying {
             self.pinchInProgress = CenteredPOVRadialMove(self.currentPOV, touchLocation, constants)
         }
     }
@@ -379,7 +393,7 @@ public class OrbitingPOVController: ObservableObject, POVController, DragHandler
     }
 
     public func rotationBegan(at location: SIMD2<Float>, mode: GestureMode) {
-        if !flying {
+        if !frozen && !flying {
             self.rotationInProgress = CenteredPOVRoll(self.currentPOV, location, constants)
         }
     }
@@ -416,7 +430,7 @@ public class OrbitingPOVController: ObservableObject, POVController, DragHandler
         // after dragging it always returns true.
         // ==================================================================
 
-        if orbitEnabled && !flying,
+        if orbitEnabled && !frozen && !flying,
            let t0 = _lastUpdateTimestamp {
             // Multiply by -1 so that positive speed looks like earth's direction of rotation
             let dPhi = -1 * orbitSpeed * Float(timestamp.timeIntervalSince(t0))
