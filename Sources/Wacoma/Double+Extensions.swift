@@ -32,9 +32,9 @@ extension Double {
         return Double.random(in: self-width...self+width)
     }
 
-    public func clamp(_ min: Self, _ max: Self) -> Self {
-        return self < min ? min : (self > max ? max : self)
-    }
+//    public func clamp(_ min: Self, _ max: Self) -> Self {
+//        return self < min ? min : (self > max ? max : self)
+//    }
 
     public func clamp(_ range: ClosedRange<Self>) -> Self {
         return self < range.lowerBound ? range.lowerBound : (self > range.upperBound ? range.upperBound : self)

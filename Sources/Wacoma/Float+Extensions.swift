@@ -24,9 +24,9 @@ extension Float {
     
     public static let logTwo: Float = log(2)
     
-    public func clamp(_ min: Self, _ max: Self) -> Self {
-        return self < min ? min : (self > max ? max : self)
-    }
+//    public func clamp(_ min: Self, _ max: Self) -> Self {
+//        return self < min ? min : (self > max ? max : self)
+//    }
 
     public func fuzz(_ fuzzFactor: Self) -> Self {
         if self > 0 {
