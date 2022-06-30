@@ -14,14 +14,24 @@ public struct HTMLResourceView: UIViewRepresentable {
 
     public typealias UIViewType = WKWebView
 
-    public let resource: String
+//    public let resource: String
+//
+//    public let anchor: String?
+//
+//    public init(_ resource: String, _ anchor: String? = nil) {
+//        debug("HTMLResourceView", "init resource: \(resource), anchor: \(anchor ?? "nil")")
+//        self.resource = resource
+//        self.anchor = anchor
+//    }
 
-    public let anchor: String?
+    // ALT
+    @Binding public var resource: String
 
-    public init(_ resource: String, _ anchor: String? = nil) {
-        debug("HTMLResourceView", "init resource: \(resource), anchor: \(anchor ?? "nil")")
-        self.resource = resource
-        self.anchor = anchor
+    @Binding public var anchor: String?
+
+    public init(_ resource: Binding<String>, _ anchor: Binding<String?>) {
+        self._resource = resource
+        self._anchor = anchor
     }
 
     public func makeUIView(context: Context) -> WKWebView {
@@ -39,7 +49,7 @@ public struct HTMLResourceView: UIViewRepresentable {
     }
 
     public func updateUIView(_ uiView: WKWebView, context: Context) {
-        // NOP
+        loadResource(uiView)
     }
 
     public func makeCoordinator() -> Coordinator {
@@ -62,15 +72,24 @@ public struct HTMLResourceView: NSViewRepresentable {
 
     public typealias NSViewType = WKWebView
 
-    public let resource: String
+//    public let resource: String
+//
+//    public let anchor: String?
+//
+//    public init(_ resource: String, _ anchor: String? = nil) {
+//        debug("HTMLResourceView", "init resource: \(resource), anchor: \(anchor ?? "nil")")
+//        self.resource = resource
+//        self.anchor = anchor
+//    }
 
-    public let anchor: String?
+        @Binding public var resource: String
 
-    public init(_ resource: String, _ anchor: String? = nil) {
-        debug("HTMLResourceView", "init resource: \(resource), anchor: \(anchor ?? "nil")")
-        self.resource = resource
-        self.anchor = anchor
-    }
+        @Binding public var anchor: String?
+
+        public init(_ resource: Binding<String>, _ anchor: Binding<String?>) {
+            self._resource = resource
+            self._anchor = anchor
+        }
 
     public func makeNSView(context: Context) -> WKWebView {
         let wkWebView = WKWebView()
@@ -87,7 +106,7 @@ public struct HTMLResourceView: NSViewRepresentable {
     }
 
     public func updateNSView(_ nsView: WKWebView, context: Context) {
-        // NOP
+        loadResource(nsView)
     }
 
     public func makeCoordinator() -> Coordinator {
