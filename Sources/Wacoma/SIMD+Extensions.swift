@@ -68,6 +68,14 @@ extension SIMD2 {
     public var prettyString: String {
         "(\(format(self.x)), \(format(self.y)))"
     }
+
+    public func differentFrom(_ v: Self) -> Bool where Self.Scalar == Float {
+        return x.differentFrom(v.x) || y.differentFrom(v.y)
+    }
+
+    public func differentFrom(_ v: Self) -> Bool where Self.Scalar == Double {
+        return x.differentFrom(v.x) || y.differentFrom(v.y)
+    }
 }
 
 extension SIMD3 {
@@ -78,6 +86,14 @@ extension SIMD3 {
 
     public var prettyString: String {
         "(\(format(self.x)), \(format(self.y)), \(format(self.z)))"
+    }
+
+    public func differentFrom(_ v: Self) -> Bool where Self.Scalar == Float {
+        return x.differentFrom(v.x) || y.differentFrom(v.y) || z.differentFrom(v.z)
+    }
+
+    public func differentFrom(_ v: Self) -> Bool where Self.Scalar == Double {
+        return x.differentFrom(v.x) || y.differentFrom(v.y) || z.differentFrom(v.z)
     }
 }
 
@@ -94,6 +110,15 @@ extension SIMD4 {
     public var prettyString: String {
         "(\(format(self.x)), \(format(self.y)), \(format(self.z)), \(format(self.w)))"
     }
+
+    public func differentFrom(_ v: Self) -> Bool where Self.Scalar == Float {
+        return x.differentFrom(v.x) || y.differentFrom(v.y) || z.differentFrom(v.z) || w.differentFrom(v.w)
+    }
+
+    public func differentFrom(_ v: Self) -> Bool where Self.Scalar == Double {
+        return x.differentFrom(v.x) || y.differentFrom(v.y) || z.differentFrom(v.z) || w.differentFrom(v.w)
+    }
+
 }
 
 extension simd_float3x3 {
