@@ -274,7 +274,9 @@ extension RendererView: UIViewRepresentable {
     public typealias Coordinator = Renderer
 
     public func makeUIView(context: Context) -> MTKView {
-        return makeMTKView(context.coordinator)
+        let mtkView = makeMTKView(context.coordinator)
+        mtkView.isMultipleTouchEnabled = true
+        return mtkView
     }
 
     public func updateUIView(_ mtkView: MTKView, context: Context) {
