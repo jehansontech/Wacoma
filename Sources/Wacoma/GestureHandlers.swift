@@ -358,7 +358,7 @@ public class GestureHandlers: NSObject, NSGestureRecognizerDelegate {
         }
 
         if longPressRecognizer == nil {
-            longPressRecognizer = NSPressGestureRecognizer(target: self, action: #selector(longPress))
+            longPressRecognizer = NSPressGestureRecognizer(target: self, action: #selector(longPressText))
             mtkView.addGestureRecognizer(longPressRecognizer!)
         }
 
