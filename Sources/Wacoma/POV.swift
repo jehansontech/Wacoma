@@ -354,7 +354,7 @@ public class OrbitingPOVController: ObservableObject, POVController, DragHandler
         flyTo(pov: CenteredPOV(location: destination, center: currentPOV.center, up: currentPOV.up), callback)
     }
 
-    public func dragBegan(at location: SIMD2<Float>, mode: GestureMode) {
+    public func dragBegan(at location: SIMD2<Float>) {
         if !frozen && !flying {
             self.dragInProgress = CenteredPOVTurn(self.currentPOV, location, constants)
         }
@@ -373,7 +373,7 @@ public class OrbitingPOVController: ObservableObject, POVController, DragHandler
         self.dragInProgress = nil
     }
 
-    public func pinchBegan(at touchLocation: SIMD2<Float>, mode: GestureMode) {
+    public func pinchBegan(at touchLocation: SIMD2<Float>) {
         if !frozen && !flying {
             self.pinchInProgress = CenteredPOVRadialMove(self.currentPOV, touchLocation, constants)
         }
@@ -392,7 +392,7 @@ public class OrbitingPOVController: ObservableObject, POVController, DragHandler
         pinchInProgress = nil
     }
 
-    public func rotationBegan(at location: SIMD2<Float>, mode: GestureMode) {
+    public func rotationBegan(at location: SIMD2<Float>) {
         if !frozen && !flying {
             self.rotationInProgress = CenteredPOVRoll(self.currentPOV, location, constants)
         }
