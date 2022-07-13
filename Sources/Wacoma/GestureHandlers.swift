@@ -346,19 +346,19 @@ public class GestureHandlers: NSObject, NSGestureRecognizerDelegate {
     public func connectGestures(_ mtkView: MTKView) {
 
         if tapRecognizer1 == nil {
-            tapRecognizer1 = NSClickGestureRecognizer(target: self, action: #selector(tap1))
+            tapRecognizer1 = NSClickGestureRecognizer(target: self, action: #selector(onePointTap))
             tapRecognizer1?.buttonMask = 0x1
             mtkView.addGestureRecognizer(tapRecognizer1!)
         }
 
         if tapRecognizer2 == nil {
-            tapRecognizer2 = NSClickGestureRecognizer(target: self, action: #selector(tap2))
+            tapRecognizer2 = NSClickGestureRecognizer(target: self, action: #selector(twoPointTap))
             tapRecognizer2?.buttonMask = 0x2
             mtkView.addGestureRecognizer(tapRecognizer2!)
         }
 
         if longPressRecognizer == nil {
-            longPressRecognizer = NSPressGestureRecognizer(target: self, action: #selector(longPressText))
+            longPressRecognizer = NSPressGestureRecognizer(target: self, action: #selector(longPress))
             mtkView.addGestureRecognizer(longPressRecognizer!)
         }
 
@@ -406,7 +406,7 @@ public class GestureHandlers: NSObject, NSGestureRecognizerDelegate {
         }
     }
 
-    @objc func tap1(_ gesture: NSClickGestureRecognizer) {
+    @objc func onePointTap(_ gesture: NSClickGestureRecognizer) {
         if var tapHandler = self.tapHandler,
            let view = gesture.view {
             switch gesture.state {
@@ -418,7 +418,7 @@ public class GestureHandlers: NSObject, NSGestureRecognizerDelegate {
         }
     }
 
-    @objc func tap2(_ gesture: NSClickGestureRecognizer) {
+    @objc func twoPointTap(_ gesture: NSClickGestureRecognizer) {
         if var tapHandler = self.tapHandler,
            let view = gesture.view {
             switch gesture.state {
