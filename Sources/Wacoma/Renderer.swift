@@ -24,7 +24,7 @@ public struct RenderSettings {
 
     public var viewMatrix: float4x4
 
-    public var fadeoutOnset: Float
+    public var fadeoutMidpoint: Float
 
     public var fadeoutDistance: Float
 
@@ -150,7 +150,7 @@ public class Renderer: NSObject, MTKViewDelegate {
         controller.fovController.update(date)
         let renderSettings = RenderSettings(pov: controller.povController.pov,
                                             viewMatrix: controller.povController.viewMatrix,
-                                            fadeoutOnset: controller.fovController.fadeoutOnset,
+                                            fadeoutMidpoint: controller.fovController.fadeoutMidpoint,
                                             fadeoutDistance: controller.fovController.fadeoutDistance,
                                             projectionMatrix: controller.fovController.projectionMatrix,
                                             preferredFramesPerSecond: view.preferredFramesPerSecond)

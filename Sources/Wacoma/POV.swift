@@ -26,12 +26,13 @@ public protocol POV {
     var up: SIMD3<Float> { get }
 }
 
-/// POV whose forward vector is defined by reference to a fixed point in world coordinates.
+/// POV whose forward vector always points toward a fixed point in world coordinates.
 public struct CenteredPOV: POV, Codable, Hashable, Equatable, CustomStringConvertible   {
 
     public var description: String {
         "{ location: \(location.prettyString), center: \(center.prettyString), up: \(trueUp.prettyString) }"
     }
+
     public var location: SIMD3<Float>
 
     public var forward: SIMD3<Float> {
@@ -48,15 +49,15 @@ public struct CenteredPOV: POV, Codable, Hashable, Equatable, CustomStringConver
     private var trueUp: SIMD3<Float>
 
     /// location is any point
-    /// center is any point not equal to location,
-    /// up is any nonzero vector not parallel to the displacement between center and location
+    /// center can be any point not equal to location
+    /// up can be any nonzero vector not parallel to the displacement between center and location
     public init(location: SIMD3<Float> = SIMD3<Float>(0, 0, -1),
                 center: SIMD3<Float> = SIMD3<Float>(0, 0, 0),
                 up: SIMD3<Float> = SIMD3<Float>(0,1,0)) {
         self.location = location
         self.center = center
         let delta = center - location
-        self.trueUp =  normalize(up - (dot(delta, up) / dot(delta, delta)) * delta)
+        self.trueUp =  normalize(up - (simd_dot(delta, up) / simd_dot(delta, delta)) * delta)
     }
 
     public init(from decoder: Decoder) throws {
@@ -186,7 +187,7 @@ public struct POVControllerConstants {
 
     public let flyMaxSpeed: Double
 
-#if os(iOS)
+#if os(iOS) // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     public init() {
         self.scrollSensitivity = 1.5 * .piOverTwo
         self.panSensitivity = 1.5 * .pi
@@ -197,7 +198,7 @@ public struct POVControllerConstants {
         self.flyMinSpeed  = 0.01
         self.flyMaxSpeed = 10
     }
-#elseif os(macOS)
+#elseif os(macOS) // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     public init() {
         self.scrollSensitivity = 1.5 * .piOverTwo
         self.panSensitivity = 1.5 * .pi
@@ -208,7 +209,7 @@ public struct POVControllerConstants {
         self.flyMinSpeed  = 0.01
         self.flyMaxSpeed = 10
     }
-#endif
+#endif // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 }
 
@@ -590,29 +591,32 @@ struct CenteredPOVTurn {
 
     // let touchLocation: SIMD2<Float>
 
-    let scrollSensitivity: Float
+    let scrollFactor: Float
 
-    let panSensitivity: Float
+    let panFactor: Float
 
     init(_ pov: CenteredPOV, _ touchLocation: SIMD2<Float>, _ constants: POVControllerConstants) {
         self.initialPOV = pov
         // self.touchLocation = touchLocation
-        self.scrollSensitivity = constants.scrollSensitivity
-        self.panSensitivity = constants.panSensitivity
+        let inverseRadius = 1 / sqrt(distance(pov.location, pov.center))
+        self.scrollFactor = inverseRadius * constants.scrollSensitivity
+        self.panFactor = inverseRadius * constants.panSensitivity
     }
 
-    mutating func dragChanged(_ pov: CenteredPOV, pan: Float, scroll: Float) -> CenteredPOV? {
+    mutating func dragChanged(_ pov: POV, pan: Float, scroll: Float) -> CenteredPOV? {
         /// unit vector perpendicular to POV's forward and up vectors
         let perpAxis = normalize(simd_cross(initialPOV.forward, initialPOV.up))
 
         let newLocation = (
-            float4x4(rotationAround: initialPOV.up, by: -pan * panSensitivity)
-            * float4x4(rotationAround: perpAxis, by: scroll * scrollSensitivity)
+            float4x4(translationBy: initialPOV.center)
+            * float4x4(rotationAround: initialPOV.up, by: -pan * panFactor)
+            * float4x4(rotationAround: perpAxis, by: scroll * scrollFactor)
+            * float4x4(translationBy: -initialPOV.center)
             * SIMD4<Float>(initialPOV.location, 1)
         ).xyz
 
         let newUp = (
-            float4x4(rotationAround: perpAxis, by: scroll * scrollSensitivity)
+            float4x4(rotationAround: perpAxis, by: scroll * scrollFactor)
             * SIMD4<Float>(initialPOV.up, 1)
         ).xyz
 
@@ -629,6 +633,8 @@ struct CenteredPOVRadialMove {
 
     let initialPOV: CenteredPOV
 
+    let initialDisplacement: SIMD3<Float>
+
     // let touchLocation: SIMD2<Float>
 
     let magnificationSensitivity: Float
@@ -636,17 +642,17 @@ struct CenteredPOVRadialMove {
     /// ASSUMES pov.forward is pointed toward center
     init(_ pov: CenteredPOV, _ touchLocation: SIMD2<Float>, _ constants: POVControllerConstants) {
         self.initialPOV = pov
+        self.initialDisplacement = initialPOV.location - initialPOV.center
         // self.touchLocation = touchLocation
         self.magnificationSensitivity = constants.magnificationSensitivity
     }
 
     mutating func scaleChanged(_ pov: POV, scale: Float) -> CenteredPOV? {
-        let displacementXYZ = initialPOV.location - initialPOV.center
-        let newDisplacementXYZ = displacementXYZ / scale
-        let newLocation = newDisplacementXYZ + initialPOV.center
+        let newDisplacement = initialDisplacement / scale
+        let newLocation = newDisplacement + initialPOV.center
         return CenteredPOV(location: newLocation,
-                    center: pov.forward,
-                    up: pov.up)
+                           center: initialPOV.center,
+                           up: pov.up)
     }
 }
 

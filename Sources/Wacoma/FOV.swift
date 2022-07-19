@@ -10,11 +10,13 @@ import simd
 
 public protocol FOVController {
 
-    /// forward distance in view coords from the plane of the POV to the point at which the figure starts to fade out
-    var fadeoutOnset: Float { get set }
+    /// The midpoint of the visible slice.
+    /// Only points for which the forward distance in view coords from the plane of the POV is in the range fadeoutMidpoint +/- fadeoutDistance will be visible.
+    var fadeoutMidpoint: Float { get set }
 
-    /// distance over which the figure fades out
-    /// fadeoutDistance+fadeoutOnset is the forward distance in view coords from the plane of the POV to the point at which the fadeout is complete
+    /// The half-width of the visible slice
+    /// Only points for which the forward distance in view coords from the plane of the POV is in the range fadeoutMidpoint +/- fadeoutDistance will be visible.
+    /// Visibility decreases linearly with distance from the midpoint.
     var fadeoutDistance: Float { get set }
 
     /// physical dimensions of the UI view in pixels.
@@ -35,7 +37,7 @@ public protocol FOVController {
 
 public class PerspectiveFOVController: ObservableObject, FOVController {
 
-    @Published public var fadeoutOnset: Float
+    @Published public var fadeoutMidpoint: Float
 
     @Published public var fadeoutDistance: Float
 
@@ -56,8 +58,8 @@ public class PerspectiveFOVController: ObservableObject, FOVController {
                         farZ: zFar)
     }
 
-    public init(fadeoutOnset: Float = 0, fadeoutDistance: Float = 1000, zNear: Float = 0.001, zFar: Float = 1000, yFOV: Float = .piOverTwo) {
-        self.fadeoutOnset = fadeoutOnset
+    public init(fadeoutMidpoint: Float = 0, fadeoutDistance: Float = 1000, zNear: Float = 0.001, zFar: Float = 1000, yFOV: Float = .piOverTwo) {
+        self.fadeoutMidpoint = fadeoutMidpoint
         self.fadeoutDistance = fadeoutDistance
         self.zNear = zNear
         self.zFar = zFar
