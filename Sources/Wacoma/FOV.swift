@@ -35,6 +35,13 @@ public protocol FOVController {
     func update(_ date: Date)
 }
 
+extension FOVController {
+
+    public func isInVisibleSlice(z: Float) -> Bool {
+        return z >= zNear && z <= zFar && z > fadeoutMidpoint - fadeoutDistance && z < fadeoutMidpoint + fadeoutDistance
+    }
+}
+
 public class PerspectiveFOVController: ObservableObject, FOVController {
 
     @Published public var fadeoutMidpoint: Float
