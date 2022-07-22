@@ -33,18 +33,18 @@ public struct CenteredPOV: POV, Codable, Hashable, Equatable, CustomStringConver
         "{ location: \(location.prettyString), center: \(center.prettyString), up: \(trueUp.prettyString) }"
     }
 
-    public var location: SIMD3<Float>
-
     public var forward: SIMD3<Float> {
         normalize(center - location)
     }
-
-    public var center: SIMD3<Float>
 
     public var up: SIMD3<Float> {
         get { trueUp }
         set { trueUp = normalize(newValue - dot(forward, newValue) * forward) }
     }
+
+    public var location: SIMD3<Float>
+
+    public var center: SIMD3<Float>
 
     private var trueUp: SIMD3<Float>
 
