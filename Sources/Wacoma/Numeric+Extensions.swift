@@ -1,6 +1,6 @@
 //
-//  File 2.swift
-//  
+//  Numeric+Extensions.swift
+//  Wacoma
 //
 //  Created by Jim Hanson on 6/18/22.
 //
@@ -29,3 +29,18 @@ extension BinaryFloatingPoint {
     }
 }
 
+/// from https://stackoverflow.com/questions/31396301/getting-the-decimal-part-of-a-double-in-swift/55010456#55010456
+///
+extension Decimal {
+
+    public var whole: Decimal { rounded(sign == .minus ? .up : .down) }
+
+    public var fraction: Decimal { self - whole }
+
+    public func rounded(_ roundingMode: NSDecimalNumber.RoundingMode = .plain) -> Decimal {
+        var result = Decimal()
+        var number = self
+        NSDecimalRound(&result, &number, 0, roundingMode)
+        return result
+    }
+}
