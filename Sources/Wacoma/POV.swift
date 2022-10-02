@@ -27,7 +27,7 @@ public protocol POV {
 }
 
 /// POV whose forward vector always points toward a fixed point in world coordinates.
-public struct CenteredPOV: POV, Codable, Hashable, Equatable, CustomStringConvertible   {
+public struct CenteredPOV: POV, Codable, Sendable, Hashable, Equatable, CustomStringConvertible   {
 
     public var description: String {
         "{ location: \(location.prettyString), center: \(center.prettyString), up: \(trueUp.prettyString) }"
