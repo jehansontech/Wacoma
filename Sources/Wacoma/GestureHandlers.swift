@@ -172,7 +172,7 @@ public class GestureHandlers: NSObject, UIGestureRecognizerDelegate {
     }
 
     @objc func onePointTap(_ gesture: UITapGestureRecognizer) {
-        print("onePointTap")
+        // print("onePointTap")
         if var tapHandler = self.tapHandler,
            let view = gesture.view {
 
@@ -186,7 +186,7 @@ public class GestureHandlers: NSObject, UIGestureRecognizerDelegate {
     }
 
     @objc func twoPointTap(_ gesture: UITapGestureRecognizer) {
-        print("twoPointTap")
+        // print("twoPointTap")
         if var tapHandler = self.tapHandler,
            let view = gesture.view {
 

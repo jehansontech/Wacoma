@@ -70,6 +70,19 @@ public class RenderController: ObservableObject {
     public func requestSnapshot() {
         snapshotRequested = true
     }
+
+    public func ray(at touchLocation: SIMD2<Float>) -> (SIMD3<Float>, SIMD3<Float>, ClosedRange<Float>) {
+        // print("findNearestNode. touchLocation: \(touchLocation.prettyString)")
+        let ray0 = SIMD4<Float>(Float(touchLocation.x), touchLocation.y, 0, 1)
+        var ray1 = fovController.projectionMatrix.inverse * ray0
+        ray1.z = -1
+        ray1.w = 0
+
+        let rayOrigin = (povController.viewMatrix.inverse * SIMD4<Float>(0, 0, 0, 1)).xyz
+        let rayDirection = normalize(povController.viewMatrix.inverse * ray1).xyz
+        let zRange = fovController.visibleZ
+        return (rayOrigin, rayDirection, zRange)
+    }
 }
 
 public class Renderer: NSObject, MTKViewDelegate {

@@ -37,6 +37,10 @@ public protocol FOVController {
 
 extension FOVController {
 
+    public var visibleZ: ClosedRange<Float> {
+        return max(zNear, fadeoutMidpoint-fadeoutDistance)...min(zFar, fadeoutMidpoint+fadeoutDistance)
+    }
+
     public func isInVisibleSlice(z: Float) -> Bool {
         return z >= zNear && z <= zFar && z > fadeoutMidpoint - fadeoutDistance && z < fadeoutMidpoint + fadeoutDistance
     }
