@@ -77,7 +77,7 @@ extension RenderController {
     public func ray(at touchLocation: SIMD2<Float>) -> (SIMD3<Float>, SIMD3<Float>, ClosedRange<Float>) {
         // print("RenderController.ray -- touchLocation: \(touchLocation.prettyString)")
 
-        // FIXME: the glass is at z=zNear, not z=0
+        // FIXME: the glass is at z=zNear, not z=0 or z=-1 or whatever we're doing here.
         let ray0 = SIMD4<Float>(touchLocation.x, touchLocation.y, 0, 1)
         var ray1 = fovController.projectionMatrix.inverse * ray0
         ray1.z = -1
