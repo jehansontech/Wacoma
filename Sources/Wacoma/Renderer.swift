@@ -70,17 +70,30 @@ public class RenderController: ObservableObject {
     public func requestSnapshot() {
         snapshotRequested = true
     }
+}
+
+extension RenderController {
 
     public func ray(at touchLocation: SIMD2<Float>) -> (SIMD3<Float>, SIMD3<Float>, ClosedRange<Float>) {
-        // print("findNearestNode. touchLocation: \(touchLocation.prettyString)")
-        let ray0 = SIMD4<Float>(Float(touchLocation.x), touchLocation.y, 0, 1)
+        // print("RenderController.ray -- touchLocation: \(touchLocation.prettyString)")
+
+        // FIXME: the glass is at z=zNear, not z=0
+        let ray0 = SIMD4<Float>(touchLocation.x, touchLocation.y, 0, 1)
         var ray1 = fovController.projectionMatrix.inverse * ray0
         ray1.z = -1
         ray1.w = 0
 
+        // FIXME: this is misnamed.
+        // This is something like the world coord's of the point (0,0,0) in FOV coord's
         let rayOrigin = (povController.viewMatrix.inverse * SIMD4<Float>(0, 0, 0, 1)).xyz
+
+        // FIXME: this is misnamed.
+        // It's something like the displacement in world coords of the touch location
         let rayDirection = normalize(povController.viewMatrix.inverse * ray1).xyz
+
+        // FIXME: need to transform vizibleZ to tworld coor's
         let zRange = fovController.visibleZ
+
         return (rayOrigin, rayDirection, zRange)
     }
 }
