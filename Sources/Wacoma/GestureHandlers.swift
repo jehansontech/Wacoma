@@ -26,7 +26,9 @@ public protocol LongPressHandler {
     /// location is in clip space: (-1, -1) to (+1, +1)
     mutating func longPressBegan(at location: SIMD2<Float>)
 
-    mutating func longPressEnded()
+    mutating func longPressMoved(to location: SIMD2<Float>)
+
+    mutating func longPressEnded(at location: SIMD2<Float>)
 }
 
 
@@ -206,8 +208,12 @@ public class GestureHandlers: NSObject, UIGestureRecognizerDelegate {
             switch gesture.state {
             case .began:
                 longPressHandler.longPressBegan(at: clipPoint(gesture.location(ofTouch: 0, in: view), view.bounds))
+            case .changed:
+                let loc = clipPoint(gesture.location(ofTouch: 0, in: view), view.bounds)
+                print("longPressChanged. location = \(loc.prettyString)")
+                // longPressHandler.longPressChanged(location: clipPoint(gesture.location(ofTouch: 0, in: view), view.bounds))
             case .ended:
-                longPressHandler.longPressEnded()
+                longPressHandler.longPressEnded(at: clipPoint(gesture.location(ofTouch: 0, in: view), view.bounds))
             default:
                 break
             }
@@ -433,8 +439,10 @@ public class GestureHandlers: NSObject, NSGestureRecognizerDelegate {
             switch gesture.state {
             case .began:
                 longPressHandler.longPressBegan(at: clipPoint(gesture.location(in: view), view.bounds))
+            case .changed:
+                longPressHandler.longPressMoved(to: clipPoint(gesture.location(in: view), view.bounds))
             case .ended:
-                longPressHandler.longPressEnded()
+                longPressHandler.longPressEnded(at: clipPoint(gesture.location(in: view), view.bounds))
             default:
                 break
             }
