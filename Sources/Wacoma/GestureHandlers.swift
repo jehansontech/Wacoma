@@ -24,11 +24,11 @@ public protocol LongPressHandler {
 
     /// called when the user starts executing a long-press gesture
     /// location is in clip space: (-1, -1) to (+1, +1)
-    mutating func longPressBegan(at location: SIMD2<Float>)
+    mutating func longPress1Began(at location: SIMD2<Float>)
 
-    mutating func longPressMoved(to location: SIMD2<Float>)
+    mutating func longPress1Moved(to location: SIMD2<Float>)
 
-    mutating func longPressEnded(at location: SIMD2<Float>)
+    mutating func longPress1Ended(at location: SIMD2<Float>)
 }
 
 
@@ -121,6 +121,7 @@ public class GestureHandlers: NSObject, UIGestureRecognizerDelegate {
 
         if longPressRecognizer == nil {
             longPressRecognizer = UILongPressGestureRecognizer(target: self, action: #selector(longPress))
+            longPressRecognizer.numberOfTouchesRequired = 1
             mtkView.addGestureRecognizer(longPressRecognizer!)
         }
 
@@ -207,13 +208,13 @@ public class GestureHandlers: NSObject, UIGestureRecognizerDelegate {
 
             switch gesture.state {
             case .began:
-                longPressHandler.longPressBegan(at: clipPoint(gesture.location(ofTouch: 0, in: view), view.bounds))
+                longPressHandler.longPress1Began(at: clipPoint(gesture.location(ofTouch: 0, in: view), view.bounds))
             case .changed:
                 let loc = clipPoint(gesture.location(ofTouch: 0, in: view), view.bounds)
                 print("longPressChanged. location = \(loc.prettyString)")
                 // longPressHandler.longPressChanged(location: clipPoint(gesture.location(ofTouch: 0, in: view), view.bounds))
             case .ended:
-                longPressHandler.longPressEnded(at: clipPoint(gesture.location(ofTouch: 0, in: view), view.bounds))
+                longPressHandler.longPress1Ended(at: clipPoint(gesture.location(ofTouch: 0, in: view), view.bounds))
             default:
                 break
             }
@@ -356,6 +357,7 @@ public class GestureHandlers: NSObject, NSGestureRecognizerDelegate {
 
         if longPressRecognizer == nil {
             longPressRecognizer = NSPressGestureRecognizer(target: self, action: #selector(longPress))
+            longPressRecognizer?.buttonMask = 0x1
             mtkView.addGestureRecognizer(longPressRecognizer!)
         }
 
@@ -438,11 +440,11 @@ public class GestureHandlers: NSObject, NSGestureRecognizerDelegate {
 
             switch gesture.state {
             case .began:
-                longPressHandler.longPressBegan(at: clipPoint(gesture.location(in: view), view.bounds))
+                longPressHandler.longPress1Began(at: clipPoint(gesture.location(in: view), view.bounds))
             case .changed:
-                longPressHandler.longPressMoved(to: clipPoint(gesture.location(in: view), view.bounds))
+                longPressHandler.longPress1Moved(to: clipPoint(gesture.location(in: view), view.bounds))
             case .ended:
-                longPressHandler.longPressEnded(at: clipPoint(gesture.location(in: view), view.bounds))
+                longPressHandler.longPress1Ended(at: clipPoint(gesture.location(in: view), view.bounds))
             default:
                 break
             }
