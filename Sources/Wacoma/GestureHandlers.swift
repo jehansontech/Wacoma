@@ -181,7 +181,7 @@ public class GestureHandlers: NSObject, UIGestureRecognizerDelegate {
 
             switch gesture.state {
             case .ended:
-                tapHandler.tap1(at: clipPoint(gesture.location(ofTouch: 0, in: view), view.bounds))
+                tapHandler.tap1(at: clipPoint(gesture.location(in: view), view.bounds))
             default:
                 break
             }
@@ -195,7 +195,7 @@ public class GestureHandlers: NSObject, UIGestureRecognizerDelegate {
 
             switch gesture.state {
             case .ended:
-                tapHandler.tap2(at: clipPoint(gesture.location(ofTouch: 0, in: view), view.bounds))
+                tapHandler.tap2(at: clipPoint(gesture.location(in: view), view.bounds))
             default:
                 break
             }
@@ -208,13 +208,13 @@ public class GestureHandlers: NSObject, UIGestureRecognizerDelegate {
 
             switch gesture.state {
             case .began:
-                longPressHandler.longPress1Began(at: clipPoint(gesture.location(ofTouch: 0, in: view), view.bounds))
+                longPressHandler.longPress1Began(at: clipPoint(gesture.location(in: view), view.bounds))
             case .changed:
-                let loc = clipPoint(gesture.location(ofTouch: 0, in: view), view.bounds)
+                let loc = clipPoint(gesture.location(in: view), view.bounds)
                 print("longPressChanged. location = \(loc.prettyString)")
-                // longPressHandler.longPressChanged(location: clipPoint(gesture.location(ofTouch: 0, in: view), view.bounds))
+                // longPressHandler.longPressChanged(location: clipPoint(gesture.location(in: view), view.bounds))
             case .ended:
-                longPressHandler.longPress1Ended(at: clipPoint(gesture.location(ofTouch: 0, in: view), view.bounds))
+                longPressHandler.longPress1Ended(at: clipPoint(gesture.location(in: view), view.bounds))
             default:
                 break
             }
@@ -229,7 +229,7 @@ public class GestureHandlers: NSObject, UIGestureRecognizerDelegate {
             case .possible:
                 break
             case .began:
-                dragHandler.dragBegan(at: clipPoint(gesture.location(ofTouch: 0, in: view), view.bounds))
+                dragHandler.dragBegan(at: clipPoint(gesture.location(in: view), view.bounds))
             case .changed:
                 let translation = gesture.translation(in: view)
                 // NOTE that factor on -1 on scroll
@@ -243,8 +243,8 @@ public class GestureHandlers: NSObject, UIGestureRecognizerDelegate {
 
     @objc func pinch(_ gesture: UIPinchGestureRecognizer) {
         if var pinchHandler = self.pinchHandler,
-           let view = gesture.view {
-
+           let view = gesture.view,
+           gesture.numberOfTouches >= 2 {
             switch gesture.state {
             case .possible:
                 break
@@ -262,7 +262,8 @@ public class GestureHandlers: NSObject, UIGestureRecognizerDelegate {
 
     @objc func rotate(_ gesture: UIRotationGestureRecognizer) {
         if var rotationHandler = rotationHandler,
-           let view = gesture.view {
+           let view = gesture.view,
+           gesture.numberOfTouches >= 2 {
 
             switch gesture.state {
             case .possible:

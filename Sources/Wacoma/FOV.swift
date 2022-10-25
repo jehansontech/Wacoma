@@ -59,7 +59,7 @@ public class PerspectiveFOVController: ObservableObject, FOVController {
     public var zFar: Float
 
     /// angular width in radians
-    public var yFOV: Float = .piOverTwo
+    public var yFOV: Float = .piOverThree
 
     public var projectionMatrix: float4x4 {
         let aspectRatio = (viewSize.height > 0) ? Float(viewSize.width) / Float(viewSize.height) : 1

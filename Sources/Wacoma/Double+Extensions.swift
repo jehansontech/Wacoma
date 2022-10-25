@@ -9,19 +9,21 @@ import Foundation
 
 extension Double {
 
-    public static let twoPi: Double = 2 * .pi
+    public static let epsilon: Self = 1e-12
 
-    public static let piOverTwo: Double = 0.5 * .pi
+    public static let twoPi: Self = 2 * .pi
 
-    public static let threePiOverTwo: Float = 1.5 * .pi
+    public static let piOverTwo: Self = .pi / 2
 
-    public static let piOverFour: Double = 0.25 * .pi
+    public static let threePiOverTwo: Self = 3 * .pi / 2
 
-    public static let epsilon: Double = 1e-12
+    public static let piOverThree: Self = .pi / 3
 
-    public static let goldenRatio: Double = (0.5 * (1 + sqrt(5)))
+    public static let piOverFour: Self = .pi / 4
 
-    public static let logTwo: Double = log(2)
+    public static let goldenRatio: Self = (1 + sqrt(5)) / 2
+
+    public static let logTwo: Self = log(2)
 
     public func nonNegative() -> Self {
         return self > 0 ? self : 0

@@ -10,20 +10,22 @@ import Foundation
  
 extension Float {
     
-    public static let twoPi: Float = 2 * .pi
-    
-    public static let piOverTwo: Float = 0.5 * .pi
-    
-    public static let threePiOverTwo: Float = 1.5 * .pi
-
-    public static let piOverFour: Float = 0.25 * .pi
-
     public static let epsilon: Float = 1e-6
-    
-    public static let goldenRatio: Float = (0.5 * (1 + sqrt(5)))
-    
-    public static let logTwo: Float = log(2)
-    
+
+    public static let twoPi: Self = 2 * .pi
+
+    public static let piOverTwo: Self = .pi / 2
+
+    public static let threePiOverTwo: Self = 3 * .pi / 2
+
+    public static let piOverThree: Self = .pi / 3
+
+    public static let piOverFour: Self = .pi / 4
+
+    public static let goldenRatio: Self = (1 + sqrt(5)) / 2
+
+    public static let logTwo: Self = log(2)
+
 //    public func clamp(_ min: Self, _ max: Self) -> Self {
 //        return self < min ? min : (self > max ? max : self)
 //    }
