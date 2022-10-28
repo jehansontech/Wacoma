@@ -43,7 +43,6 @@ public protocol Renderable {
     func encodeDrawCommands(_ encoder: MTLRenderCommandEncoder)
 }
 
-
 public class RenderController: ObservableObject {
 
     public static let defaultDarkBackground = SIMD4<Double>(0.025, 0.025, 0.025, 1)
@@ -82,8 +81,10 @@ public class RenderController: ObservableObject {
         let callback = snapshotCallback
         snapshotRequested = false
         snapshotCallback = nil
-        if let callback {
-            _ = callback(response)
+        Task {
+            if let callback {
+                _ = callback(response)
+            }
         }
     }
 }
@@ -100,6 +101,7 @@ extension RenderController {
         // print("RenderController.ray -- touchLocation: \(touchLocation.prettyString)")
 
         // FIXME: the glass is at z=zNear, not z=0 or z=-1 or whatever we're doing here.
+        // FIXME: I don't actually know what we're doing. . . .
         let ray0 = SIMD4<Float>(touchLocation.x, touchLocation.y, 0, 1)
         var ray1 = fovController.projectionMatrix.inverse * ray0
         ray1.z = -1
