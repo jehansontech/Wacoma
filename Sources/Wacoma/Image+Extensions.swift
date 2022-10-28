@@ -18,10 +18,10 @@ extension UIImage {
 
 extension CGImage {
 
-    public func save() {
+    public func save() -> String {
         let timestamp: String = makeTimestamp()
         UIImage(cgImage: self).save()
-        print("Image saved to Photos @ timestamp: \(timestamp)")
+        return "Image saved to Photos with timestamp: \(timestamp)"
     }
 
     public func makeTimestamp() -> String {
@@ -35,28 +35,25 @@ extension CGImage {
 
 extension NSImage {
 
-    public func save() {
+    public func save() -> String {
         let timestamp: String = makeTimestamp()
         let filename = "snapshot.\(timestamp).png"
         let picturesURL = FileManager.default.urls(for: .picturesDirectory, in: .userDomainMask).first!
         let destinationURL = picturesURL.appendingPathComponent(filename)
-        if pngWrite(to: destinationURL, options: .withoutOverwriting) {
-            print("Image saved to Pictures/\(destinationURL)")
+
+        guard let tiffRepresentation = tiffRepresentation,
+              let bitmapImage = NSBitmapImageRep(data: tiffRepresentation),
+              let pngData = bitmapImage.representation(using: .png, properties: [:])
+        else {
+            return "Image capture failed."
         }
-    }
 
-    public var pngData: Data? {
-        guard let tiffRepresentation = tiffRepresentation, let bitmapImage = NSBitmapImageRep(data: tiffRepresentation) else { return nil }
-        return bitmapImage.representation(using: .png, properties: [:])
-    }
-
-    public func pngWrite(to url: URL, options: Data.WritingOptions = .atomic) -> Bool {
         do {
-            try pngData?.write(to: url, options: options)
-            return true
-        } catch {
-            print(error)
-            return false
+            try pngData.write(to: destinationURL, options: .atomic)
+            return "Image saved to Pictures/\(destinationURL.lastPathComponent)"
+        }
+        catch {
+            return "Image save failed. Error: \(error)"
         }
     }
 
@@ -69,8 +66,8 @@ extension NSImage {
 
 extension CGImage {
 
-    public func save() {
-        NSImage(cgImage: self, size: NSSize(width: self.width, height: self.height)).save()
+    public func save() -> String {
+        return NSImage(cgImage: self, size: NSSize(width: self.width, height: self.height)).save()
     }
 }
 

@@ -16,6 +16,7 @@ public enum RenderError: Error {
     case noDepthStencilState
     case badVertexDescriptor
     case bufferCreationFailed
+    case snapshotInProgress
 }
 
 public struct RenderSettings {
@@ -57,7 +58,9 @@ public class RenderController: ObservableObject {
 
     @Published public var backgroundColor: SIMD4<Double>
 
-    internal var snapshotRequested: Bool = false
+    @Published public private(set) var snapshotRequested: Bool = false
+
+    private var snapshotCallback: ((String) -> Any?)? = nil
 
     public init(_ povController: POVController,
                 _ fovController: FOVController,
@@ -67,8 +70,21 @@ public class RenderController: ObservableObject {
         self.backgroundColor = backgroundColor
     }
 
-    public func requestSnapshot() {
+    public func requestSnapshot(_ callback: @escaping ((String) -> Any?)) throws {
+        if snapshotRequested {
+            throw RenderError.snapshotInProgress
+        }
         snapshotRequested = true
+        snapshotCallback = callback
+    }
+
+    public func snapshotTaken(_ response: String) {
+        let callback = snapshotCallback
+        snapshotRequested = false
+        snapshotCallback = nil
+        if let callback {
+            _ = callback(response)
+        }
     }
 }
 
@@ -102,29 +118,6 @@ extension RenderController {
 
         return TouchRay(origin: rayOrigin, direction: rayDirection, range: zRange)
     }
-
-//    public func ray(at touchLocation: SIMD2<Float>) -> (SIMD3<Float>, SIMD3<Float>, ClosedRange<Float>) {
-//        // print("RenderController.ray -- touchLocation: \(touchLocation.prettyString)")
-//
-//        // FIXME: the glass is at z=zNear, not z=0 or z=-1 or whatever we're doing here.
-//        let ray0 = SIMD4<Float>(touchLocation.x, touchLocation.y, 0, 1)
-//        var ray1 = fovController.projectionMatrix.inverse * ray0
-//        ray1.z = -1
-//        ray1.w = 0
-//
-//        // FIXME: this is misnamed.
-//        // This is something like the world coord's of the point (0,0,0) in FOV coord's
-//        let rayOrigin = (povController.viewMatrix.inverse * SIMD4<Float>(0, 0, 0, 1)).xyz
-//
-//        // FIXME: this is misnamed.
-//        // It's something like the displacement in world coords of the touch location
-//        let rayDirection = normalize(povController.viewMatrix.inverse * ray1).xyz
-//
-//        // FIXME: need to transform vizibleZ to tworld coor's
-//        let zRange = fovController.visibleZ
-//
-//        return (rayOrigin, rayDirection, zRange)
-//    }
 }
 
 public class Renderer: NSObject, MTKViewDelegate {
@@ -192,11 +185,10 @@ public class Renderer: NSObject, MTKViewDelegate {
         // let t0 = Date()
 
         // Swift compiler sez that the snapshot needs to be taken before the current drawable
-        // is presented. (This means it will capture the figure that was drawn last time this
-        // method was called.)
+        // is presented. This means it will capture the figure that was drawn the in PREVIOUS
+        // call to this method.
         if controller.snapshotRequested {
-            saveSnapshot(view)
-            controller.snapshotRequested = false
+            controller.snapshotTaken(saveSnapshot(view))
         }
 
         // Make sure all the renderables get exactly the same values
@@ -221,8 +213,9 @@ public class Renderer: NSObject, MTKViewDelegate {
                 semaphore.signal()
             }
 
-            // Delay getting the current RenderPassDescriptor until we absolutely need it to avoid
-            // holding onto the drawable and blocking the display pipeline any longer than necessary
+            // Delay getting the current Drawable and RenderPassDescriptor until we absolutely
+            // them, in order to avoid holding onto the drawable and therby blocking the display
+            // pipeline any longer than necessary
             if let drawable = view.currentDrawable,
                let renderPassDescriptor = view.currentRenderPassDescriptor,
                let renderEncoder = commandBuffer.makeRenderCommandEncoder(descriptor: renderPassDescriptor) {
@@ -244,9 +237,16 @@ public class Renderer: NSObject, MTKViewDelegate {
         }
     }
 
-    func saveSnapshot(_ view: MTKView) {
+    func saveSnapshot(_ view: MTKView) -> String {
         if let cgImage = view.takeSnapshot() {
-            cgImage.save()
+            return cgImage.save()
+
+            // Docco sez: "You are responsible for releasing this object by calling CGImageRelease"
+            // but I get a compiler error: "'CGImageRelease' is unavailable: Core Foundation objects are automatically memory managed"
+            // CGImageRelease(cgImage)
+        }
+        else {
+            return "Image capture failed"
         }
     }
 }
