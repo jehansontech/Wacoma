@@ -169,23 +169,23 @@ public struct FlyingPOV: POV, Codable, Hashable, Equatable, CustomStringConverti
 
 }
 
-public struct POVControllerConstants {
+public struct POVControllerSettings {
 
-    public let scrollSensitivity: Float
+    public var scrollSensitivity: Float
 
-    public let panSensitivity: Float
+    public var panSensitivity: Float
 
-    public let magnificationSensitivity: Float
+    public var magnificationSensitivity: Float
 
-    public let rotationSensitivity: Float
+    public var rotationSensitivity: Float
 
-    public let flyCoastingThreshold: Double
+    public var flyCoastingThreshold: Double
 
-    public let flyNormalizedAcceleration: Double
+    public var flyNormalizedAcceleration: Double
 
-    public let flyMinSpeed: Double
+    public var flyMinSpeed: Double
 
-    public let flyMaxSpeed: Double
+    public var flyMaxSpeed: Double
 
 #if os(iOS) // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     public init() {
@@ -215,6 +215,8 @@ public struct POVControllerConstants {
 
 public protocol POVController {
 
+    var settings: POVControllerSettings { get set }
+    
     var pov: POV { get }
 
     var viewMatrix: float4x4 { get }
@@ -277,7 +279,7 @@ public class OrbitingPOVController: ObservableObject, POVController, DragHandler
         return dragInProgress != nil || pinchInProgress != nil || rotationInProgress != nil
     }
 
-    private var constants = POVControllerConstants()
+    public var settings = POVControllerSettings()
 
     private var _lastUpdateTimestamp: Date? = nil
 
@@ -339,7 +341,7 @@ public class OrbitingPOVController: ObservableObject, POVController, DragHandler
 
     public func flyTo(pov destination: CenteredPOV, _ callback: (() -> ())? = nil) {
         if !frozen && !flying {
-            self.flightInProgress = CenteredPOVFlight(self.currentPOV, destination, constants, callback: callback)
+            self.flightInProgress = CenteredPOVFlight(self.currentPOV, destination, settings, callback: callback)
         }
     }
 
@@ -357,7 +359,7 @@ public class OrbitingPOVController: ObservableObject, POVController, DragHandler
 
     public func dragBegan(at location: SIMD2<Float>) {
         if !frozen && !flying {
-            self.dragInProgress = CenteredPOVTurn(self.currentPOV, location, constants)
+            self.dragInProgress = CenteredPOVTurn(self.currentPOV, location, settings)
         }
     }
 
@@ -376,7 +378,7 @@ public class OrbitingPOVController: ObservableObject, POVController, DragHandler
 
     public func pinchBegan(at touchLocation: SIMD2<Float>) {
         if !frozen && !flying {
-            self.pinchInProgress = CenteredPOVRadialMove(self.currentPOV, touchLocation, constants)
+            self.pinchInProgress = CenteredPOVRadialMove(self.currentPOV, touchLocation, settings)
         }
     }
 
@@ -395,7 +397,7 @@ public class OrbitingPOVController: ObservableObject, POVController, DragHandler
 
     public func rotationBegan(at location: SIMD2<Float>) {
         if !frozen && !flying {
-            self.rotationInProgress = CenteredPOVRoll(self.currentPOV, location, constants)
+            self.rotationInProgress = CenteredPOVRoll(self.currentPOV, location, settings)
         }
     }
 
@@ -492,13 +494,13 @@ class CenteredPOVFlight {
 
     var callback: (() -> ())?
 
-    init(_ pov: CenteredPOV, _ destination: CenteredPOV, _ constants: POVControllerConstants, callback:(() -> ())? = nil) {
+    init(_ pov: CenteredPOV, _ destination: CenteredPOV, _ settings: POVControllerSettings, callback:(() -> ())? = nil) {
         self.povSequence = [pov, destination]
         self.totalDistance = Self.calculateTotalDistance([pov, destination])
-        self.coastingThreshold = constants.flyCoastingThreshold
-        self.normalizedAcceleration = constants.flyNormalizedAcceleration
-        self.minSpeed = constants.flyMinSpeed
-        self.maxSpeed = constants.flyMaxSpeed
+        self.coastingThreshold = settings.flyCoastingThreshold
+        self.normalizedAcceleration = settings.flyNormalizedAcceleration
+        self.minSpeed = settings.flyMinSpeed
+        self.maxSpeed = settings.flyMaxSpeed
         self.callback = callback
     }
 
@@ -595,12 +597,12 @@ struct CenteredPOVTurn {
 
     let panFactor: Float
 
-    init(_ pov: CenteredPOV, _ touchLocation: SIMD2<Float>, _ constants: POVControllerConstants) {
+    init(_ pov: CenteredPOV, _ touchLocation: SIMD2<Float>, _ settings: POVControllerSettings) {
         self.initialPOV = pov
         // self.touchLocation = touchLocation
         let inverseRadius = 1 / sqrt(distance(pov.location, pov.center))
-        self.scrollFactor = inverseRadius * constants.scrollSensitivity
-        self.panFactor = inverseRadius * constants.panSensitivity
+        self.scrollFactor = inverseRadius * settings.scrollSensitivity
+        self.panFactor = inverseRadius * settings.panSensitivity
     }
 
     mutating func dragChanged(_ pov: POV, pan: Float, scroll: Float) -> CenteredPOV? {
@@ -640,11 +642,11 @@ struct CenteredPOVRadialMove {
     let magnificationSensitivity: Float
 
     /// ASSUMES pov.forward is pointed toward center
-    init(_ pov: CenteredPOV, _ touchLocation: SIMD2<Float>, _ constants: POVControllerConstants) {
+    init(_ pov: CenteredPOV, _ touchLocation: SIMD2<Float>, _ settings: POVControllerSettings) {
         self.initialPOV = pov
         self.initialDisplacement = initialPOV.location - initialPOV.center
         // self.touchLocation = touchLocation
-        self.magnificationSensitivity = constants.magnificationSensitivity
+        self.magnificationSensitivity = settings.magnificationSensitivity
     }
 
     mutating func scaleChanged(_ pov: POV, scale: Float) -> CenteredPOV? {
@@ -668,10 +670,10 @@ struct CenteredPOVRoll {
 
     let rotationSensitivity: Float
 
-    init(_ pov: CenteredPOV, _ touchLocation: SIMD2<Float>, _ constants: POVControllerConstants) {
+    init(_ pov: CenteredPOV, _ touchLocation: SIMD2<Float>, _ settings: POVControllerSettings) {
         self.initialPOV = pov
         // self.touchLocation = touchLocation
-        self.rotationSensitivity = constants.rotationSensitivity
+        self.rotationSensitivity = settings.rotationSensitivity
     }
 
     mutating func rotationChanged(_ pov: CenteredPOV, radians: Float) -> CenteredPOV? {
