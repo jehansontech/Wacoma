@@ -24,13 +24,13 @@ extension MTKView {
         let pColorSpace = CGColorSpaceCreateDeviceRGB()
 
         let rawBitmapInfo = CGImageAlphaInfo.noneSkipFirst.rawValue | CGBitmapInfo.byteOrder32Little.rawValue
-        let bitmapInfo:CGBitmapInfo = CGBitmapInfo(rawValue: rawBitmapInfo)
+        let bitmapInfo: CGBitmapInfo = CGBitmapInfo(rawValue: rawBitmapInfo)
 
-        let selftureSize = texture.width * texture.height * 4
+        let dataSize = texture.width * texture.height * 4
         let releaseMaskImagePixelData: CGDataProviderReleaseDataCallback = { (info: UnsafeMutableRawPointer?, data: UnsafeRawPointer, size: Int) -> () in
             return
         }
-        let provider = CGDataProvider(dataInfo: nil, data: p!, size: selftureSize, releaseData: releaseMaskImagePixelData)
+        let provider = CGDataProvider(dataInfo: nil, data: p!, size: dataSize, releaseData: releaseMaskImagePixelData)
         return CGImage(width: texture.width,
                        height: texture.height,
                        bitsPerComponent: 8,

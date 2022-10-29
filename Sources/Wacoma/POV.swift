@@ -216,7 +216,7 @@ public struct POVControllerSettings {
 public protocol POVController {
 
     var settings: POVControllerSettings { get set }
-    
+
     var pov: POV { get }
 
     var viewMatrix: float4x4 { get }
@@ -316,16 +316,16 @@ public class OrbitingPOVController: ObservableObject, POVController, DragHandler
 
     public func jumpToMark() {
         if !frozen {
-        if let mark = markedPOV {
-            currentPOV = mark
-        }
+            if let mark = markedPOV {
+                currentPOV = mark
+            }
         }
     }
 
     public func jumpTo(pov: CenteredPOV) {
         if !frozen {
-        // print("OrbitingPOVController.jumpTo -- new pov: \(pov)")
-        currentPOV = pov
+            // print("OrbitingPOVController.jumpTo -- new pov: \(pov)")
+            currentPOV = pov
         }
     }
 
