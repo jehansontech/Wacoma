@@ -90,6 +90,7 @@ public class RenderController: ObservableObject {
 }
 
 public struct TouchRay {
+
     public var origin: SIMD3<Float>
     public var direction:SIMD3<Float>
     public var range: ClosedRange<Float>
@@ -100,25 +101,53 @@ extension RenderController {
     public func touchRay(at touchLocation: SIMD2<Float>) -> TouchRay {
         // print("RenderController.ray -- touchLocation: \(touchLocation.prettyString)")
 
-        // FIXME: the glass is at z=zNear, not z=0 or z=-1 or whatever we're doing here.
-        // FIXME: I don't actually know what we're doing. . . .
-        let ray0 = SIMD4<Float>(touchLocation.x, touchLocation.y, 0, 1)
-        var ray1 = fovController.projectionMatrix.inverse * ray0
-        ray1.z = -1
-        ray1.w = 0
+        let point0 = SIMD4<Float>(touchLocation.x, touchLocation.y, 0, 1)
+        var point1 = fovController.projectionMatrix.inverse * point0
+        point1.z = -1
+        point1.w = 0
 
-        // FIXME: this is misnamed.
-        // This is something like the world coord's of the point (0,0,0) in FOV coord's
-        let rayOrigin = (povController.viewMatrix.inverse * SIMD4<Float>(0, 0, 0, 1)).xyz
+        // I don't know what's going on here.
+        //
+        // point0 is the point we touched in screen coordinates with a z-component
+        // set to 0. I was thinking that meant it was somwehere on the near face
+        // of the frustum but now I'm not sure.
+        //
+        // ¿ point1 at first is that same point transformed into modelview coordinates
+        // (in which the origin is the POV's location and the z axis gives the POV's
+        // direction of gaze). Then we move it along the POV's direction of gaze (i.e.,
+        // either ahead of or behind the eye, I don't know which).
+        //
+        // But point1.z was -1 already . . . is that a coincidence because of my zNear and zFar?
+        // point1.w was NOT 0
+        //
+        // Is point1 on the BACK face of the frustum?
+        //
+        //        let zz0 = fovController.projectionMatrix.inverse *  SIMD4<Float>(touchLocation.x, touchLocation.y, 0, 1)
+        //        let zz1 = fovController.projectionMatrix.inverse *  SIMD4<Float>(touchLocation.x, touchLocation.y, 1, 1)
+        //        let zz2 = fovController.projectionMatrix.inverse * SIMD4<Float>(touchLocation.x, touchLocation.y, -1, 1)
+        //        print("zz0: \(zz0.prettyString)")
+        //        print("zz1: \(zz1.prettyString)")
+        //        print("zz2: \(zz2.prettyString)")
+        //
+        // The values I'm seeing for x coords are all in, -1.3 to 1.3
+        // The y's are all in -1 to 1.
+        // The z's are ALL -1.
+        // The w coord is quite big, at least the ones I remember.
+        //
+        // I have verified that rayOrigin is equal to pov.location.
+        // let rayOrigin = (povController.viewMatrix.inverse * SIMD4<Float>(0, 0, 0, 1)).xyz
 
-        // FIXME: this is misnamed.
-        // It's something like the displacement in world coords of the touch location
-        let rayDirection = normalize(povController.viewMatrix.inverse * ray1).xyz
-
-        // FIXME: need to transform vizibleZ to tworld coor's
+        // FIXME: this is totally wrong.
+        // What I'm looking for are the distances, in world coordinates,
+        // to the nearest and farthest visible points *along the ray*.
         let zRange = fovController.visibleZ
 
-        return TouchRay(origin: rayOrigin, direction: rayDirection, range: zRange)
+        // The "origin" of the ray is the POV's location in world coordinates.
+        // Its "direction" is the displacement vector from the POV's location
+        // to point1, transformed to world coordinates and normalized.
+        return TouchRay(origin: povController.pov.location,
+                        direction: normalize(povController.viewMatrix.inverse * point1).xyz,
+                        range: zRange)
     }
 }
 
