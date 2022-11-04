@@ -10,25 +10,24 @@ import MetalKit
 
 public protocol TapHandler {
 
-    /// called when the user executes a primary tap gesture: one-finger tap in iOS, left-button mouse click in macOS
+    /// called when the user executes a primary tap gesture: one-finger tap in iOS, button-1 mouse click in macOS
     /// location is in clip space: (-1, -1) to (+1, +1)
-    mutating func tap1(at location: SIMD2<Float>)
+    mutating func primaryTap(at location: SIMD2<Float>)
 
-    /// called when the user executes a secondary tap gesture: two-finger tap in iOS, right-button mouse click in macOS
+    /// called when the user executes a secondary tap gesture: two-finger tap in iOS, button-2 mouse click in macOS
     /// location is in clip space: (-1, -1) to (+1, +1)
-    mutating func tap2(at location: SIMD2<Float>)
-
+    mutating func secondaryTap(at location: SIMD2<Float>)
 }
 
 public protocol LongPressHandler {
 
     /// called when the user starts executing a long-press gesture
     /// location is in clip space: (-1, -1) to (+1, +1)
-    mutating func longPress1Began(at location: SIMD2<Float>)
+    mutating func longPressBegan(at location: SIMD2<Float>)
 
-    mutating func longPress1Moved(to location: SIMD2<Float>)
+    mutating func longPressMoved(to location: SIMD2<Float>)
 
-    mutating func longPress1Ended(at location: SIMD2<Float>)
+    mutating func longPressEnded(at location: SIMD2<Float>)
 }
 
 
@@ -48,7 +47,7 @@ public protocol DragHandler {
 public protocol PinchHandler {
 
     /// called when the user starts executing a pinch gesture
-    /// center is midpoint between two fingers
+    /// center is midpoint between two fingers, in clip space: (-1, -1) to (+1, +1)
     mutating func pinchBegan(at location: SIMD2<Float>)
 
     /// scale goes like 1 -> 0.1 when squeezing,  1 -> 10 when stretching
@@ -61,7 +60,7 @@ public protocol PinchHandler {
 public protocol RotationHandler {
 
     /// called when the user starts executing a rotation gesture
-    /// center is midpoint between two fingers
+    /// center is midpoint between two fingers, in clip space: (-1, -1) to (+1, +1)
     mutating func rotationBegan(at location: SIMD2<Float>)
 
     /// increases as the fingers rotate counterclockwise
@@ -85,7 +84,7 @@ public class GestureHandlers: NSObject, UIGestureRecognizerDelegate {
     public var pinchHandler: PinchHandler?
     public var rotationHandler: RotationHandler?
 
-    private var oneTouchRecognizer: UITapGestureRecognizer? = nil
+    private var singleTapRecognizer: UITapGestureRecognizer? = nil
     private var twoTouchRecognizer: UITapGestureRecognizer? = nil
     private var longPressRecognizer: UILongPressGestureRecognizer? = nil
     private var dragRecognizer: UIPanGestureRecognizer? = nil
@@ -107,81 +106,86 @@ public class GestureHandlers: NSObject, UIGestureRecognizerDelegate {
 
     public func connectGestures(_ mtkView: MTKView) {
 
-        if oneTouchRecognizer == nil {
-            oneTouchRecognizer = UITapGestureRecognizer(target: self, action: #selector(onePointTap))
-            oneTouchRecognizer!.numberOfTouchesRequired = 1
-            mtkView.addGestureRecognizer(oneTouchRecognizer!)
+        if singleTapRecognizer == nil {
+            let recognizer = UITapGestureRecognizer(target: self, action: #selector(singleTap))
+            recognizer.numberOfTapsRequired = 1
+            recognizer.numberOfTouchesRequired = 1
+            mtkView.addGestureRecognizer(recognizer)
+            self.singleTapRecognizer = recognizer
         }
 
         if twoTouchRecognizer == nil {
-            twoTouchRecognizer = UITapGestureRecognizer(target: self, action: #selector(twoPointTap))
-            twoTouchRecognizer!.numberOfTouchesRequired = 2
-            mtkView.addGestureRecognizer(twoTouchRecognizer!)
+            let recognizer = UITapGestureRecognizer(target: self, action: #selector(twoPointTap))
+            recognizer.numberOfTapsRequired = 1
+            recognizer.numberOfTouchesRequired = 2
+            mtkView.addGestureRecognizer(recognizer)
+            self.twoTouchRecognizer = recognizer
         }
 
         if longPressRecognizer == nil {
-            longPressRecognizer = UILongPressGestureRecognizer(target: self, action: #selector(longPress))
-            longPressRecognizer!.numberOfTouchesRequired = 1
-            mtkView.addGestureRecognizer(longPressRecognizer!)
+            let recognizer = UILongPressGestureRecognizer(target: self, action: #selector(longPress))
+            recognizer.numberOfTouchesRequired = 1
+            mtkView.addGestureRecognizer(recognizer)
+            self.longPressRecognizer = recognizer
         }
 
         if dragRecognizer == nil {
-            dragRecognizer = UIPanGestureRecognizer(target: self, action: #selector(drag))
-            mtkView.addGestureRecognizer(dragRecognizer!)
+            let recognizer = UIPanGestureRecognizer(target: self, action: #selector(drag))
+            mtkView.addGestureRecognizer(recognizer)
+            self.dragRecognizer = recognizer
         }
 
         if pinchRecognizer == nil {
-            pinchRecognizer = UIPinchGestureRecognizer(target: self, action: #selector(pinch))
-            mtkView.addGestureRecognizer(pinchRecognizer!)
+            let recognizer = UIPinchGestureRecognizer(target: self, action: #selector(pinch))
+            mtkView.addGestureRecognizer(recognizer)
+            self.pinchRecognizer = recognizer
         }
 
         if rotationRecognizer == nil {
-            rotationRecognizer = UIRotationGestureRecognizer(target: self, action: #selector(rotate))
-            mtkView.addGestureRecognizer(rotationRecognizer!)
+            let recognizer = UIRotationGestureRecognizer(target: self, action: #selector(rotate))
+            mtkView.addGestureRecognizer(recognizer)
+            self.rotationRecognizer = recognizer
         }
     }
 
     public func disconnectGestures(_ mtkView: MTKView) {
 
-        if let oneTouchRecognizer = self.oneTouchRecognizer {
-            mtkView.removeGestureRecognizer(oneTouchRecognizer)
-            self.oneTouchRecognizer = nil
+        if let singleTapRecognizer {
+            mtkView.removeGestureRecognizer(singleTapRecognizer)
+            self.singleTapRecognizer = nil
         }
 
-        if let twoTouchRecognizer = self.twoTouchRecognizer {
+        if let twoTouchRecognizer {
             mtkView.removeGestureRecognizer(twoTouchRecognizer)
             self.twoTouchRecognizer = nil
         }
 
-        if let longPressRecognizer = self.longPressRecognizer {
+        if let longPressRecognizer {
             mtkView.removeGestureRecognizer(longPressRecognizer)
             self.longPressRecognizer = nil
         }
 
-        if let dragRecognizer = self.dragRecognizer {
+        if let dragRecognizer {
             mtkView.removeGestureRecognizer(dragRecognizer)
             self.dragRecognizer = nil
         }
 
-        if let pinchRecognizer = self.pinchRecognizer {
+        if let pinchRecognizer {
             mtkView.removeGestureRecognizer(pinchRecognizer)
             self.pinchRecognizer = nil
         }
 
-        if let rotationRecognizer = self.rotationRecognizer {
+        if let rotationRecognizer {
             mtkView.removeGestureRecognizer(rotationRecognizer)
             self.rotationRecognizer = nil
         }
     }
 
-    @objc func onePointTap(_ gesture: UITapGestureRecognizer) {
-        // print("onePointTap")
-        if var tapHandler = self.tapHandler,
-           let view = gesture.view {
-
+    @objc func singleTap(_ gesture: UITapGestureRecognizer) {
+        if let view = gesture.view {
             switch gesture.state {
             case .ended:
-                tapHandler.tap1(at: clipPoint(gesture.location(in: view), view.bounds))
+                tapHandler?.primaryTap(at: clipPoint(gesture.location(in: view), view.bounds))
             default:
                 break
             }
@@ -189,13 +193,10 @@ public class GestureHandlers: NSObject, UIGestureRecognizerDelegate {
     }
 
     @objc func twoPointTap(_ gesture: UITapGestureRecognizer) {
-        // print("twoPointTap")
-        if var tapHandler = self.tapHandler,
-           let view = gesture.view {
-
+        if let view = gesture.view {
             switch gesture.state {
             case .ended:
-                tapHandler.tap2(at: clipPoint(gesture.location(in: view), view.bounds))
+                tapHandler?.secondaryTap(at: clipPoint(gesture.location(in: view), view.bounds))
             default:
                 break
             }
@@ -203,18 +204,14 @@ public class GestureHandlers: NSObject, UIGestureRecognizerDelegate {
     }
 
     @objc func longPress(_ gesture: UILongPressGestureRecognizer) {
-        if var longPressHandler = self.longPressHandler,
-           let view = gesture.view {
-
+        if let view = gesture.view {
             switch gesture.state {
             case .began:
-                longPressHandler.longPress1Began(at: clipPoint(gesture.location(in: view), view.bounds))
+                longPressHandler?.longPressBegan(at: clipPoint(gesture.location(in: view), view.bounds))
             case .changed:
-                let loc = clipPoint(gesture.location(in: view), view.bounds)
-                print("longPressChanged. location = \(loc.prettyString)")
-                // longPressHandler.longPressChanged(location: clipPoint(gesture.location(in: view), view.bounds))
+                longPressHandler?.longPressMoved(to: clipPoint(gesture.location(in: view), view.bounds))
             case .ended:
-                longPressHandler.longPress1Ended(at: clipPoint(gesture.location(in: view), view.bounds))
+                longPressHandler?.longPressEnded(at: clipPoint(gesture.location(in: view), view.bounds))
             default:
                 break
             }
@@ -222,60 +219,57 @@ public class GestureHandlers: NSObject, UIGestureRecognizerDelegate {
     }
 
     @objc func drag(_ gesture: UIPanGestureRecognizer) {
-        if var dragHandler = self.dragHandler,
-           let view = gesture.view {
-
+        if let view = gesture.view {
             switch gesture.state {
             case .possible:
                 break
             case .began:
-                dragHandler.dragBegan(at: clipPoint(gesture.location(in: view), view.bounds))
+                dragHandler?.dragBegan(at: clipPoint(gesture.location(in: view), view.bounds))
             case .changed:
                 let translation = gesture.translation(in: view)
-                // NOTE that factor on -1 on scroll
-                dragHandler.dragChanged(pan: Float(translation.x / view.bounds.width),
-                                        scroll: Float(-translation.y / view.bounds.height))
+                // NOTE that factor of -1 on the scroll
+                dragHandler?.dragChanged(pan: Float(translation.x / view.bounds.width),
+                                         scroll: Float(-translation.y / view.bounds.height))
             default:
-                dragHandler.dragEnded()
+                dragHandler?.dragEnded()
             }
         }
     }
 
     @objc func pinch(_ gesture: UIPinchGestureRecognizer) {
-        if var pinchHandler = self.pinchHandler,
-           let view = gesture.view,
-           gesture.numberOfTouches >= 2 {
+        if let view = gesture.view {
             switch gesture.state {
             case .possible:
                 break
             case .began:
-                pinchHandler.pinchBegan(at: clipPoint(gesture.location(ofTouch: 0, in: view),
-                                                      gesture.location(ofTouch: 1, in: view),
-                                                      view.bounds))
+                if gesture.numberOfTouches >= 2 {
+                    pinchHandler?.pinchBegan(at: clipPoint(gesture.location(ofTouch: 0, in: view),
+                                                           gesture.location(ofTouch: 1, in: view),
+                                                           view.bounds))
+                }
             case .changed:
-                pinchHandler.pinchChanged(by: Float(gesture.scale))
+                pinchHandler?.pinchChanged(by: Float(gesture.scale))
             default:
-                pinchHandler.pinchEnded()
+                pinchHandler?.pinchEnded()
             }
         }
     }
 
     @objc func rotate(_ gesture: UIRotationGestureRecognizer) {
-        if var rotationHandler = rotationHandler,
-           let view = gesture.view,
-           gesture.numberOfTouches >= 2 {
-
+        if let view = gesture.view {
             switch gesture.state {
             case .possible:
                 break
             case .began:
-                rotationHandler.rotationBegan(at: clipPoint(gesture.location(ofTouch: 0, in: view),
-                                                            gesture.location(ofTouch: 1, in: view),
-                                                            view.bounds))
+                if gesture.numberOfTouches >= 2 {
+                    rotationHandler?.rotationBegan(at: clipPoint(gesture.location(ofTouch: 0, in: view),
+                                                                 gesture.location(ofTouch: 1, in: view),
+                                                                 view.bounds))
+                }
             case .changed:
-                rotationHandler.rotationChanged(by: Float(gesture.rotation))
+                rotationHandler?.rotationChanged(by: Float(gesture.rotation))
             default:
-                rotationHandler.rotationEnded()
+                rotationHandler?.rotationEnded()
             }
         }
     }
@@ -345,36 +339,44 @@ public class GestureHandlers: NSObject, NSGestureRecognizerDelegate {
     public func connectGestures(_ mtkView: MTKView) {
 
         if button1Recognizer == nil {
-            button1Recognizer = NSClickGestureRecognizer(target: self, action: #selector(onePointTap))
-            button1Recognizer?.buttonMask = 0x1
-            mtkView.addGestureRecognizer(button1Recognizer!)
+            let recognizer = NSClickGestureRecognizer(target: self, action: #selector(button1Click))
+            recognizer.numberOfClicksRequired = 1
+            recognizer.buttonMask = 0x1
+            mtkView.addGestureRecognizer(recognizer)
+            self.button1Recognizer = recognizer
         }
 
         if button2Recognizer == nil {
-            button2Recognizer = NSClickGestureRecognizer(target: self, action: #selector(twoPointTap))
+            let recognizer = NSClickGestureRecognizer(target: self, action: #selector(button2Click))
+            recognizer.numberOfClicksRequired = 1
             button2Recognizer?.buttonMask = 0x2
-            mtkView.addGestureRecognizer(button2Recognizer!)
+            mtkView.addGestureRecognizer(recognizer)
+            self.button2Recognizer = recognizer
         }
 
         if longPressRecognizer == nil {
-            longPressRecognizer = NSPressGestureRecognizer(target: self, action: #selector(longPress))
-            longPressRecognizer?.buttonMask = 0x1
-            mtkView.addGestureRecognizer(longPressRecognizer!)
+            let recognizer = NSPressGestureRecognizer(target: self, action: #selector(longPress))
+            recognizer.buttonMask = 0x1
+            mtkView.addGestureRecognizer(recognizer)
+            self.longPressRecognizer = recognizer
         }
 
         if dragRecognizer == nil {
-            dragRecognizer = NSPanGestureRecognizer(target: self, action: #selector(drag))
-            mtkView.addGestureRecognizer(dragRecognizer!)
+            let recognizer = NSPanGestureRecognizer(target: self, action: #selector(drag))
+            mtkView.addGestureRecognizer(recognizer)
+            self.dragRecognizer = recognizer
         }
 
         if pinchRecognizer == nil {
-            pinchRecognizer = NSMagnificationGestureRecognizer(target: self, action: #selector(pinch))
-            mtkView.addGestureRecognizer(pinchRecognizer!)
+            let recognizer = NSMagnificationGestureRecognizer(target: self, action: #selector(pinch))
+            mtkView.addGestureRecognizer(recognizer)
+            self.pinchRecognizer = recognizer
         }
 
         if rotationRecognizer == nil {
-            rotationRecognizer = NSRotationGestureRecognizer(target: self, action: #selector(rotate))
-            mtkView.addGestureRecognizer(rotationRecognizer!)
+            let recognizer = NSRotationGestureRecognizer(target: self, action: #selector(rotate))
+            mtkView.addGestureRecognizer(recognizer)
+            self.rotationRecognizer = recognizer
         }
     }
 
@@ -411,24 +413,22 @@ public class GestureHandlers: NSObject, NSGestureRecognizerDelegate {
         }
     }
 
-    @objc func onePointTap(_ gesture: NSClickGestureRecognizer) {
-        if var tapHandler = self.tapHandler,
-           let view = gesture.view {
+    @objc func button1Click(_ gesture: NSClickGestureRecognizer) {
+        if let view = gesture.view {
             switch gesture.state {
             case .ended:
-                tapHandler.tap1(at: clipPoint(gesture.location(in: view), view.bounds))
+                tapHandler?.primaryTap(at: clipPoint(gesture.location(in: view), view.bounds))
             default:
                 break
             }
         }
     }
 
-    @objc func twoPointTap(_ gesture: NSClickGestureRecognizer) {
-        if var tapHandler = self.tapHandler,
-           let view = gesture.view {
+    @objc func button2Click(_ gesture: NSClickGestureRecognizer) {
+        if let view = gesture.view {
             switch gesture.state {
             case .ended:
-                tapHandler.tap2(at: clipPoint(gesture.location(in: view), view.bounds))
+                tapHandler?.secondaryTap(at: clipPoint(gesture.location(in: view), view.bounds))
             default:
                 break
             }
@@ -436,16 +436,14 @@ public class GestureHandlers: NSObject, NSGestureRecognizerDelegate {
     }
 
     @objc func longPress(_ gesture: NSPressGestureRecognizer) {
-        if var longPressHandler = self.longPressHandler,
-           let view = gesture.view  {
-
+        if let view = gesture.view  {
             switch gesture.state {
             case .began:
-                longPressHandler.longPress1Began(at: clipPoint(gesture.location(in: view), view.bounds))
+                longPressHandler?.longPressBegan(at: clipPoint(gesture.location(in: view), view.bounds))
             case .changed:
-                longPressHandler.longPress1Moved(to: clipPoint(gesture.location(in: view), view.bounds))
+                longPressHandler?.longPressMoved(to: clipPoint(gesture.location(in: view), view.bounds))
             case .ended:
-                longPressHandler.longPress1Ended(at: clipPoint(gesture.location(in: view), view.bounds))
+                longPressHandler?.longPressEnded(at: clipPoint(gesture.location(in: view), view.bounds))
             default:
                 break
             }
@@ -453,57 +451,51 @@ public class GestureHandlers: NSObject, NSGestureRecognizerDelegate {
     }
 
     @objc func drag(_ gesture: NSPanGestureRecognizer) {
-        if var dragHandler = self.dragHandler,
-           let view  = gesture.view  {
-
+        if let view = gesture.view  {
             switch gesture.state {
             case .possible:
                 break
             case .began:
-                dragHandler.dragBegan(at: clipPoint(gesture.location(in: view), view.bounds))
+                dragHandler?.dragBegan(at: clipPoint(gesture.location(in: view), view.bounds))
             case .changed:
                 let translation = gesture.translation(in: view)
                 // macOS uses upside-down clip coords, so the scroll value is the opposite of that on iOS
-                dragHandler.dragChanged(pan: Float(translation.x / view.bounds.width),
+                dragHandler?.dragChanged(pan: Float(translation.x / view.bounds.width),
                                         scroll: Float(translation.y / view.bounds.height))
             default:
-                dragHandler.dragEnded()
+                dragHandler?.dragEnded()
             }
         }
     }
 
     @objc func pinch(_ gesture: NSMagnificationGestureRecognizer) {
-        if var pinchHandler = self.pinchHandler,
-           let view  = gesture.view  {
-
+        if let view = gesture.view  {
             switch gesture.state {
             case .possible:
                 break
             case .began:
-                pinchHandler.pinchBegan(at: clipPoint(gesture.location(in: view), view.bounds))
+                pinchHandler?.pinchBegan(at: clipPoint(gesture.location(in: view), view.bounds))
             case .changed:
                 // macOS gesture's magnification=0 corresponds to iOS gesture's scale=1
-                pinchHandler.pinchChanged(by: Float(1 + gesture.magnification))
+                pinchHandler?.pinchChanged(by: Float(1 + gesture.magnification))
             default:
-                pinchHandler.pinchEnded()
+                pinchHandler?.pinchEnded()
             }
         }
     }
 
     @objc func rotate(_ gesture: NSRotationGestureRecognizer) {
-        if var rotationHandler = self.rotationHandler,
-           let view  = gesture.view  {
-
+        if let view = gesture.view  {
             switch gesture.state {
             case .possible:
                 break
             case .began:
-                rotationHandler.rotationBegan(at: clipPoint(gesture.location(in: view), view.bounds))
+                rotationHandler?.rotationBegan(at: clipPoint(gesture.location(in: view), view.bounds))
             case .changed:
                 // multiply by -1 because macOS gestures use upside-down clip space
-                rotationHandler.rotationChanged(by: Float(-gesture.rotation))
+                rotationHandler?.rotationChanged(by: Float(-gesture.rotation))
             default:
-                rotationHandler.rotationEnded()
+                rotationHandler?.rotationEnded()
             }
         }
     }
