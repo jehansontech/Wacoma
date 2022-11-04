@@ -145,8 +145,7 @@ public struct NumericSettingViewModel<T: DecimalConverter> {
     public init(_ transformer: T,
                 _ value: T.ValueType,
                 range: ClosedRange<T.ValueType>,
-                snapToStep: Bool,
-                initialValueSnapToStep: Bool) {
+                snapToStep: Bool) {
 
         let tmpDecimal = transformer.valueToDecimal(value)
         let tmpLB = transformer.valueToDecimal(range.lowerBound)
@@ -154,11 +153,12 @@ public struct NumericSettingViewModel<T: DecimalConverter> {
 
         let initialStepSize = transformer.makeStepSize(range)
         let initialStep = Self.getStep(tmpDecimal, initialStepSize)
-        let initialSnap = snapToStep || initialValueSnapToStep
-        let initialDecimal = initialSnap ? initialStep * initialStepSize : tmpDecimal
-        let initialLB = initialSnap ? initialStep * tmpLB * initialStepSize : tmpLB
-        let initialUB = initialSnap ? initialStep * tmpUB * initialStepSize : tmpUB
-
+        let initialDecimal = snapToStep ? initialStep * initialStepSize : tmpDecimal
+        let initialLB = snapToStep ? Self.getStep(tmpLB, initialStepSize) * initialStepSize : tmpLB
+        var initialUB = snapToStep ? Self.getStep(tmpUB, initialStepSize) * initialStepSize : tmpUB
+        if initialUB < tmpUB {
+            initialUB += initialStepSize
+        }
         self.transformer = transformer
         self.decimalValue = initialDecimal
         self.valueLB = initialLB
@@ -170,7 +170,7 @@ public struct NumericSettingViewModel<T: DecimalConverter> {
         self.step = initialStep
         self.sliderPosition = Self.getSliderPosition(initialDecimal, initialLB, initialUB)
         self.sliderLB = initialLB
-        self.sliderUB = initialLB
+        self.sliderUB = initialUB
     }
 
     public mutating func applyFieldText() {
@@ -288,7 +288,7 @@ public struct NumericSettingViewModel<T: DecimalConverter> {
     }
 
     private static func getStep(_ value: Decimal, _ stepSize: Decimal) -> Decimal {
-        return (value/stepSize).whole
+        return (value/stepSize).nearestWhole
     }
 
     private static func getSliderPosition(_ value: Decimal, _ lowerBound: Decimal, _ upperBound: Decimal) -> Double {
@@ -342,8 +342,7 @@ public struct NumericSettingView<T: DecimalConverter, Content: View>: View {
         self._model = State(initialValue: NumericSettingViewModel(DecimalIntegerConverter<V>(),
                                                                   value.wrappedValue,
                                                                   range: range,
-                                                                  snapToStep: snapToStep,
-                                                                  initialValueSnapToStep: initialValueSnapToStep))
+                                                                  snapToStep: snapToStep))
         self.contentBuilder = contentBuilder
     }
 
@@ -358,8 +357,7 @@ public struct NumericSettingView<T: DecimalConverter, Content: View>: View {
         self._model = State(initialValue: NumericSettingViewModel(DecimalFloatingPointConverter<V>(),
                                                                   value.wrappedValue,
                                                                   range: range,
-                                                                  snapToStep: snapToStep,
-                                                                  initialValueSnapToStep: initialValueSnapToStep))
+                                                                  snapToStep: snapToStep))
         self.contentBuilder = contentBuilder
     }
 }

@@ -33,7 +33,15 @@ extension BinaryFloatingPoint {
 ///
 extension Decimal {
 
-    public var whole: Decimal { rounded(sign == .minus ? .up : .down) }
+    public var nearestWhole: Decimal {
+        let below = rounded(.down)
+        let above = rounded(.up)
+        return (self - below) <= (above - self) ? below : above
+    }
+    
+    public var whole: Decimal {
+        return rounded(sign == .minus ? .up : .down)
+    }
 
     public var fraction: Decimal { self - whole }
 
