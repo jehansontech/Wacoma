@@ -175,8 +175,6 @@ public struct POVControllerSettings {
 
     public var panSensitivity: Float
 
-    public var magnificationSensitivity: Float
-
     public var rotationSensitivity: Float
 
     public var flyCoastingThreshold: Double
@@ -191,7 +189,6 @@ public struct POVControllerSettings {
     public init() {
         self.scrollSensitivity = 1.5 * .piOverTwo
         self.panSensitivity = 1.5 * .pi
-        self.magnificationSensitivity = 2
         self.rotationSensitivity = 1.25
         self.flyCoastingThreshold = 0.33
         self.flyNormalizedAcceleration = 6
@@ -202,7 +199,6 @@ public struct POVControllerSettings {
     public init() {
         self.scrollSensitivity = 1.5 * .piOverTwo
         self.panSensitivity = 1.5 * .pi
-        self.magnificationSensitivity = 2
         self.rotationSensitivity = 1.25
         self.flyCoastingThreshold = 0.33
         self.flyNormalizedAcceleration = 6
@@ -280,6 +276,10 @@ public class OrbitingPOVController: ObservableObject, POVController, DragHandler
     }
 
     public var settings = POVControllerSettings()
+
+    /// Z-distance in world coordinates to the point in space where a gesture is centered.
+    /// If unset, we use pov center.
+    public var touchZDistance: Float? = nil
 
     private var _lastUpdateTimestamp: Date? = nil
 
@@ -378,7 +378,7 @@ public class OrbitingPOVController: ObservableObject, POVController, DragHandler
 
     public func pinchBegan(at touchLocation: SIMD2<Float>) {
         if !frozen && !flying {
-            self.pinchInProgress = CenteredPOVRadialMove(self.currentPOV, touchLocation, settings)
+            self.pinchInProgress = CenteredPOVRadialMove(self.currentPOV, touchLocation, settings, zDistance: touchZDistance)
         }
     }
 
@@ -633,25 +633,33 @@ struct CenteredPOVTurn {
 ///
 struct CenteredPOVRadialMove {
 
+
     let initialPOV: CenteredPOV
+
+    let pinchLocation: SIMD3<Float>
 
     let initialDisplacement: SIMD3<Float>
 
-    // let touchLocation: SIMD2<Float>
-
-    let magnificationSensitivity: Float
-
     /// ASSUMES pov.forward is pointed toward center
-    init(_ pov: CenteredPOV, _ touchLocation: SIMD2<Float>, _ settings: POVControllerSettings) {
+    /// zDistance is the (positive definite) distance from the POV's location to the place in 3D space where we want the pinch to originate.
+    init(_ pov: CenteredPOV, _ touchLocation: SIMD2<Float>, _ settings: POVControllerSettings, zDistance: Float? = nil) {
+
+        let pinchLocation: SIMD3<Float>
+        if let zDistance {
+            pinchLocation = pov.location + zDistance * pov.forward
+        }
+        else {
+            pinchLocation = pov.center
+        }
+
         self.initialPOV = pov
-        self.initialDisplacement = initialPOV.location - initialPOV.center
-        // self.touchLocation = touchLocation
-        self.magnificationSensitivity = settings.magnificationSensitivity
+        self.pinchLocation = pinchLocation
+        self.initialDisplacement = pov.location - pinchLocation
     }
 
     mutating func scaleChanged(_ pov: POV, scale: Float) -> CenteredPOV? {
         let newDisplacement = initialDisplacement / scale
-        let newLocation = newDisplacement + initialPOV.center
+        let newLocation = newDisplacement + pinchLocation
         return CenteredPOV(location: newLocation,
                            center: initialPOV.center,
                            up: pov.up)

@@ -47,7 +47,7 @@ public protocol DragHandler {
 public protocol PinchHandler {
 
     /// called when the user starts executing a pinch gesture
-    /// center is midpoint between two fingers, in clip space: (-1, -1) to (+1, +1)
+    /// loation is midpoint between two fingers, in clip space: (-1, -1) to (+1, +1)
     mutating func pinchBegan(at location: SIMD2<Float>)
 
     /// scale goes like 1 -> 0.1 when squeezing,  1 -> 10 when stretching
