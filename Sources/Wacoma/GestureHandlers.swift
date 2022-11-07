@@ -349,7 +349,7 @@ public class GestureHandlers: NSObject, NSGestureRecognizerDelegate {
         if button2Recognizer == nil {
             let recognizer = NSClickGestureRecognizer(target: self, action: #selector(button2Click))
             recognizer.numberOfClicksRequired = 1
-            button2Recognizer?.buttonMask = 0x2
+            recognizer.buttonMask = 0x2
             mtkView.addGestureRecognizer(recognizer)
             self.button2Recognizer = recognizer
         }
@@ -414,6 +414,7 @@ public class GestureHandlers: NSObject, NSGestureRecognizerDelegate {
     }
 
     @objc func button1Click(_ gesture: NSClickGestureRecognizer) {
+        print("button1Click")
         if let view = gesture.view {
             switch gesture.state {
             case .ended:
