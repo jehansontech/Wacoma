@@ -59,7 +59,7 @@ public class PerspectiveFOVController: ObservableObject, FOVController {
     public var zFar: Float
 
     /// angular width in radians
-    public var yFOV: Float = .piOverThree
+    public var yFOV: Float
 
     public var projectionMatrix: float4x4 {
         let aspectRatio = (viewSize.height > 0) ? Float(viewSize.width) / Float(viewSize.height) : 1
@@ -69,7 +69,7 @@ public class PerspectiveFOVController: ObservableObject, FOVController {
                         farZ: zFar)
     }
 
-    public init(fadeoutMidpoint: Float = 0, fadeoutDistance: Float = 1000, zNear: Float = 0.001, zFar: Float = 1000, yFOV: Float = .piOverTwo) {
+    public init(fadeoutMidpoint: Float = 0, fadeoutDistance: Float = 1000, zNear: Float = 0.001, zFar: Float = 1000, yFOV: Float = .piOverThree) {
         self.fadeoutMidpoint = fadeoutMidpoint
         self.fadeoutDistance = fadeoutDistance
         self.zNear = zNear
