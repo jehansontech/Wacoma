@@ -11,23 +11,24 @@ import SwiftUI
 
 extension UIImage {
 
-    public func save() {
-        UIImageWriteToSavedPhotosAlbum(self, nil, nil, nil)
-    }
-}
-
-extension CGImage {
-
     public func save() -> String {
         let timestamp: String = makeTimestamp()
-        UIImage(cgImage: self).save()
-        return "Image saved to Photos with timestamp: \(timestamp)"
+        UIImageWriteToSavedPhotosAlbum(self, nil, nil, nil)
+        return "Image saved to Photos with timestamp \(timestamp)"
     }
 
     public func makeTimestamp() -> String {
         let formatter = DateFormatter()
         formatter.dateFormat = "yyyy-MM-dd-HHmmss"
         return formatter.string(from: Date())
+    }
+
+}
+
+extension CGImage {
+
+    public func save() -> String {
+        return UIImage(cgImage: self).save()
     }
 }
 

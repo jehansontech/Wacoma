@@ -134,7 +134,7 @@ extension RenderController {
         // The z's are ALL -1.
         // The w coord is quite big, at least the ones I remember.
         //
-        // I have verified that rayOrigin is equal to pov.location.
+        // I have verified that rayOrigin as calculated below is equal to pov.location. 
         // let rayOrigin = (povController.viewMatrix.inverse * SIMD4<Float>(0, 0, 0, 1)).xyz
 
         // FIXME: this is totally wrong.
