@@ -95,9 +95,9 @@ public class RenderController: ObservableObject, DragHandler, PinchHandler, Rota
         // print("RenderController.ray -- touchLocation: \(touchLocation.prettyString)")
 
         let point0 = SIMD4<Float>(touchLocation.x, touchLocation.y, 0, 1)
-        var point1 = fovController.projectionMatrix.inverse * point0
-        point1.z = -1
-        point1.w = 0
+        var ray1 = fovController.projectionMatrix.inverse * point0
+        ray1.z = -1
+        ray1.w = 0
 
         // I don't know what's going on here.
         //
@@ -105,13 +105,13 @@ public class RenderController: ObservableObject, DragHandler, PinchHandler, Rota
         // set to 0. I was thinking that meant it was somwehere on the near face
         // of the frustum but now I'm not sure.
         //
-        // ¿ point1 at first is that same point transformed into modelview coordinates
+        // ¿ ray1 at first is that same point transformed into modelview coordinates
         // (in which the origin is the POV's location and the z axis gives the POV's
         // direction of gaze). Then we move it along the POV's direction of gaze (i.e.,
         // either ahead of or behind the eye, I don't know which).
         //
-        // But point1.z was -1 already . . . is that a coincidence because of my zNear and zFar?
-        // point1.w was NOT 0
+        // But ray1.z was -1 already . . . is that a coincidence because of my zNear and zFar?
+        // ray1.w was NOT 0
         //
         // Is point1 on the BACK face of the frustum?
         //
@@ -139,14 +139,22 @@ public class RenderController: ObservableObject, DragHandler, PinchHandler, Rota
         // Its "direction" is the displacement vector from the POV's location
         // to point1, transformed to world coordinates and normalized.
         return TouchRay(origin: povController.pov.location,
-                        direction: normalize(povController.viewMatrix.inverse * point1).xyz,
+                        direction: normalize(povController.viewMatrix.inverse * ray1).xyz,
                         range: zRange)
     }
 
     public func touchPoint(_ location: SIMD2<Float>) -> SIMD3<Float> {
-        // FIXME: impl
-        // use touchRay and touchZDistance
-        return .zero
+
+        // Find the x and y coordinates of a point in space
+        // lying on a line passing through ray.origin and pointing in direction ray.direction
+        // such that the point's z component is ray.origin.z + touchZDistance
+
+        let ray = touchRay(at: location)
+        let distanceToPoint = touchZDistance / ray.direction.z
+        let displacementToPoint = SIMD3<Float>(distanceToPoint * ray.direction.x,
+                                               distanceToPoint * ray.direction.y,
+                                               touchZDistance)
+        return ray.origin + displacementToPoint
     }
 
 
@@ -166,15 +174,15 @@ public class RenderController: ObservableObject, DragHandler, PinchHandler, Rota
     }
 
     public func pinchBegan(at location: SIMD2<Float>) {
-        // povController.pinchGestureBegan(at: touchPoint(location))
+        povController.pinchGestureBegan(at: touchPoint(location))
     }
 
     public func pinchChanged(by scale: Float) {
-        // povController.pinchGestureChanged(by: scale)
+        povController.pinchGestureChanged(by: scale)
     }
 
     public func pinchEnded() {
-        // povController.pinchGestureEnded()
+        povController.pinchGestureEnded()
     }
 
     public func rotationBegan(at location: SIMD2<Float>) {
