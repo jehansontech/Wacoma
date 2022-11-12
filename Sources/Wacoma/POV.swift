@@ -221,6 +221,12 @@ public protocol POVController {
     /// This is called during each rendering cycle as a way to support a POV that changes on its own
     func update(_ timestamp: Date)
 
+    func rotationGestureBegan(at: SIMD3<Float>)
+
+    func rotationGestureChanged(by radians: Float)
+
+    func rotationGestureEnded()
+
 }
 
 extension POVController {
@@ -243,7 +249,7 @@ extension POVController {
     }
 }
 
-public class OrbitingPOVController: ObservableObject, POVController, DragHandler, PinchHandler, RotationHandler {
+public class OrbitingPOVController: ObservableObject, POVController, DragHandler, PinchHandler {
 
     @Published public var orbitEnabled: Bool
 
@@ -405,13 +411,13 @@ public class OrbitingPOVController: ObservableObject, POVController, DragHandler
         pinchInProgress = nil
     }
 
-    public func rotationBegan(at location: SIMD2<Float>) {
+    public func rotationGestureBegan(at: SIMD3<Float>) {
         if !frozen && !flying {
-            self.rotationInProgress = CenteredPOVRoll(self.currentPOV, location, settings)
+            self.rotationInProgress = CenteredPOVRoll(self.currentPOV, settings)
         }
     }
 
-    public func rotationChanged(by radians: Float) {
+    public func rotationGestureChanged(by radians: Float) {
         if var povRotationHandler = self.rotationInProgress {
             if let newPOV = povRotationHandler.rotationChanged(self.currentPOV, radians: radians) {
                 self.currentPOV = newPOV
@@ -419,10 +425,28 @@ public class OrbitingPOVController: ObservableObject, POVController, DragHandler
         }
     }
 
-    public func rotationEnded() {
-        // print("rotationEnded")
+    public func rotationGestureEnded() {
         self.rotationInProgress = nil
     }
+
+//    public func rotationBegan(at location: SIMD2<Float>) {
+//        if !frozen && !flying {
+//            self.rotationInProgress = CenteredPOVRoll(self.currentPOV, settings)
+//        }
+//    }
+//
+//    public func rotationChanged(by radians: Float) {
+//        if var povRotationHandler = self.rotationInProgress {
+//            if let newPOV = povRotationHandler.rotationChanged(self.currentPOV, radians: radians) {
+//                self.currentPOV = newPOV
+//            }
+//        }
+//    }
+//
+//    public func rotationEnded() {
+//        // print("rotationEnded")
+//        self.rotationInProgress = nil
+//    }
 
     public func update(_ timestamp: Date) {
         var updatedPOV: CenteredPOV
@@ -690,13 +714,10 @@ struct CenteredPOVRoll {
 
     let initialPOV: CenteredPOV
 
-    // let touchLocation: SIMD2<Float>
-
     let rotationSensitivity: Float
 
-    init(_ pov: CenteredPOV, _ touchLocation: SIMD2<Float>, _ settings: POVControllerSettings) {
+    init(_ pov: CenteredPOV, _ settings: POVControllerSettings) {
         self.initialPOV = pov
-        // self.touchLocation = touchLocation
         self.rotationSensitivity = settings.rotationSensitivity
     }
 

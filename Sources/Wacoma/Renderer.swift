@@ -43,7 +43,7 @@ public protocol Renderable {
     func encodeDrawCommands(_ encoder: MTLRenderCommandEncoder)
 }
 
-public class RenderController: ObservableObject {
+public class RenderController: ObservableObject, DragHandler, PinchHandler, RotationHandler {
 
     public static let defaultDarkBackground = SIMD4<Double>(0.025, 0.025, 0.025, 1)
 
@@ -54,6 +54,9 @@ public class RenderController: ObservableObject {
     public var povController: POVController
 
     public var fovController: FOVController
+
+    /// Z-distance in world coordinates to the point in space where a gesture is centered.
+    public var touchZDistance: Float = 0
 
     @Published public var backgroundColor: SIMD4<Double>
 
@@ -87,16 +90,6 @@ public class RenderController: ObservableObject {
             }
         }
     }
-}
-
-public struct TouchRay {
-
-    public var origin: SIMD3<Float>
-    public var direction:SIMD3<Float>
-    public var range: ClosedRange<Float>
-}
-
-extension RenderController {
 
     public func touchRay(at touchLocation: SIMD2<Float>) -> TouchRay {
         // print("RenderController.ray -- touchLocation: \(touchLocation.prettyString)")
@@ -134,7 +127,7 @@ extension RenderController {
         // The z's are ALL -1.
         // The w coord is quite big, at least the ones I remember.
         //
-        // I have verified that rayOrigin as calculated below is equal to pov.location. 
+        // I have verified that rayOrigin as calculated below is equal to pov.location.
         // let rayOrigin = (povController.viewMatrix.inverse * SIMD4<Float>(0, 0, 0, 1)).xyz
 
         // FIXME: this is totally wrong.
@@ -149,6 +142,60 @@ extension RenderController {
                         direction: normalize(povController.viewMatrix.inverse * point1).xyz,
                         range: zRange)
     }
+
+    public func touchPoint(_ location: SIMD2<Float>) -> SIMD3<Float> {
+        // FIXME: impl
+        // use touchRay and touchZDistance
+        return .zero
+    }
+
+
+    public func dragBegan(at location: SIMD2<Float>) {
+        // FIXME: impl
+        // povController.dragGestureBegan(at: touchPoint(location))
+    }
+
+    public func dragChanged(pan: Float, scroll: Float) {
+        // FIXME: impl
+        // find new touchPoint in world coordinates. use touchZDistance
+        // povController.dragGestureMoved(to: touchPoint)
+    }
+
+    public func dragEnded() {
+        // povController.dragGestureEnded()
+    }
+
+    public func pinchBegan(at location: SIMD2<Float>) {
+        // povController.pinchGestureBegan(at: touchPoint(location))
+    }
+
+    public func pinchChanged(by scale: Float) {
+        // povController.pinchGestureChanged(by: scale)
+    }
+
+    public func pinchEnded() {
+        // povController.pinchGestureEnded()
+    }
+
+    public func rotationBegan(at location: SIMD2<Float>) {
+        povController.rotationGestureBegan(at: touchPoint(location))
+    }
+
+    public func rotationChanged(by radians: Float) {
+        povController.rotationGestureChanged(by: radians)
+    }
+
+    public func rotationEnded() {
+        povController.rotationGestureEnded()
+    }
+
+}
+
+public struct TouchRay {
+
+    public var origin: SIMD3<Float>
+    public var direction:SIMD3<Float>
+    public var range: ClosedRange<Float>
 }
 
 public class Renderer: NSObject, MTKViewDelegate {
