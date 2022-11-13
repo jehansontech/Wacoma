@@ -154,8 +154,14 @@ public class RenderController: ObservableObject, DragHandler, PinchHandler, Rota
         povController.dragGestureBegan(at: touchPoint(location))
     }
 
-    public func dragChanged(pan: Float, scroll: Float) {
-        povController.dragGestureChanged(pan: pan, scroll: scroll)
+    public func dragChanged(panFraction: Float, scrollFraction: Float) {
+        // HERE is where we can convert pan & scroll from fractions of screen
+        // to distances in world coordinates. We need to use touchZDistance
+        // and fovController.fovWidth
+        // and maybe aspect ratio.
+        let fovSize = fovController.fovSize(touchZDistance)
+        povController.dragGestureChanged(panDistance: panFraction * Float(fovSize.width),
+                                         scrollDistance: scrollFraction * Float(fovSize.height))
     }
 
     public func dragEnded() {

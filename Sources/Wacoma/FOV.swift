@@ -30,12 +30,20 @@ public protocol FOVController {
 
     var projectionMatrix: float4x4 { get }
 
+    /// size of the field of view at the given distance from the POV, in world coordinates,
+    func fovSize(_ zDistance: Float) -> CGSize
+
     /// Sets the POV's properties to the values they should have at the given system time.
     /// This is called during each rendering cycle as a way to support a POV that changes on its own
     func update(_ date: Date)
+
 }
 
 extension FOVController {
+
+    var aspectRatio: Float {
+        (viewSize.height > 0) ? Float(viewSize.width) / Float(viewSize.height) : 1
+    }
 
     public var visibleZ: ClosedRange<Float> {
         return max(zNear, fadeoutMidpoint-fadeoutDistance)...min(zFar, fadeoutMidpoint+fadeoutDistance)
@@ -62,7 +70,6 @@ public class PerspectiveFOVController: ObservableObject, FOVController {
     public var yFOV: Float
 
     public var projectionMatrix: float4x4 {
-        let aspectRatio = (viewSize.height > 0) ? Float(viewSize.width) / Float(viewSize.height) : 1
         return float4x4(perspectiveProjectionRHFovY: yFOV,
                         aspectRatio: aspectRatio,
                         nearZ: zNear,
@@ -77,7 +84,13 @@ public class PerspectiveFOVController: ObservableObject, FOVController {
         self.yFOV = yFOV
     }
 
+    public func fovSize(_ zDistance: Float) -> CGSize {
+        let width = zDistance * tan(yFOV/2)
+        return CGSize(width: Double(width), height: Double(width / aspectRatio))
+    }
+
     public func update(_ date: Date) {
         // NOP
     }
+
 }

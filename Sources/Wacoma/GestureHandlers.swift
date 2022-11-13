@@ -37,9 +37,9 @@ public protocol DragHandler {
     /// location is in clip space: (-1, -1) to (+1, +1)
     mutating func dragBegan(at location: SIMD2<Float>)
 
-    /// pan is fraction of view width; negative means "to the left"
-    /// scroll is fraction of view height; negative means "down"
-    mutating func dragChanged(pan: Float, scroll: Float)
+    /// panFraction is in [-1, 1]. It's fraction of view width; negative means "to the left"
+    /// scrollFraction is in [-1, 1]. It's fraction of view height; negative means "down"
+    mutating func dragChanged(panFraction: Float, scrollFraction: Float)
 
     mutating func dragEnded()
 }
@@ -228,8 +228,8 @@ public class GestureHandlers: NSObject, UIGestureRecognizerDelegate {
             case .changed:
                 let translation = gesture.translation(in: view)
                 // NOTE that factor of -1 on the scroll
-                dragHandler?.dragChanged(pan: Float(translation.x / view.bounds.width),
-                                         scroll: Float(-translation.y / view.bounds.height))
+                dragHandler?.dragChanged(panFraction: Float(translation.x / view.bounds.width),
+                                         scrollFraction: Float(-translation.y / view.bounds.height))
             default:
                 dragHandler?.dragEnded()
             }

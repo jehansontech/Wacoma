@@ -227,7 +227,7 @@ public protocol POVController {
 
     func dragGestureBegan(at: SIMD3<Float>)
 
-    func dragGestureChanged(pan: Float, scroll: Float)
+    func dragGestureChanged(panDistance: Float, scrollDistance: Float)
 
     func dragGestureEnded()
 
@@ -298,9 +298,6 @@ public class OrbitingPOVController: ObservableObject, POVController {
     }
 
     public var settings = POVControllerSettings()
-
-    /// Set this to true of the drag's touch point is on the far side of the center
-    public var isTouchInverted: Bool = false
 
     private var _lastUpdateTimestamp: Date? = nil
 
@@ -380,13 +377,13 @@ public class OrbitingPOVController: ObservableObject, POVController {
 
     public func dragGestureBegan(at touchPoint: SIMD3<Float>) {
         if !frozen && !flying {
-            self.dragInProgress = CenteredPOVTangentialMove(self.currentPOV, touchPoint, isTouchInverted, settings)
+            self.dragInProgress = CenteredPOVTangentialMove(self.currentPOV, touchPoint, settings)
         }
     }
 
-    public func dragGestureChanged(pan: Float, scroll: Float) {
+    public func dragGestureChanged(panDistance pan: Float, scrollDistance scroll: Float) {
         if let handler = self.dragInProgress {
-            if let newPOV = handler.locationChanged(pan: pan, scroll: scroll) {
+            if let newPOV = handler.locationChanged(panDistance: pan, scrollDistance: scroll) {
                 self.currentPOV = newPOV
             }
         }
@@ -399,7 +396,7 @@ public class OrbitingPOVController: ObservableObject, POVController {
 
     public func pinchGestureBegan(at pinchCenter: SIMD3<Float>) {
         if !frozen && !flying {
-            self.pinchInProgress = CenteredPOVRadialMove(self.currentPOV, pinchCenter, isTouchInverted, settings)
+            self.pinchInProgress = CenteredPOVRadialMove(self.currentPOV, pinchCenter, settings)
         }
     }
 
@@ -614,6 +611,8 @@ struct CenteredPOVTangentialMove {
 
     let initialTouch: SIMD3<Float>
 
+    let touchToCenterDistance: Float
+
     let initialTheta: Float
 
     let initialPhi: Float
@@ -626,27 +625,28 @@ struct CenteredPOVTangentialMove {
     let scrollFactor: Float
     let panFactor: Float
 
-    init(_ pov: CenteredPOV, _ touchLocation: SIMD3<Float>, _ inverted: Bool, _ settings: POVControllerSettings) {
-        let initialDisplacementRTP = cartesianToSpherical(xyz: touchLocation - pov.center)
+    init(_ pov: CenteredPOV, _ touchLocation: SIMD3<Float>, _ settings: POVControllerSettings) {
 
         self.initialPOV = pov
         self.initialTouch = touchLocation
-        self.initialTheta = initialDisplacementRTP.y
-        self.initialPhi = initialDisplacementRTP.z
         self.scrollRotationAxis = normalize(simd_cross(initialPOV.forward, initialPOV.up))
         self.panRotationAxis = initialPOV.up
 
-        let inversionFactor: Float = inverted ? -1 : 1
-        let distanceFactor: Float = inversionFactor / sqrt(simd_distance(pov.location, pov.center))
-        self.scrollFactor = distanceFactor * settings.scrollSensitivity
-        self.panFactor = distanceFactor * settings.panSensitivity
+        let d = simd_dot((touchLocation - pov.center), -pov.forward)
+        self.touchToCenterDistance = (d == 0) ? 1 : d
+
+        let initialDisplacementRTP = cartesianToSpherical(xyz: touchLocation - pov.center)
+        self.initialTheta = initialDisplacementRTP.y
+        self.initialPhi = initialDisplacementRTP.z
+
+        self.scrollFactor = settings.scrollSensitivity
+        self.panFactor = settings.panSensitivity
     }
 
-    func locationChanged(pan: Float, scroll: Float) -> CenteredPOV? {
+    func locationChanged(panDistance: Float, scrollDistance: Float) -> CenteredPOV? {
 
-        // FIXME: these are too sensitive up close, not sensitive enough far away.
-        let dTheta = scroll * scrollFactor
-        let dPhi =  -pan * panFactor
+        let dTheta = scrollFactor * atan(scrollDistance/touchToCenterDistance)
+        let dPhi = -scrollFactor * atan(panDistance/touchToCenterDistance)
 
         let newLocation = (
             float4x4(translationBy: initialPOV.center)
@@ -678,7 +678,7 @@ struct CenteredPOVRadialMove {
 
     let initialRTP: SIMD3<Float>
 
-    init(_ pov: CenteredPOV, _ pinchCenter: SIMD3<Float>, _ inverted: Bool, _ settings: POVControllerSettings) {
+    init(_ pov: CenteredPOV, _ pinchCenter: SIMD3<Float>, _ settings: POVControllerSettings) {
         self.initialPOV = pov
         self.pinchRadius = cartesianToSpherical(xyz: (pinchCenter-pov.center)).x
         self.initialRTP = cartesianToSpherical(xyz: (pov.location-pov.center))
