@@ -709,52 +709,26 @@ struct CenteredPOVTangentialMove {
         self.scrollRotationAxis = normalize(simd_cross(initialPOV.forward, initialPOV.up))
         self.panRotationAxis = initialPOV.up
 
-        let inverseRadius = 1 / sqrt(distance(pov.location, pov.center))
-        self.scrollFactor = inverseRadius * settings.scrollSensitivity
-        self.panFactor = inverseRadius * settings.panSensitivity
+        let distanceFactor = 1 / sqrt(distance(pov.location, pov.center))
+        self.scrollFactor = distanceFactor * settings.scrollSensitivity
+        self.panFactor = distanceFactor * settings.panSensitivity
     }
 
-//    func locationChanged(to newTouchLocation: SIMD3<Float>) -> CenteredPOV? {
-//        let newDisplacementRTP = cartesianToSpherical(xyz: newTouchLocation - initialPOV.center)
-//        let dTheta = newDisplacementRTP.y - initialTheta
-//        let dPhi = newDisplacementRTP.z - initialPhi
-//
-//        print("dTouch=\((newTouchLocation-initialTouch).prettyString), dTheta=\(dTheta), dPhi=\(dPhi)")
-//
-////        let newLocation =  (
-////            float4x4(translationBy: initialPOV.center)
-////            * float4x4(rotationAround: thetaRotationAxis, by: dTheta)
-////            * float4x4(rotationAround: phiRotationAxis, by: dPhi)
-////            * float4x4(translationBy: -initialPOV.center)
-////            * SIMD4<Float>(initialPOV.location, 1)
-////        ).xyz
-////
-////        let newUp = (
-////            float4x4(rotationAround: thetaRotationAxis, by: dTheta)
-////            * SIMD4<Float>(initialPOV.up, 1)
-////        ).xyz
-//
-//        let newLocation = initialPOV.location
-//        let newUp = initialPOV.up
-//
-//        return CenteredPOV(location: newLocation,
-//                           center: initialPOV.center,
-//                           up: newUp)
-//    }
-
     func locationChanged(pan: Float, scroll: Float) -> CenteredPOV? {
-        /// unit vector perpendicular to POV's forward and up vectors
+
+        let dTheta = scroll * scrollFactor
+        let dPhi =  -pan * panFactor
 
         let newLocation = (
             float4x4(translationBy: initialPOV.center)
-            * float4x4(rotationAround: panRotationAxis, by: -pan * panFactor)
-            * float4x4(rotationAround: scrollRotationAxis, by: scroll * scrollFactor)
+            * float4x4(rotationAround: panRotationAxis, by: dPhi)
+            * float4x4(rotationAround: scrollRotationAxis, by: dTheta)
             * float4x4(translationBy: -initialPOV.center)
             * SIMD4<Float>(initialPOV.location, 1)
         ).xyz
 
         let newUp = (
-            float4x4(rotationAround: scrollRotationAxis, by: scroll * scrollFactor)
+            float4x4(rotationAround: scrollRotationAxis, by: dTheta)
             * SIMD4<Float>(initialPOV.up, 1)
         ).xyz
 
