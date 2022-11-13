@@ -614,9 +614,6 @@ struct CenteredPOVTangentialMove {
 
     let initialTouch: SIMD3<Float>
 
-    /// displacement of initialTouch from pov.center
-    // let initialDisplacement: SIMD3<Float>
-
     let initialTheta: Float
 
     let initialPhi: Float
@@ -647,6 +644,7 @@ struct CenteredPOVTangentialMove {
 
     func locationChanged(pan: Float, scroll: Float) -> CenteredPOV? {
 
+        // FIXME: these are too sensitive up close, not sensitive enough far away.
         let dTheta = scroll * scrollFactor
         let dPhi =  -pan * panFactor
 
@@ -676,24 +674,23 @@ struct CenteredPOVRadialMove {
 
     let initialPOV: CenteredPOV
 
-    let pinchCenter: SIMD3<Float>
+    let pinchRadius: Float
 
-    let inverted: Bool
-
-    let initialDisplacement: SIMD3<Float>
+    let initialRTP: SIMD3<Float>
 
     init(_ pov: CenteredPOV, _ pinchCenter: SIMD3<Float>, _ inverted: Bool, _ settings: POVControllerSettings) {
         self.initialPOV = pov
-        self.pinchCenter = pinchCenter
-        self.inverted = inverted
-        self.initialDisplacement = pov.location - pinchCenter
+        self.pinchRadius = cartesianToSpherical(xyz: (pinchCenter-pov.center)).x
+        self.initialRTP = cartesianToSpherical(xyz: (pov.location-pov.center))
+        // print("pinchRadius: \(pinchRadius), initialRadius: \(initialRTP.x)")
     }
 
     func scaleChanged(scale: Float) -> CenteredPOV? {
-        // MAYBE:
-        // let newDisplacement = inverted ? initialDisplacement * scale : initialDisplacement / scale
-        let newDisplacement = initialDisplacement / scale
-        let newLocation = newDisplacement + pinchCenter
+        let newRadius = (initialRTP.x - pinchRadius) / scale + pinchRadius
+        let newLocation = initialPOV.center + sphericalToCartesian(rtp: SIMD3<Float>(newRadius,
+                                                                                     initialRTP.y,
+                                                                                     initialRTP.z))
+        // print("    scale: \(scale), newRadius: \(newRadius)")
         return CenteredPOV(location: newLocation,
                            center: initialPOV.center,
                            up: initialPOV.up)
