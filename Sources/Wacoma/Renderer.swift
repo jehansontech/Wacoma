@@ -55,7 +55,7 @@ public class RenderController: ObservableObject, DragHandler, PinchHandler, Rota
 
     public var fovController: FOVController
 
-    /// Z-distance in world coordinates to the point in space where a gesture is centered.
+    /// Z-distance in world coordinates between the POV and the point in space where a touch is located. Non-negative.
     public var touchZDistance: Float = 0
 
     @Published public var backgroundColor: SIMD4<Double>
@@ -147,8 +147,6 @@ public class RenderController: ObservableObject, DragHandler, PinchHandler, Rota
 
         // Find the x and y coordinates of a point in space lying on touch ray
         // such that the point's z component is ray.origin.z - touchZDistance.
-        // (The factor of -1 is because a ray going away from the eye has
-        // negative z-direction in view coordinates)
 
         let ray = touchRay(at: location)
         let distanceToPoint: Float = touchZDistance / abs(ray.direction.z)
@@ -171,9 +169,7 @@ public class RenderController: ObservableObject, DragHandler, PinchHandler, Rota
     }
 
     public func pinchBegan(at location: SIMD2<Float>) {
-        // FIXME: temporary
-        let clipCenter: SIMD2<Float> = .zero
-        povController.pinchGestureBegan(at: touchPoint(clipCenter))
+        povController.pinchGestureBegan(at: touchPoint(location))
     }
 
     public func pinchChanged(scale: Float) {
@@ -200,8 +196,12 @@ public class RenderController: ObservableObject, DragHandler, PinchHandler, Rota
 
 public struct TouchRay {
 
+    /// Ray's point of origin in world coordinates
     public var origin: SIMD3<Float>
-    public var direction:SIMD3<Float>
+
+    /// Unit vector giving ray's direction in world coordinates
+    public var direction :SIMD3<Float>
+
     public var range: ClosedRange<Float>
 }
 

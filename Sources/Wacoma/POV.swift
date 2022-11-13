@@ -378,9 +378,9 @@ public class OrbitingPOVController: ObservableObject, POVController {
         flyTo(pov: CenteredPOV(location: destination, center: currentPOV.center, up: currentPOV.up), callback)
     }
 
-    public func dragGestureBegan(at location: SIMD3<Float>) {
+    public func dragGestureBegan(at touchPoint: SIMD3<Float>) {
         if !frozen && !flying {
-            self.dragInProgress = CenteredPOVTangentialMove(self.currentPOV, location, isTouchInverted, settings)
+            self.dragInProgress = CenteredPOVTangentialMove(self.currentPOV, touchPoint, isTouchInverted, settings)
         }
     }
 
@@ -399,7 +399,7 @@ public class OrbitingPOVController: ObservableObject, POVController {
 
     public func pinchGestureBegan(at pinchCenter: SIMD3<Float>) {
         if !frozen && !flying {
-            self.pinchInProgress = CenteredPOVRadialMove(self.currentPOV, pinchCenter, settings)
+            self.pinchInProgress = CenteredPOVRadialMove(self.currentPOV, pinchCenter, isTouchInverted, settings)
         }
     }
 
@@ -678,15 +678,20 @@ struct CenteredPOVRadialMove {
 
     let pinchCenter: SIMD3<Float>
 
+    let inverted: Bool
+
     let initialDisplacement: SIMD3<Float>
 
-    init(_ pov: CenteredPOV, _ pinchCenter: SIMD3<Float>, _ settings: POVControllerSettings) {
+    init(_ pov: CenteredPOV, _ pinchCenter: SIMD3<Float>, _ inverted: Bool, _ settings: POVControllerSettings) {
         self.initialPOV = pov
         self.pinchCenter = pinchCenter
+        self.inverted = inverted
         self.initialDisplacement = pov.location - pinchCenter
     }
 
     func scaleChanged(scale: Float) -> CenteredPOV? {
+        // MAYBE:
+        // let newDisplacement = inverted ? initialDisplacement * scale : initialDisplacement / scale
         let newDisplacement = initialDisplacement / scale
         let newLocation = newDisplacement + pinchCenter
         return CenteredPOV(location: newLocation,
