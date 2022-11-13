@@ -299,9 +299,8 @@ public class OrbitingPOVController: ObservableObject, POVController {
 
     public var settings = POVControllerSettings()
 
-    /// Z-distance in world coordinates to the point in space where a gesture is centered.
-    /// If unset, we use pov center.
-    public var touchZDistance: Float? = nil
+    /// Set this to true of the drag's touch point is on the far side of the center
+    public var isTouchInverted: Bool = false
 
     private var _lastUpdateTimestamp: Date? = nil
 
@@ -381,7 +380,7 @@ public class OrbitingPOVController: ObservableObject, POVController {
 
     public func dragGestureBegan(at location: SIMD3<Float>) {
         if !frozen && !flying {
-            self.dragInProgress = CenteredPOVTangentialMove(self.currentPOV, location, settings)
+            self.dragInProgress = CenteredPOVTangentialMove(self.currentPOV, location, isTouchInverted, settings)
         }
     }
 
@@ -398,15 +397,15 @@ public class OrbitingPOVController: ObservableObject, POVController {
     }
 
 
-    public func pinchGestureBegan(at pinchLocation: SIMD3<Float>) {
+    public func pinchGestureBegan(at pinchCenter: SIMD3<Float>) {
         if !frozen && !flying {
-            self.pinchInProgress = CenteredPOVRadialMove(self.currentPOV, pinchLocation)
+            self.pinchInProgress = CenteredPOVRadialMove(self.currentPOV, pinchCenter, settings)
         }
     }
 
     public func pinchGestureChanged(scale: Float) {
-        if var povPinchHandler = self.pinchInProgress {
-            if let newPOV = povPinchHandler.scaleChanged(self.pov, scale: scale) {
+        if let handler = self.pinchInProgress {
+            if let newPOV = handler.scaleChanged(scale: scale) {
                 self.currentPOV = newPOV
             }
         }
@@ -416,15 +415,15 @@ public class OrbitingPOVController: ObservableObject, POVController {
         pinchInProgress = nil
     }
 
-    public func rotationGestureBegan(at: SIMD3<Float>) {
+    public func rotationGestureBegan(at rotationCenter: SIMD3<Float>) {
         if !frozen && !flying {
-            self.rotationInProgress = CenteredPOVRoll(self.currentPOV, settings)
+            self.rotationInProgress = CenteredPOVRoll(self.currentPOV, rotationCenter, settings)
         }
     }
 
     public func rotationGestureChanged(radians: Float) {
-        if var povRotationHandler = self.rotationInProgress {
-            if let newPOV = povRotationHandler.rotationChanged(self.currentPOV, radians: radians) {
+        if let handler = self.rotationInProgress {
+            if let newPOV = handler.rotationChanged(radians: radians) {
                 self.currentPOV = newPOV
             }
         }
@@ -434,78 +433,18 @@ public class OrbitingPOVController: ObservableObject, POVController {
         self.rotationInProgress = nil
     }
 
-    //    public func dragBegan(at location: SIMD2<Float>) {
-    //        if !frozen && !flying {
-    //
-    //            // Find the point in 3-space where the touch occurred. use touchZDistance as world-coordinate distance from
-    //            // eye to the point
-    //            self.dragInProgress = CenteredPOVTangentialMove(self.currentPOV, location, settings, zDistance: touchZDistance)
-    //        }
-    //    }
-    //
-    //    public func dragChanged(pan: Float, scroll: Float) {
-    //        if var povDragHandler = self.dragInProgress {
-    //            if let newPOV = povDragHandler.dragChanged(self.currentPOV, pan: pan, scroll: scroll) {
-    //                self.currentPOV = newPOV
-    //            }
-    //        }
-    //    }
-    //
-    //    public func dragMoved(to location: SIMD2<Float>) {
-    //        // NOP
-    //    }
-    //
-    //    public func dragEnded() {
-    //        // print("dragEnded")
-    //        self.dragInProgress = nil
-    //    }
-    //
-    //    public func pinchBegan(at touchLocation: SIMD2<Float>) {
-    //        if !frozen && !flying {
-    //            let pinchLocation: SIMD3<Float>
-    //            if let touchZDistance {
-    //                pinchLocation = currentPOV.location + touchZDistance * pov.forward
-    //            }
-    //            else {
-    //                pinchLocation = currentPOV.center
-    //            }
-    //            self.pinchInProgress = CenteredPOVRadialMove(self.currentPOV, pinchLocation)
-    //        }
-    //    }
-    //
-    //    public func pinchChanged(by scale: Float) {
-    //        if var povPinchHandler = self.pinchInProgress {
-    //            if let newPOV = povPinchHandler.scaleChanged(self.pov, scale: scale) {
-    //                self.currentPOV = newPOV
-    //            }
-    //        }
-    //    }
-    //
-    //    public func pinchEnded() {
-    //        // print("pinchEnded")
-    //        pinchInProgress = nil
-    //    }
-    //
-    //    public func rotationBegan(at location: SIMD2<Float>) {
-    //        if !frozen && !flying {
-    //            self.rotationInProgress = CenteredPOVRoll(self.currentPOV, settings)
-    //        }
-    //    }
-    //
-    //    public func rotationChanged(by radians: Float) {
-    //        if var povRotationHandler = self.rotationInProgress {
-    //            if let newPOV = povRotationHandler.rotationChanged(self.currentPOV, radians: radians) {
-    //                self.currentPOV = newPOV
-    //            }
-    //        }
-    //    }
-    //
-    //    public func rotationEnded() {
-    //        // print("rotationEnded")
-    //        self.rotationInProgress = nil
-    //    }
-
     public func update(_ timestamp: Date) {
+
+        // ==================================================================
+        // Q: orbital motion even if we're flying?
+        // A: No, it's confusing
+        //
+        // Q: how about if we're handling a gesture?
+        // A: I'd rather not because it looks jerky. But on iOS we never
+        //    get notified when drag ends, so if I check for gesture in progress
+        //    after dragging it always returns true.
+        // ==================================================================
+
         var updatedPOV: CenteredPOV
         if let newPOV = flightInProgress?.update(timestamp) {
             updatedPOV = newPOV
@@ -514,15 +453,6 @@ public class OrbitingPOVController: ObservableObject, POVController {
             self.flightInProgress = nil
             updatedPOV = self.currentPOV
         }
-
-        // ==================================================================
-        // Q: orbital motion even if we're flying?
-        // A: No, it's confusing
-        // Q: how about if we're handling a gesture?
-        // A: I'd rather not because it looks jerky. But on iOS we never
-        // get notified when drag ends, so if I check for gesture in progress
-        // after dragging it always returns true.
-        // ==================================================================
 
         if orbitEnabled && !frozen && !flying,
            let t0 = _lastUpdateTimestamp {
@@ -699,7 +629,7 @@ struct CenteredPOVTangentialMove {
     let scrollFactor: Float
     let panFactor: Float
 
-    init(_ pov: CenteredPOV, _ touchLocation: SIMD3<Float>, _ settings: POVControllerSettings) {
+    init(_ pov: CenteredPOV, _ touchLocation: SIMD3<Float>, _ inverted: Bool, _ settings: POVControllerSettings) {
         let initialDisplacementRTP = cartesianToSpherical(xyz: touchLocation - pov.center)
 
         self.initialPOV = pov
@@ -709,7 +639,8 @@ struct CenteredPOVTangentialMove {
         self.scrollRotationAxis = normalize(simd_cross(initialPOV.forward, initialPOV.up))
         self.panRotationAxis = initialPOV.up
 
-        let distanceFactor = 1 / sqrt(distance(pov.location, pov.center))
+        let inversionFactor: Float = inverted ? -1 : 1
+        let distanceFactor: Float = inversionFactor / sqrt(simd_distance(pov.location, pov.center))
         self.scrollFactor = distanceFactor * settings.scrollSensitivity
         self.panFactor = distanceFactor * settings.panSensitivity
     }
@@ -743,42 +674,24 @@ struct CenteredPOVTangentialMove {
 ///
 struct CenteredPOVRadialMove {
 
-
     let initialPOV: CenteredPOV
 
-    let pinchLocation: SIMD3<Float>
+    let pinchCenter: SIMD3<Float>
 
     let initialDisplacement: SIMD3<Float>
 
-    init(_ pov: CenteredPOV, _ pinchLocation: SIMD3<Float>) {
+    init(_ pov: CenteredPOV, _ pinchCenter: SIMD3<Float>, _ settings: POVControllerSettings) {
         self.initialPOV = pov
-        self.pinchLocation = pinchLocation
-        self.initialDisplacement = pov.location - pinchLocation
+        self.pinchCenter = pinchCenter
+        self.initialDisplacement = pov.location - pinchCenter
     }
 
-    //    /// ASSUMES pov.forward is pointed toward center
-    //    /// zDistance is the (positive definite) distance from the POV's location to the place in 3D space where we want the pinch to originate.
-    //    init(_ pov: CenteredPOV, _ touchLocation: SIMD2<Float>, _ settings: POVControllerSettings, zDistance: Float? = nil) {
-    //
-    //        let pinchLocation: SIMD3<Float>
-    //        if let zDistance {
-    //            pinchLocation = pov.location + zDistance * pov.forward
-    //        }
-    //        else {
-    //            pinchLocation = pov.center
-    //        }
-    //
-    //        self.initialPOV = pov
-    //        self.pinchLocation = pinchLocation
-    //        self.initialDisplacement = pov.location - pinchLocation
-    //    }
-
-    mutating func scaleChanged(_ pov: POV, scale: Float) -> CenteredPOV? {
+    func scaleChanged(scale: Float) -> CenteredPOV? {
         let newDisplacement = initialDisplacement / scale
-        let newLocation = newDisplacement + pinchLocation
+        let newLocation = newDisplacement + pinchCenter
         return CenteredPOV(location: newLocation,
                            center: initialPOV.center,
-                           up: pov.up)
+                           up: initialPOV.up)
     }
 }
 
@@ -789,19 +702,21 @@ struct CenteredPOVRadialMove {
 struct CenteredPOVRoll {
 
     let initialPOV: CenteredPOV
-
+    let rotationCenter: SIMD3<Float>
     let rotationSensitivity: Float
 
-    init(_ pov: CenteredPOV, _ settings: POVControllerSettings) {
+    init(_ pov: CenteredPOV, _ rotationCenter: SIMD3<Float>, _ settings: POVControllerSettings) {
         self.initialPOV = pov
+        self.rotationCenter = rotationCenter
         self.rotationSensitivity = settings.rotationSensitivity
     }
 
-    mutating func rotationChanged(_ pov: CenteredPOV, radians: Float) -> CenteredPOV? {
-        let upMatrix = float4x4(rotationAround: pov.forward, by: Float(-rotationSensitivity * radians))
-        let newUp = (upMatrix * SIMD4<Float>(initialPOV.up, 1)).xyz
-        return CenteredPOV(location: pov.location,
-                           center: pov.center,
+    func rotationChanged(radians: Float) -> CenteredPOV? {
+        let newUp = (
+            float4x4(rotationAround: initialPOV.forward, by: Float(-rotationSensitivity * radians))
+            * SIMD4<Float>(initialPOV.up, 1)).xyz
+        return CenteredPOV(location: initialPOV.location,
+                           center: initialPOV.center,
                            up: newUp)
     }
 }

@@ -153,8 +153,7 @@ public class RenderController: ObservableObject, DragHandler, PinchHandler, Rota
         let ray = touchRay(at: location)
         let distanceToPoint: Float = touchZDistance / abs(ray.direction.z)
         let touchPoint = ray.origin + distanceToPoint * ray.direction
-        print("ray.origin: \(ray.origin.prettyString), ray.direction: \(ray.direction.prettyString), touchPoint: \(touchPoint.prettyString)")
-        // print("touchPoint: \(touchPoint.prettyString)")
+        // print("ray.origin: \(ray.origin.prettyString), ray.direction: \(ray.direction.prettyString), touchPoint: \(touchPoint.prettyString)")
         return touchPoint
     }
 
