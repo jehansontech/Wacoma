@@ -145,40 +145,40 @@ public class RenderController: ObservableObject, DragHandler, PinchHandler, Rota
 
     public func touchPoint(_ location: SIMD2<Float>) -> SIMD3<Float> {
 
-        // Find the x and y coordinates of a point in space
-        // lying on a line passing through ray.origin and pointing in direction ray.direction
-        // such that the point's z component is ray.origin.z + touchZDistance
+        // Find the x and y coordinates of a point in space lying on touch ray
+        // such that the point's z component is ray.origin.z - touchZDistance.
+        // (The factor of -1 is because a ray going away from the eye has
+        // negative z-direction in view coordinates)
 
         let ray = touchRay(at: location)
-        let distanceToPoint = touchZDistance / ray.direction.z
-        let displacementToPoint = SIMD3<Float>(distanceToPoint * ray.direction.x,
-                                               distanceToPoint * ray.direction.y,
-                                               touchZDistance)
-        return ray.origin + displacementToPoint
+        let distanceToPoint: Float = touchZDistance / abs(ray.direction.z)
+        let touchPoint = ray.origin + distanceToPoint * ray.direction
+        print("ray.origin: \(ray.origin.prettyString), ray.direction: \(ray.direction.prettyString), touchPoint: \(touchPoint.prettyString)")
+        // print("touchPoint: \(touchPoint.prettyString)")
+        return touchPoint
     }
 
 
     public func dragBegan(at location: SIMD2<Float>) {
-        // FIXME: impl
-        // povController.dragGestureBegan(at: touchPoint(location))
+        povController.dragGestureBegan(at: touchPoint(location))
     }
 
     public func dragChanged(pan: Float, scroll: Float) {
-        // FIXME: impl
-        // find new touchPoint in world coordinates. use touchZDistance
-        // povController.dragGestureMoved(to: touchPoint)
+        povController.dragGestureChanged(pan: pan, scroll: scroll)
     }
 
     public func dragEnded() {
-        // povController.dragGestureEnded()
+        povController.dragGestureEnded()
     }
 
     public func pinchBegan(at location: SIMD2<Float>) {
-        povController.pinchGestureBegan(at: touchPoint(location))
+        // FIXME: temporary
+        let clipCenter: SIMD2<Float> = .zero
+        povController.pinchGestureBegan(at: touchPoint(clipCenter))
     }
 
-    public func pinchChanged(by scale: Float) {
-        povController.pinchGestureChanged(by: scale)
+    public func pinchChanged(scale: Float) {
+        povController.pinchGestureChanged(scale: scale)
     }
 
     public func pinchEnded() {
@@ -189,8 +189,8 @@ public class RenderController: ObservableObject, DragHandler, PinchHandler, Rota
         povController.rotationGestureBegan(at: touchPoint(location))
     }
 
-    public func rotationChanged(by radians: Float) {
-        povController.rotationGestureChanged(by: radians)
+    public func rotationChanged(radians: Float) {
+        povController.rotationGestureChanged(radians: radians)
     }
 
     public func rotationEnded() {

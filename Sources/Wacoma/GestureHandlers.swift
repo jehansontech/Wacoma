@@ -51,7 +51,7 @@ public protocol PinchHandler {
     mutating func pinchBegan(at location: SIMD2<Float>)
 
     /// scale goes like 1 -> 0.1 when squeezing,  1 -> 10 when stretching
-    mutating func pinchChanged(by scale: Float)
+    mutating func pinchChanged(scale: Float)
 
     mutating func pinchEnded()
 }
@@ -64,7 +64,7 @@ public protocol RotationHandler {
     mutating func rotationBegan(at location: SIMD2<Float>)
 
     /// increases as the fingers rotate counterclockwise
-    mutating func rotationChanged(by radians: Float)
+    mutating func rotationChanged(radians: Float)
 
     mutating func rotationEnded()
 }
@@ -248,7 +248,7 @@ public class GestureHandlers: NSObject, UIGestureRecognizerDelegate {
                                                            view.bounds))
                 }
             case .changed:
-                pinchHandler?.pinchChanged(by: Float(gesture.scale))
+                pinchHandler?.pinchChanged(scale: Float(gesture.scale))
             default:
                 pinchHandler?.pinchEnded()
             }
@@ -267,7 +267,7 @@ public class GestureHandlers: NSObject, UIGestureRecognizerDelegate {
                                                                  view.bounds))
                 }
             case .changed:
-                rotationHandler?.rotationChanged(by: Float(gesture.rotation))
+                rotationHandler?.rotationChanged(radians: Float(gesture.rotation))
             default:
                 rotationHandler?.rotationEnded()
             }
@@ -462,7 +462,7 @@ public class GestureHandlers: NSObject, NSGestureRecognizerDelegate {
                 let translation = gesture.translation(in: view)
                 // macOS uses upside-down clip coords, so the scroll value is the opposite of that on iOS
                 dragHandler?.dragChanged(pan: Float(translation.x / view.bounds.width),
-                                        scroll: Float(translation.y / view.bounds.height))
+                                         scroll: Float(translation.y / view.bounds.height))
             default:
                 dragHandler?.dragEnded()
             }
@@ -478,7 +478,7 @@ public class GestureHandlers: NSObject, NSGestureRecognizerDelegate {
                 pinchHandler?.pinchBegan(at: clipPoint(gesture.location(in: view), view.bounds))
             case .changed:
                 // macOS gesture's magnification=0 corresponds to iOS gesture's scale=1
-                pinchHandler?.pinchChanged(by: Float(1 + gesture.magnification))
+                pinchHandler?.pinchChanged(scale: Float(1 + gesture.magnification))
             default:
                 pinchHandler?.pinchEnded()
             }
@@ -494,7 +494,7 @@ public class GestureHandlers: NSObject, NSGestureRecognizerDelegate {
                 rotationHandler?.rotationBegan(at: clipPoint(gesture.location(in: view), view.bounds))
             case .changed:
                 // multiply by -1 because macOS gestures use upside-down clip space
-                rotationHandler?.rotationChanged(by: Float(-gesture.rotation))
+                rotationHandler?.rotationChanged(radians: Float(-gesture.rotation))
             default:
                 rotationHandler?.rotationEnded()
             }

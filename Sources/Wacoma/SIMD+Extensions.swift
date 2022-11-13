@@ -149,6 +149,7 @@ extension simd_float3x3 {
 
 extension simd_float4x4 {
 
+    /// angle in radians
     public init(rotationAround axis: SIMD3<Float>, by angle: Float) {
 
         // from MetalPicking
