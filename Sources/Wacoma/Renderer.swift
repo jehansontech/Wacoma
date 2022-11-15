@@ -100,7 +100,7 @@ public class RenderController: ObservableObject, DragHandler, PinchHandler, Rota
         ray1.z = -1
         ray1.w = 0
 
-        // FIXME: this is totally wrong.
+        // FIXME: ray.range is totally wrong.
         // I don't know what's going on here.
         // * viewPoint1 is the point we touched, transformed into view coordinates.
         // * ray1 at first is that same point, but then we set its z and w components.
@@ -110,7 +110,7 @@ public class RenderController: ObservableObject, DragHandler, PinchHandler, Rota
         //   `let rayOrigin = (inverseViewMatrix * SIMD4<Float>(0, 0, 0, 1)).xyz`
         // * What I'm looking for are the z-components, in world coordinates,
         //   of nearest and farthest visible points
-        // * What I'm returning are the DISTANCES from the glass to those points
+        // * I think what I'm returning are the DISTANCES from the glass to those points
         let visibleZ = fovController.visibleZ
 
         //        print("touchRay touchLocation: \(touchLocation.prettyString)")
@@ -155,10 +155,8 @@ public class RenderController: ObservableObject, DragHandler, PinchHandler, Rota
     }
 
     public func dragChanged(panFraction: Float, scrollFraction: Float) {
-        // HERE is where we can convert pan & scroll from fractions of screen
-        // to distances in world coordinates. We need to use touchZDistance
-        // and fovController.fovWidth
-        // and maybe aspect ratio.
+        // Convert pan & scroll from fractions of the screen (-1...1)
+        // to distances in view coordinates.
         let fovSize = fovController.fovSize(touchZDistance)
         povController.dragGestureChanged(panDistance: panFraction * Float(fovSize.width),
                                          scrollDistance: scrollFraction * Float(fovSize.height))
@@ -169,7 +167,8 @@ public class RenderController: ObservableObject, DragHandler, PinchHandler, Rota
     }
 
     public func pinchBegan(at location: SIMD2<Float>) {
-        povController.pinchGestureBegan(at: touchPoint(location))
+        // HACK HACK HACK HACK use center of screen, not location
+        povController.pinchGestureBegan(at: touchPoint(.zero))
     }
 
     public func pinchChanged(scale: Float) {
@@ -181,7 +180,8 @@ public class RenderController: ObservableObject, DragHandler, PinchHandler, Rota
     }
 
     public func rotationBegan(at location: SIMD2<Float>) {
-        povController.rotationGestureBegan(at: touchPoint(location))
+        // HACK HACK HACK HACK use center of screen, not location
+        povController.rotationGestureBegan(at: touchPoint(.zero))
     }
 
     public func rotationChanged(radians: Float) {

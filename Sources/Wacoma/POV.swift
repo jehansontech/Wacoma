@@ -383,6 +383,11 @@ public class OrbitingPOVController: ObservableObject, POVController {
 
     public func dragGestureChanged(panDistance pan: Float, scrollDistance scroll: Float) {
         if let handler = self.dragInProgress {
+            // NO GOOD:
+            // let viewDelta = SIMD4<Float>(pan, scroll, 0, 1)
+            // if let newPOV = handler.touchLocationChanged(delta: (viewMatrix.inverse * viewDelta).xyz) {
+
+            // ORIG
             if let newPOV = handler.locationChanged(panDistance: pan, scrollDistance: scroll) {
                 self.currentPOV = newPOV
             }
@@ -625,28 +630,61 @@ struct CenteredPOVTangentialMove {
     let scrollFactor: Float
     let panFactor: Float
 
-    init(_ pov: CenteredPOV, _ touchLocation: SIMD3<Float>, _ settings: POVControllerSettings) {
+    init(_ pov: CenteredPOV, _ touchPoint: SIMD3<Float>, _ settings: POVControllerSettings) {
 
         self.initialPOV = pov
-        self.initialTouch = touchLocation
+        self.initialTouch = touchPoint
         self.scrollRotationAxis = normalize(simd_cross(initialPOV.forward, initialPOV.up))
         self.panRotationAxis = initialPOV.up
 
-        let d = simd_dot((touchLocation - pov.center), -pov.forward)
+        let d = simd_dot((touchPoint - pov.center), -pov.forward)
         self.touchToCenterDistance = (d == 0) ? 1 : d
 
-        let initialDisplacementRTP = cartesianToSpherical(xyz: touchLocation - pov.center)
+        let initialDisplacementRTP = cartesianToSpherical(xyz: touchPoint - pov.center)
         self.initialTheta = initialDisplacementRTP.y
         self.initialPhi = initialDisplacementRTP.z
+        print("initialTheta: \(initialTheta), initialPhi: \(initialPhi)")
 
         self.scrollFactor = settings.scrollSensitivity
         self.panFactor = settings.panSensitivity
     }
 
+    func touchLocationChanged(delta: SIMD3<Float>) -> CenteredPOV? {
+
+        // ALT.
+        // Doesn't work.
+
+        let newTouch = initialTouch + delta
+        let newDisplacementRTP = cartesianToSpherical(xyz: (newTouch - initialPOV.center))
+        let dTheta = newDisplacementRTP.y - initialTheta
+        let dPhi = newDisplacementRTP.z - initialPhi
+
+        print("dTheta: \(dTheta), dPhi: \(dPhi)")
+
+        let newLocation = (
+            float4x4(translationBy: initialPOV.center)
+            * float4x4(rotationAround: panRotationAxis, by: dPhi)
+            * float4x4(rotationAround: scrollRotationAxis, by: dTheta)
+            * float4x4(translationBy: -initialPOV.center)
+            * SIMD4<Float>(initialPOV.location, 1)
+        ).xyz
+
+        let newUp = (
+            float4x4(rotationAround: scrollRotationAxis, by: dTheta)
+            * SIMD4<Float>(initialPOV.up, 1)
+        ).xyz
+
+        return CenteredPOV(location: newLocation,
+                           center: initialPOV.center,
+                           up: newUp)
+
+    }
+
     func locationChanged(panDistance: Float, scrollDistance: Float) -> CenteredPOV? {
 
         let dTheta = scrollFactor * atan(scrollDistance/touchToCenterDistance)
-        let dPhi = -scrollFactor * atan(panDistance/touchToCenterDistance)
+        let dPhi = -panFactor * atan(panDistance/touchToCenterDistance)
+        // print("dTheta: \(dTheta), dPhi: \(dPhi)")
 
         let newLocation = (
             float4x4(translationBy: initialPOV.center)
@@ -676,6 +714,7 @@ struct CenteredPOVRadialMove {
 
     let pinchRadius: Float
 
+    /// displacement from POV center to POV location, in speherical world coordinates
     let initialRTP: SIMD3<Float>
 
     init(_ pov: CenteredPOV, _ pinchCenter: SIMD3<Float>, _ settings: POVControllerSettings) {
