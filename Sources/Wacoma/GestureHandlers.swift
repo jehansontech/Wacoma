@@ -461,8 +461,8 @@ public class GestureHandlers: NSObject, NSGestureRecognizerDelegate {
             case .changed:
                 let translation = gesture.translation(in: view)
                 // macOS uses upside-down clip coords, so the scroll value is the opposite of that on iOS
-                dragHandler?.dragChanged(pan: Float(translation.x / view.bounds.width),
-                                         scroll: Float(translation.y / view.bounds.height))
+                dragHandler?.dragChanged(panFraction: Float(translation.x / view.bounds.width),
+                                         scrollFraction: Float(translation.y / view.bounds.height))
             default:
                 dragHandler?.dragEnded()
             }
