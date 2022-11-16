@@ -191,8 +191,8 @@ public struct POVControllerSettings {
 
 #if os(iOS) // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     public init() {
-        self.scrollSensitivity = 1.5 * .piOverTwo
-        self.panSensitivity = 1.5 * .pi
+        self.scrollSensitivity = 2.5
+        self.panSensitivity = 2.5
         self.rotationSensitivity = 1.25
         self.flyCoastingThreshold = 0.33
         self.flyNormalizedAcceleration = 6
@@ -201,8 +201,8 @@ public struct POVControllerSettings {
     }
 #elseif os(macOS) // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     public init() {
-        self.scrollSensitivity = 1.5 * .piOverTwo
-        self.panSensitivity = 1.5 * .pi
+        self.scrollSensitivity = 2.5
+        self.panSensitivity = 2.5
         self.rotationSensitivity = 1.25
         self.flyCoastingThreshold = 0.33
         self.flyNormalizedAcceleration = 6

@@ -55,8 +55,8 @@ public class RenderController: ObservableObject, DragHandler, PinchHandler, Rota
 
     public var fovController: FOVController
 
-    /// Z-distance in world coordinates between the POV and the point in space where a touch is located. Non-negative.
-    public var touchZDistance: Float = 0
+    /// distance in world coordinates between the POV's location and the plane on which a touch is located. Non-negative.
+    public var touchPlaneDistance: Float = 0
 
     @Published public var backgroundColor: SIMD4<Double>
 
@@ -139,13 +139,26 @@ public class RenderController: ObservableObject, DragHandler, PinchHandler, Rota
 
     public func touchPoint(_ location: SIMD2<Float>) -> SIMD3<Float> {
 
-        // Find the x and y coordinates of a point in space lying on touch ray
-        // such that the point's z component is ray.origin.z - touchZDistance.
+        // I want to find the world coordinates of the point where the
+        // touch ray intersects the touch plane
+        //
+        // touch plane is normal to pov.forward (which is given in world coordinates)
+        // touchPlaneDistance is distance btw POV and touch plane, in world coordinates
+        // touch ray's origin and direction are given in world coordinates
 
         let ray = touchRay(at: location)
-        let distanceToPoint: Float = touchZDistance / abs(ray.direction.z)
+        let distanceToPoint: Float = touchPlaneDistance / simd_dot(povController.pov.forward, ray.direction)
         let touchPoint = ray.origin + distanceToPoint * ray.direction
-        // print("ray.origin: \(ray.origin.prettyString), ray.direction: \(ray.direction.prettyString), touchPoint: \(touchPoint.prettyString)")
+
+//        print("RenderController.touchPoint")
+//        print("    pov.forward: \(povController.pov.forward.prettyString)")
+//        print("    touchPlaneDistance: \(touchPlaneDistance)")
+//        print("    ray.origin: \(ray.origin.prettyString)")
+//        print("    ray.direction: \(ray.origin.prettyString)")
+//        print("    fwd*ray: \(simd_dot(povController.pov.forward, ray.direction))")
+//        print("    distanceToPoint: \(distanceToPoint)")
+//        print("    touchPoint: \(touchPoint.prettyString)")
+
         return touchPoint
     }
 
@@ -157,7 +170,7 @@ public class RenderController: ObservableObject, DragHandler, PinchHandler, Rota
     public func dragChanged(panFraction: Float, scrollFraction: Float) {
         // Convert pan & scroll from fractions of the screen (-1...1)
         // to distances in view coordinates.
-        let fovSize = fovController.fovSize(touchZDistance)
+        let fovSize = fovController.fovSize(touchPlaneDistance)
         povController.dragGestureChanged(panDistance: panFraction * Float(fovSize.width),
                                          scrollDistance: scrollFraction * Float(fovSize.height))
     }

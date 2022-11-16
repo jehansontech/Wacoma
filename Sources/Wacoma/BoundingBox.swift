@@ -86,6 +86,13 @@ public struct BoundingBox: Sendable, Codable, Equatable {
     }
 }
 
+extension BoundingBox: CustomStringConvertible {
+
+    public var description: String {
+        "min: \(self.min.prettyString) max:\(self.max.prettyString)"
+    }
+}
+
 extension BoundingBox {
     
     public static func unitCube() -> BoundingBox {
