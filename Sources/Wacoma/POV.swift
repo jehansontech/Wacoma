@@ -643,42 +643,43 @@ struct CenteredPOVTangentialMove {
         let initialDisplacementRTP = cartesianToSpherical(xyz: touchPoint - pov.center)
         self.initialTheta = initialDisplacementRTP.y
         self.initialPhi = initialDisplacementRTP.z
-        print("initialTheta: \(initialTheta), initialPhi: \(initialPhi)")
+        // print("initialTheta: \(initialTheta), initialPhi: \(initialPhi)")
 
         self.scrollFactor = settings.scrollSensitivity
         self.panFactor = settings.panSensitivity
     }
 
-    func touchLocationChanged(delta: SIMD3<Float>) -> CenteredPOV? {
-
-        // ALT.
-        // Doesn't work.
-
-        let newTouch = initialTouch + delta
-        let newDisplacementRTP = cartesianToSpherical(xyz: (newTouch - initialPOV.center))
-        let dTheta = newDisplacementRTP.y - initialTheta
-        let dPhi = newDisplacementRTP.z - initialPhi
-
-        print("dTheta: \(dTheta), dPhi: \(dPhi)")
-
-        let newLocation = (
-            float4x4(translationBy: initialPOV.center)
-            * float4x4(rotationAround: panRotationAxis, by: dPhi)
-            * float4x4(rotationAround: scrollRotationAxis, by: dTheta)
-            * float4x4(translationBy: -initialPOV.center)
-            * SIMD4<Float>(initialPOV.location, 1)
-        ).xyz
-
-        let newUp = (
-            float4x4(rotationAround: scrollRotationAxis, by: dTheta)
-            * SIMD4<Float>(initialPOV.up, 1)
-        ).xyz
-
-        return CenteredPOV(location: newLocation,
-                           center: initialPOV.center,
-                           up: newUp)
-
-    }
+    // ALT.
+    // Didn't work when I tried it.
+    // But I tried it before touchPoint calculation was fixed.
+    //    func touchLocationChanged(delta: SIMD3<Float>) -> CenteredPOV? {
+    //
+    //
+    //        let newTouch = initialTouch + delta
+    //        let newDisplacementRTP = cartesianToSpherical(xyz: (newTouch - initialPOV.center))
+    //        let dTheta = newDisplacementRTP.y - initialTheta
+    //        let dPhi = newDisplacementRTP.z - initialPhi
+    //
+    //        // print("dTheta: \(dTheta), dPhi: \(dPhi)")
+    //
+    //        let newLocation = (
+    //            float4x4(translationBy: initialPOV.center)
+    //            * float4x4(rotationAround: panRotationAxis, by: dPhi)
+    //            * float4x4(rotationAround: scrollRotationAxis, by: dTheta)
+    //            * float4x4(translationBy: -initialPOV.center)
+    //            * SIMD4<Float>(initialPOV.location, 1)
+    //        ).xyz
+    //
+    //        let newUp = (
+    //            float4x4(rotationAround: scrollRotationAxis, by: dTheta)
+    //            * SIMD4<Float>(initialPOV.up, 1)
+    //        ).xyz
+    //
+    //        return CenteredPOV(location: newLocation,
+    //                           center: initialPOV.center,
+    //                           up: newUp)
+    //
+    //    }
 
     func locationChanged(panDistance: Float, scrollDistance: Float) -> CenteredPOV? {
 
