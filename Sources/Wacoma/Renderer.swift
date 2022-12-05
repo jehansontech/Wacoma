@@ -180,7 +180,7 @@ public class RenderController: ObservableObject, DragHandler, PinchHandler, Rota
     }
 
     public func pinchBegan(at location: SIMD2<Float>) {
-        // HACK HACK HACK HACK use center of screen, not location
+        // HACK HACK HACK HACK use center of screen, not touch location
         povController.pinchGestureBegan(at: touchPoint(.zero))
     }
 
@@ -193,7 +193,7 @@ public class RenderController: ObservableObject, DragHandler, PinchHandler, Rota
     }
 
     public func rotationBegan(at location: SIMD2<Float>) {
-        // HACK HACK HACK HACK use center of screen, not location
+        // HACK HACK HACK HACK use center of screen, not touch location
         povController.rotationGestureBegan(at: touchPoint(.zero))
     }
 

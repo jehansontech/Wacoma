@@ -715,7 +715,7 @@ struct CenteredPOVRadialMove {
 
     let pinchRadius: Float
 
-    /// displacement from POV center to POV location, in speherical world coordinates
+    /// displacement from POV center to POV location, in spherical world coordinates
     let initialRTP: SIMD3<Float>
 
     init(_ pov: CenteredPOV, _ pinchCenter: SIMD3<Float>, _ settings: POVControllerSettings) {
@@ -726,7 +726,7 @@ struct CenteredPOVRadialMove {
     }
 
     func scaleChanged(scale: Float) -> CenteredPOV? {
-        let newRadius = (initialRTP.x - pinchRadius) / scale + pinchRadius
+        let newRadius = ((initialRTP.x - pinchRadius) / scale) + pinchRadius
         let newLocation = initialPOV.center + sphericalToCartesian(rtp: SIMD3<Float>(newRadius,
                                                                                      initialRTP.y,
                                                                                      initialRTP.z))
