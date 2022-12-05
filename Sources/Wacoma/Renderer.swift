@@ -141,24 +141,31 @@ public class RenderController: ObservableObject, DragHandler, PinchHandler, Rota
     }
 
     public func touchRay(at touchLocation: SIMD2<Float>, touchRadius: Float) -> TouchRay {
+
+        print("touchRay: touchLocation: \(touchLocation.prettyString), touchRadius: \(touchRadius)")
+
         let inverseProjectionMatrix = fovController.projectionMatrix.inverse
         let inverseViewMatrix = povController.viewMatrix.inverse
 
-        // loc1 is the point on the screen that we touched, transformed into view coordinates.
         let loc1 = inverseProjectionMatrix * SIMD4<Float>(touchLocation.x, touchLocation.y, 0, 1)
         var ray1 = loc1
         ray1.z = -1
         ray1.w = 0
 
-        // loc2 is the POV offset by touchRadius in the X direction, in view coordinates
-        let loc2 = inverseProjectionMatrix * SIMD4<Float>(touchRadius, 0, 0, 1)
+        let loc2 = inverseProjectionMatrix * SIMD4<Float>(touchLocation.x, touchLocation.y, 0, 1)
+        let loc3 = inverseProjectionMatrix * SIMD4<Float>(touchLocation.x-touchRadius, touchLocation.y, 0, 1)
+        print("touchRay:    loc2=\(loc2.prettyString)")
+        print("touchRay:    loc3=\(loc3.prettyString)")
 
         // FIXME: ray.range is totally wrong.
         // I don't know what's going on here.
-        // * ray1 at first is that same point, but then we set its z and w components.
-        //   EMPIRICAL: ray1.z is -1 already, but ray1.w is all over the place.
-        // * I have verified that ray's origin as calculated in the original code I
-        //   copied this method from is equal to pov.location:
+        // * ¿ loc1 is the point on the screen that we touched, transformed into view coordinates.
+        //   Why does it have w = 1?
+        // * for ray1:
+        //   "force z = -1 so that it points into the screen"
+        //   "force w = 0 because we want it to transform like a vector"
+        // * I have verified that pov.location is equal to ray's origin as calculated
+        //   in the original code I copied this method from:
         //
         //       `let rayOrigin = (inverseViewMatrix * SIMD4<Float>(0, 0, 0, 1)).xyz`
         //
@@ -167,7 +174,6 @@ public class RenderController: ObservableObject, DragHandler, PinchHandler, Rota
         // * I think what I'm returning are the DISTANCES from the glass to those points
         let visibleZ = fovController.visibleZ
 
-        //        print("touchRay touchLocation: \(touchLocation.prettyString)")
         //        print("         viewPoint1: \(viewPoint1.prettyString)")
         //        print("         visibleZ: [\(visibleZ.lowerBound), \(visibleZ.upperBound)]")
         //
@@ -188,7 +194,7 @@ public class RenderController: ObservableObject, DragHandler, PinchHandler, Rota
 
         return TouchRay(origin: povController.pov.location,
                         direction: normalize(inverseViewMatrix * ray1).xyz,
-                        radius: simd_length(loc2),
+                        radius: simd_length((loc2-loc3).xyz),
                         range: visibleZ)
     }
 
