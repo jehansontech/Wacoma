@@ -55,8 +55,10 @@ public class RenderController: ObservableObject, DragHandler, PinchHandler, Rota
 
     public var fovController: FOVController
 
-    /// distance in world coordinates between the POV's location and the plane on which a touch is located. Non-negative.
-    public var touchPlaneDistance: Float = 0
+    /// distance in world coordinates between the POV's location and the plane on which a touch is located.
+    /// If zero, then pinching and dragging do not work.
+    /// Non-negative.
+    public var touchPlaneDistance: Float = 1
 
     @Published public var backgroundColor: SIMD4<Double>
 
@@ -134,6 +136,59 @@ public class RenderController: ObservableObject, DragHandler, PinchHandler, Rota
 
         return TouchRay(origin: povController.pov.location,
                         direction: normalize(inverseViewMatrix * ray1).xyz,
+                        radius: 0,
+                        range: visibleZ)
+    }
+
+    public func touchRay(at touchLocation: SIMD2<Float>, touchRadius: Float) -> TouchRay {
+        let inverseProjectionMatrix = fovController.projectionMatrix.inverse
+        let inverseViewMatrix = povController.viewMatrix.inverse
+
+        // loc1 is the point on the screen that we touched, transformed into view coordinates.
+        let loc1 = inverseProjectionMatrix * SIMD4<Float>(touchLocation.x, touchLocation.y, 0, 1)
+        var ray1 = loc1
+        ray1.z = -1
+        ray1.w = 0
+
+        // loc2 is the POV offset by touchRadius in the X direction, in view coordinates
+        let loc2 = inverseProjectionMatrix * SIMD4<Float>(touchRadius, 0, 0, 1)
+
+        // FIXME: ray.range is totally wrong.
+        // I don't know what's going on here.
+        // * ray1 at first is that same point, but then we set its z and w components.
+        //   EMPIRICAL: ray1.z is -1 already, but ray1.w is all over the place.
+        // * I have verified that ray's origin as calculated in the original code I
+        //   copied this method from is equal to pov.location:
+        //
+        //       `let rayOrigin = (inverseViewMatrix * SIMD4<Float>(0, 0, 0, 1)).xyz`
+        //
+        // * What I'm looking for are the z-components, in world coordinates,
+        //   of nearest and farthest visible points
+        // * I think what I'm returning are the DISTANCES from the glass to those points
+        let visibleZ = fovController.visibleZ
+
+        //        print("touchRay touchLocation: \(touchLocation.prettyString)")
+        //        print("         viewPoint1: \(viewPoint1.prettyString)")
+        //        print("         visibleZ: [\(visibleZ.lowerBound), \(visibleZ.upperBound)]")
+        //
+        //        let nearPoint = inverseProjectionMatrix * SIMD4<Float>(touchLocation.x, touchLocation.y, fovController.zNear, 1)
+        //        let farPoint = inverseProjectionMatrix * SIMD4<Float>(touchLocation.x, touchLocation.y, fovController.zFar, 1)
+        //        print("         nearPoint: \(nearPoint.prettyString)")
+        //        print("         farPoint: \(farPoint.prettyString)")
+        //
+        //        let viewPoint2 = inverseProjectionMatrix * SIMD4<Float>(touchLocation.x, touchLocation.y, visibleZ.lowerBound, 1)
+        //        let viewPoint3 = inverseProjectionMatrix * SIMD4<Float>(touchLocation.x, touchLocation.y, visibleZ.upperBound, 1)
+        //        print("         viewPoint2: \(viewPoint2.prettyString)")
+        //        print("         viewPoint3: \(viewPoint3.prettyString)")
+        //
+        //        let worldPoint2 = inverseViewMatrix * viewPoint2
+        //        let worldPoint3 = inverseViewMatrix * viewPoint3
+        //        print("         worldPoint2: \(worldPoint2.prettyString)")
+        //        print("         worldPoint3: \(worldPoint3.prettyString)")
+
+        return TouchRay(origin: povController.pov.location,
+                        direction: normalize(inverseViewMatrix * ray1).xyz,
+                        radius: simd_length(loc2),
                         range: visibleZ)
     }
 
@@ -213,7 +268,10 @@ public struct TouchRay {
     public var origin: SIMD3<Float>
 
     /// Unit vector giving ray's direction in world coordinates
-    public var direction :SIMD3<Float>
+    public var direction: SIMD3<Float>
+
+    /// Radius of the ray's cross-section, in world coordinates
+    public var radius: Float
 
     public var range: ClosedRange<Float>
 }
