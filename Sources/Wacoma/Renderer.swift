@@ -142,7 +142,7 @@ public class RenderController: ObservableObject, DragHandler, PinchHandler, Rota
 
     public func touchRay(at touchLocation: SIMD2<Float>, touchRadius: Float) -> TouchRay {
 
-        print("touchRay: touchLocation: \(touchLocation.prettyString), touchRadius: \(touchRadius)")
+        // print("RenderController.touchRay: touchLocation: \(touchLocation.prettyString), touchRadius: \(touchRadius)")
 
         let inverseProjectionMatrix = fovController.projectionMatrix.inverse
         let inverseViewMatrix = povController.viewMatrix.inverse
@@ -153,9 +153,10 @@ public class RenderController: ObservableObject, DragHandler, PinchHandler, Rota
         ray1.w = 0
 
         let loc2 = inverseProjectionMatrix * SIMD4<Float>(touchLocation.x, touchLocation.y, 0, 1)
-        let loc3 = inverseProjectionMatrix * SIMD4<Float>(touchLocation.x-touchRadius, touchLocation.y, 0, 1)
-        print("touchRay:    loc2=\(loc2.prettyString)")
-        print("touchRay:    loc3=\(loc3.prettyString)")
+        let loc3 = inverseProjectionMatrix * SIMD4<Float>(touchLocation.x - touchRadius, touchLocation.y, 0, 1)
+        // print("RenderController.touchRay:    loc2=\(loc2.prettyString)")
+        // print("RenderController.touchRay:    loc3=\(loc3.prettyString)")
+        let rayRadius = simd_length((loc2-loc3).xyz)
 
         // FIXME: ray.range is totally wrong.
         // I don't know what's going on here.
@@ -194,7 +195,7 @@ public class RenderController: ObservableObject, DragHandler, PinchHandler, Rota
 
         return TouchRay(origin: povController.pov.location,
                         direction: normalize(inverseViewMatrix * ray1).xyz,
-                        radius: simd_length((loc2-loc3).xyz),
+                        radius: rayRadius,
                         range: visibleZ)
     }
 
