@@ -93,110 +93,92 @@ public class RenderController: ObservableObject, DragHandler, PinchHandler, Rota
         }
     }
 
-    public func touchRay(at touchLocation: SIMD2<Float>) -> TouchRay {
+//    public func touchRay(at touchLocation: SIMD2<Float>) -> TouchRay {
+//        let inverseProjectionMatrix = fovController.projectionMatrix.inverse
+//        let inverseViewMatrix = povController.viewMatrix.inverse
+//
+//        let viewPoint1 = inverseProjectionMatrix * SIMD4<Float>(touchLocation.x, touchLocation.y, 0, 1)
+//        var ray1 = viewPoint1
+//        ray1.z = -1
+//        ray1.w = 0
+//
+//        // FIXME: ray.range is totally wrong.
+//        // I don't know what's going on here.
+//        // * viewPoint1 is the point we touched, transformed into view coordinates.
+//        // * ray1 at first is that same point, but then we set its z and w components.
+//        //   EMPIRICAL: ray1.z is -1 already, but ray1.w is all over the place.
+//        // * I have verified that ray's origin as calculated in the code I copied this from
+//        //   is equal to pov.location:
+//        //   `let rayOrigin = (inverseViewMatrix * SIMD4<Float>(0, 0, 0, 1)).xyz`
+//        // * What I'm looking for are the z-components, in world coordinates,
+//        //   of nearest and farthest visible points
+//        // * I think what I'm returning are the DISTANCES from the glass to those points
+//        let visibleZ = fovController.visibleZ
+//
+//        //        print("touchRay touchLocation: \(touchLocation.prettyString)")
+//        //        print("         viewPoint1: \(viewPoint1.prettyString)")
+//        //        print("         visibleZ: [\(visibleZ.lowerBound), \(visibleZ.upperBound)]")
+//        //
+//        //        let nearPoint = inverseProjectionMatrix * SIMD4<Float>(touchLocation.x, touchLocation.y, fovController.zNear, 1)
+//        //        let farPoint = inverseProjectionMatrix * SIMD4<Float>(touchLocation.x, touchLocation.y, fovController.zFar, 1)
+//        //        print("         nearPoint: \(nearPoint.prettyString)")
+//        //        print("         farPoint: \(farPoint.prettyString)")
+//        //
+//        //        let viewPoint2 = inverseProjectionMatrix * SIMD4<Float>(touchLocation.x, touchLocation.y, visibleZ.lowerBound, 1)
+//        //        let viewPoint3 = inverseProjectionMatrix * SIMD4<Float>(touchLocation.x, touchLocation.y, visibleZ.upperBound, 1)
+//        //        print("         viewPoint2: \(viewPoint2.prettyString)")
+//        //        print("         viewPoint3: \(viewPoint3.prettyString)")
+//        //
+//        //        let worldPoint2 = inverseViewMatrix * viewPoint2
+//        //        let worldPoint3 = inverseViewMatrix * viewPoint3
+//        //        print("         worldPoint2: \(worldPoint2.prettyString)")
+//        //        print("         worldPoint3: \(worldPoint3.prettyString)")
+//
+//        return TouchRay(origin: povController.pov.location,
+//                        direction: normalize(inverseViewMatrix * ray1).xyz,
+//                        range: visibleZ)
+//    }
+
+    public func touchRay(at location: SIMD2<Float>, size: SIMD2<Float>) -> TouchRay {
         let inverseProjectionMatrix = fovController.projectionMatrix.inverse
         let inverseViewMatrix = povController.viewMatrix.inverse
 
-        let viewPoint1 = inverseProjectionMatrix * SIMD4<Float>(touchLocation.x, touchLocation.y, 0, 1)
-        var ray1 = viewPoint1
-        ray1.z = -1
-        ray1.w = 0
+        var v1 = inverseProjectionMatrix * SIMD4<Float>(location.x, location.y, 0, 1)
+        v1.z = -1
+        v1.w = 0
+        let ray1 = normalize(inverseViewMatrix * v1).xyz
 
-        // FIXME: ray.range is totally wrong.
-        // I don't know what's going on here.
-        // * viewPoint1 is the point we touched, transformed into view coordinates.
-        // * ray1 at first is that same point, but then we set its z and w components.
-        //   EMPIRICAL: ray1.z is -1 already, but ray1.w is all over the place.
-        // * I have verified that ray's origin as calculated in the code I copied this from
-        //   is equal to pov.location:
-        //   `let rayOrigin = (inverseViewMatrix * SIMD4<Float>(0, 0, 0, 1)).xyz`
-        // * What I'm looking for are the z-components, in world coordinates,
-        //   of nearest and farthest visible points
-        // * I think what I'm returning are the DISTANCES from the glass to those points
-        let visibleZ = fovController.visibleZ
+        var v2 = inverseProjectionMatrix * SIMD4<Float>(location.x + size.x, location.y, 0, 1)
+        v2.z = -1
+        v2.w = 0
+        let ray2 = normalize(inverseViewMatrix * v2).xyz
 
-        //        print("touchRay touchLocation: \(touchLocation.prettyString)")
-        //        print("         viewPoint1: \(viewPoint1.prettyString)")
-        //        print("         visibleZ: [\(visibleZ.lowerBound), \(visibleZ.upperBound)]")
-        //
-        //        let nearPoint = inverseProjectionMatrix * SIMD4<Float>(touchLocation.x, touchLocation.y, fovController.zNear, 1)
-        //        let farPoint = inverseProjectionMatrix * SIMD4<Float>(touchLocation.x, touchLocation.y, fovController.zFar, 1)
-        //        print("         nearPoint: \(nearPoint.prettyString)")
-        //        print("         farPoint: \(farPoint.prettyString)")
-        //
-        //        let viewPoint2 = inverseProjectionMatrix * SIMD4<Float>(touchLocation.x, touchLocation.y, visibleZ.lowerBound, 1)
-        //        let viewPoint3 = inverseProjectionMatrix * SIMD4<Float>(touchLocation.x, touchLocation.y, visibleZ.upperBound, 1)
-        //        print("         viewPoint2: \(viewPoint2.prettyString)")
-        //        print("         viewPoint3: \(viewPoint3.prettyString)")
-        //
-        //        let worldPoint2 = inverseViewMatrix * viewPoint2
-        //        let worldPoint3 = inverseViewMatrix * viewPoint3
-        //        print("         worldPoint2: \(worldPoint2.prettyString)")
-        //        print("         worldPoint3: \(worldPoint3.prettyString)")
+        var v3 = inverseProjectionMatrix * SIMD4<Float>(location.x, location.y + size.y, 0, 1)
+        v3.z = -1
+        v3.w = 0
+        let ray3 = normalize(inverseViewMatrix * v3).xyz
+
+        // Starting at ray origin, make a right triangle in space such that ray1 forms
+        // one leg and the hypoteneuse lies along ray2. axis2is the other leg.
+        let cross1 = (ray2 / simd_dot(ray1, ray2)) - ray1
+
+        // Similar thing for ray3
+        let cross2 = (ray3 / simd_dot(ray1, ray3)) - ray1
+
+//        print("Renderer.touchRay ray1: \(ray1.prettyString)")
+//        print("                  ray2: \(ray2.prettyString)")
+//        print("                  ray3: \(ray3.prettyString)")
+//        print("                  cross1: \(cross1)")
+//        print("                  cross2: \(cross2)")
+//        print("                  simd_dot(ray1, cross1): \(simd_dot(ray1, cross1))")
+//        print("                  simd_dot(ray1, cross2): \(simd_dot(ray1, cross2))")
+//        print("                  simd_dot(cross1, cross2): \(simd_dot(cross1, cross2))")
 
         return TouchRay(origin: povController.pov.location,
-                        direction: normalize(inverseViewMatrix * ray1).xyz,
-                        radius: 0,
-                        range: visibleZ)
-    }
-
-    public func touchRay(at touchLocation: SIMD2<Float>, touchRadius: Float) -> TouchRay {
-
-        // print("RenderController.touchRay: touchLocation: \(touchLocation.prettyString), touchRadius: \(touchRadius)")
-
-        let inverseProjectionMatrix = fovController.projectionMatrix.inverse
-        let inverseViewMatrix = povController.viewMatrix.inverse
-
-        let loc1 = inverseProjectionMatrix * SIMD4<Float>(touchLocation.x, touchLocation.y, 0, 1)
-        var ray1 = loc1
-        ray1.z = -1
-        ray1.w = 0
-
-        let loc2 = inverseProjectionMatrix * SIMD4<Float>(touchLocation.x, touchLocation.y, 0, 1)
-        let loc3 = inverseProjectionMatrix * SIMD4<Float>(touchLocation.x - touchRadius, touchLocation.y, 0, 1)
-        // print("RenderController.touchRay:    loc2=\(loc2.prettyString)")
-        // print("RenderController.touchRay:    loc3=\(loc3.prettyString)")
-        let rayRadius = simd_length((loc2-loc3).xyz)
-
-        // FIXME: ray.range is totally wrong.
-        // I don't know what's going on here.
-        // * ¿ loc1 is the point on the screen that we touched, transformed into view coordinates.
-        //   Why does it have w = 1?
-        // * for ray1:
-        //   "force z = -1 so that it points into the screen"
-        //   "force w = 0 because we want it to transform like a vector"
-        // * I have verified that pov.location is equal to ray's origin as calculated
-        //   in the original code I copied this method from:
-        //
-        //       `let rayOrigin = (inverseViewMatrix * SIMD4<Float>(0, 0, 0, 1)).xyz`
-        //
-        // * What I'm looking for are the z-components, in world coordinates,
-        //   of nearest and farthest visible points
-        // * I think what I'm returning are the DISTANCES from the glass to those points
-        let visibleZ = fovController.visibleZ
-
-        //        print("         viewPoint1: \(viewPoint1.prettyString)")
-        //        print("         visibleZ: [\(visibleZ.lowerBound), \(visibleZ.upperBound)]")
-        //
-        //        let nearPoint = inverseProjectionMatrix * SIMD4<Float>(touchLocation.x, touchLocation.y, fovController.zNear, 1)
-        //        let farPoint = inverseProjectionMatrix * SIMD4<Float>(touchLocation.x, touchLocation.y, fovController.zFar, 1)
-        //        print("         nearPoint: \(nearPoint.prettyString)")
-        //        print("         farPoint: \(farPoint.prettyString)")
-        //
-        //        let viewPoint2 = inverseProjectionMatrix * SIMD4<Float>(touchLocation.x, touchLocation.y, visibleZ.lowerBound, 1)
-        //        let viewPoint3 = inverseProjectionMatrix * SIMD4<Float>(touchLocation.x, touchLocation.y, visibleZ.upperBound, 1)
-        //        print("         viewPoint2: \(viewPoint2.prettyString)")
-        //        print("         viewPoint3: \(viewPoint3.prettyString)")
-        //
-        //        let worldPoint2 = inverseViewMatrix * viewPoint2
-        //        let worldPoint3 = inverseViewMatrix * viewPoint3
-        //        print("         worldPoint2: \(worldPoint2.prettyString)")
-        //        print("         worldPoint3: \(worldPoint3.prettyString)")
-
-        return TouchRay(origin: povController.pov.location,
-                        direction: normalize(inverseViewMatrix * ray1).xyz,
-                        radius: rayRadius,
-                        range: visibleZ)
+                        direction: ray1,
+                        range: fovController.visibleZ,
+                        cross1: cross1,
+                        cross2: cross2)
     }
 
     public func touchPoint(_ location: SIMD2<Float>) -> SIMD3<Float> {
@@ -208,7 +190,7 @@ public class RenderController: ObservableObject, DragHandler, PinchHandler, Rota
         // touchPlaneDistance is distance btw POV and touch plane, in world coordinates
         // touch ray's origin and direction are given in world coordinates
 
-        let ray = touchRay(at: location)
+        let ray = touchRay(at: location, size: .zero)
         let distanceToPoint: Float = touchPlaneDistance / simd_dot(povController.pov.forward, ray.direction)
         let touchPoint = ray.origin + distanceToPoint * ray.direction
 
@@ -269,7 +251,7 @@ public class RenderController: ObservableObject, DragHandler, PinchHandler, Rota
 
 }
 
-public struct TouchRay {
+public struct TouchRay: Sendable, Codable {
 
     /// Ray's point of origin in world coordinates
     public var origin: SIMD3<Float>
@@ -277,10 +259,23 @@ public struct TouchRay {
     /// Unit vector giving ray's direction in world coordinates
     public var direction: SIMD3<Float>
 
-    /// Radius of the ray's cross-section, in world coordinates
-    public var radius: Float
-
+    /// Start and end of the ray, given as distance along ray
     public var range: ClosedRange<Float>
+
+    /// cross1 and cross2 are two vectors perpendicular to ray direction giving its rate of spreading.
+    /// They give the semi-major and semi-minor axes of the ellipse that is the cross-section (we
+    /// don't know which is which).
+    public var cross1: SIMD3<Float>
+    public var cross2: SIMD3<Float>
+
+    public init(origin: SIMD3<Float>, direction: SIMD3<Float>, range: ClosedRange<Float>, cross1: SIMD3<Float>, cross2: SIMD3<Float>) {
+        self.origin = origin
+        self.direction = direction
+        self.range = range
+        self.cross1 = cross1
+        self.cross2 = cross2
+    }
+
 }
 
 public class Renderer: NSObject, MTKViewDelegate {
