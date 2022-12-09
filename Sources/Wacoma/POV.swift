@@ -221,6 +221,8 @@ public protocol POVController {
 
     var viewMatrix: float4x4 { get }
 
+    func reset()
+    
     /// Sets the POV's properties to the values they should have at the given system time.
     /// This is called during each rendering cycle as a way to support a POV that changes on its own
     func update(_ timestamp: Date)
@@ -267,6 +269,14 @@ extension POVController {
 
 public class OrbitingPOVController: ObservableObject, POVController {
 
+    @Published public var orbitPermitted: Bool {
+        didSet {
+            if orbitPermitted == false {
+                orbitEnabled = false
+            }
+        }
+    }
+
     @Published public var orbitEnabled: Bool
 
     /// angular rotation rate in radians per second
@@ -289,11 +299,11 @@ public class OrbitingPOVController: ObservableObject, POVController {
         return markedPOV != nil
     }
 
-    public var flying: Bool {
+    public var isFlying: Bool {
         return flightInProgress != nil
     }
 
-    public var getureInProgress: Bool {
+    public var isGestureInProgress: Bool {
         return dragInProgress != nil || pinchInProgress != nil || rotationInProgress != nil
     }
 
@@ -310,12 +320,21 @@ public class OrbitingPOVController: ObservableObject, POVController {
     private var rotationInProgress: CenteredPOVRoll? = nil
 
     public init(pov: CenteredPOV = CenteredPOV(),
+                orbitPermitted: Bool = true,
                 orbitEnabled: Bool = true,
                 orbitSpeed: Float = 1/8) {
         self.currentPOV = pov
         self.defaultPOV = pov
-        self.orbitEnabled = orbitEnabled
+        self.orbitPermitted = orbitPermitted
+        self.orbitEnabled = orbitEnabled && orbitPermitted
         self.orbitSpeed = orbitSpeed
+    }
+
+    public func reset() {
+        self.currentPOV = defaultPOV
+        self.orbitPermitted = true
+        self.orbitEnabled = true
+        self.orbitSpeed = 1/8
     }
 
     public func markPOV() {
@@ -358,7 +377,7 @@ public class OrbitingPOVController: ObservableObject, POVController {
     }
 
     public func flyTo(pov destination: CenteredPOV, _ callback: (() -> ())? = nil) {
-        if !frozen && !flying {
+        if !frozen && !isFlying {
             self.flightInProgress = CenteredPOVFlight(self.currentPOV, destination, settings, callback: callback)
         }
     }
@@ -376,7 +395,7 @@ public class OrbitingPOVController: ObservableObject, POVController {
     }
 
     public func dragGestureBegan(at touchPoint: SIMD3<Float>) {
-        if !frozen && !flying {
+        if !frozen && !isFlying {
             self.dragInProgress = CenteredPOVTangentialMove(self.currentPOV, touchPoint, settings)
         }
     }
@@ -400,7 +419,7 @@ public class OrbitingPOVController: ObservableObject, POVController {
 
 
     public func pinchGestureBegan(at pinchCenter: SIMD3<Float>) {
-        if !frozen && !flying {
+        if !frozen && !isFlying {
             self.pinchInProgress = CenteredPOVRadialMove(self.currentPOV, pinchCenter, settings)
         }
     }
@@ -418,7 +437,7 @@ public class OrbitingPOVController: ObservableObject, POVController {
     }
 
     public func rotationGestureBegan(at rotationCenter: SIMD3<Float>) {
-        if !frozen && !flying {
+        if !frozen && !isFlying {
             self.rotationInProgress = CenteredPOVRoll(self.currentPOV, rotationCenter, settings)
         }
     }
@@ -456,7 +475,7 @@ public class OrbitingPOVController: ObservableObject, POVController {
             updatedPOV = self.currentPOV
         }
 
-        if orbitEnabled && !frozen && !flying,
+        if orbitEnabled && !frozen && !isFlying,
            let t0 = _lastUpdateTimestamp {
             // Multiply by -1 so that positive speed looks like earth's direction of rotation
             let dPhi = -1 * orbitSpeed * Float(timestamp.timeIntervalSince(t0))
