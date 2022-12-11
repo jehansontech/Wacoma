@@ -225,6 +225,10 @@ public struct NumericSettingViewModel<T: DecimalConverter> {
         }
     }
 
+    public mutating func recomputeSliderPosition() {
+        self.sliderPosition = Self.getSliderPosition(decimalValue, sliderLB, sliderUB)
+    }
+
     public mutating func resetStepSize() {
         let newStepSize = initialStepSize
         if newStepSize != self.stepSize {
@@ -329,6 +333,15 @@ public struct NumericSettingView<T: DecimalConverter, Content: View>: View {
                 value = tmpValue
             }
         }
+        // THESE DON'T DO ANYTHING b/c model is a @State so it's never changed from outside.
+        //        .onChange(of: model.sliderLB) { newValue in
+        //            // Messages.debug("NumericSettingView", "sliderLB changed. newValue: \(newValue)")
+        //            model.recomputeSliderPosition()
+        //        }
+        //        .onChange(of: model.sliderUB) { newValue in
+        //            // Messages.debug("NumericSettingView", "sliderUB changed. newValue: \(newValue)")
+        //            model.recomputeSliderPosition()
+        //        }
     }
 
     public init<V>(_ value: Binding<V>,
