@@ -147,6 +147,8 @@ public struct NumericSettingViewModel<T: DecimalConverter> {
                 range: ClosedRange<T.ValueType>,
                 snapToStep: Bool) {
 
+        print("NumericSettingViewModel.init value=\(value) range=\(range)")
+        
         let tmpDecimal = transformer.valueToDecimal(value)
         let tmpLB = transformer.valueToDecimal(range.lowerBound)
         let tmpUB = transformer.valueToDecimal(range.upperBound)
