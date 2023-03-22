@@ -197,7 +197,7 @@ public struct POVControllerSettings {
         self.flyCoastingThreshold = 0.33
         self.flyNormalizedAcceleration = 4 // 5.5
         self.flyMinSpeed  = 0.01
-        self.flyMaxSpeed = 6 // 9
+        self.flyMaxSpeed = 5 // 9
     }
 #elseif os(macOS) // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     public init() {
@@ -207,7 +207,7 @@ public struct POVControllerSettings {
         self.flyCoastingThreshold = 0.33
         self.flyNormalizedAcceleration = 4 // 5.5
         self.flyMinSpeed  = 0.01
-        self.flyMaxSpeed = 6 // 9
+        self.flyMaxSpeed = 5 // 9
     }
 #endif // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
