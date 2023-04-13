@@ -251,7 +251,7 @@ public class RenderController: ObservableObject, DragHandler, PinchHandler, Rota
 
 }
 
-public struct TouchRay: Sendable, Codable {
+public struct TouchRay: Codable, Sendable {
 
     /// Ray's point of origin in world coordinates
     public var origin: SIMD3<Float>

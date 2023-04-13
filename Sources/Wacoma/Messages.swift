@@ -30,7 +30,7 @@ extension Notification.Name {
     public static var userMessage: Notification.Name { return .init("userMessage") }
 }
 
-public struct UserMessage: Sendable, Codable {
+public struct UserMessage: Codable, Sendable {
 
     public let messageNumber: Int
 

@@ -8,7 +8,7 @@
 import Foundation
 import simd
 
-public struct BoundingBox: Sendable, Codable, Equatable {
+public struct BoundingBox: Codable, Sendable, Equatable {
     
     public var xMin: Float
     public var yMin: Float
