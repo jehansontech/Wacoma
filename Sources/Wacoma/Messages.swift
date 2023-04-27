@@ -43,7 +43,6 @@ public struct UserMessage: Codable, Sendable {
         case low = 0
         case normal = 1
         case high = 2
-        case crash = 3
 
         public static func < (lhs: UserMessage.Priority, rhs: UserMessage.Priority) -> Bool {
             lhs.rawValue < rhs.rawValue
