@@ -34,17 +34,28 @@ public struct UserMessage: Codable, Sendable {
 
     public let messageNumber: Int
 
-    // lesser value == lower priority
-    public let priority: Int
+    public let priority: Priority
 
     public let text: String
+
+    public enum Priority: Int, Comparable, Codable, Sendable {
+
+        case low = 0
+        case normal = 1
+        case high = 2
+        case crash = 3
+
+        public static func < (lhs: UserMessage.Priority, rhs: UserMessage.Priority) -> Bool {
+            lhs.rawValue < rhs.rawValue
+        }
+    }
 }
 
 actor MessagePublisher {
 
     private var messageCounter: Int = 0
 
-    func publishMessage(_ text: String, _ priority: Int) async -> Int {
+    func publishMessage(_ text: String, _ priority: UserMessage.Priority = .normal) async -> Int {
         let messageNumber = nextMessageNumber()
         let message = UserMessage(messageNumber: messageNumber, priority: priority, text: text)
         await MainActor.run {
@@ -73,11 +84,11 @@ public struct Messages {
 
     private static var publisher = MessagePublisher()
 
-    public static func asyncUser(_ text: String, _ priority: Int = 1) async -> Int {
+    public static func asyncUser(_ text: String, _ priority: UserMessage.Priority = .normal) async -> Int {
         return await publisher.publishMessage(text, priority)
     }
 
-    public static func user(_ text: String, _ priority: Int = 1) {
+    public static func user(_ text: String, _ priority: UserMessage.Priority = .normal) {
         Task {
             await asyncUser(text, priority)
         }
@@ -91,7 +102,7 @@ public struct Messages {
         : String(format: "[%@]%@%@", displayTime, context, text)
 
         if showDebugToUser {
-            user(msg, 0)
+            user(msg, .low)
         }
         print(msg)
     }
