@@ -79,19 +79,18 @@ public struct Messages {
 
     public static var showThreadName: Bool = true
 
-    public static var showDebugToUser: Bool = false
+    public static var publishDebugMessages: Bool = false
 
     private static var publisher = MessagePublisher()
 
     public static func asyncUser(_ text: String, _ priority: UserMessage.Priority = .normal) async -> Int {
+        writeToStdout(text, priority)
         return await publisher.publishMessage(text, priority)
     }
 
     public static func user(_ text: String, _ priority: UserMessage.Priority = .normal) {
-        Task {
-            writeToStdout(text)
-            _ = await asyncUser(text, priority)
-        }
+        writeToStdout(text, priority)
+        Task { await publisher.publishMessage(text, .low) }
     }
 
     public static func debug(_ displayTime: String, _ context: String, _ text: String) {
@@ -101,10 +100,10 @@ public struct Messages {
         ? String(format: "[%@][%@]%@%@", displayTime, Thread.current.nameForDebugging, ctx, text)
         : String(format: "[%@]%@%@", displayTime, context, text)
 
-        if showDebugToUser {
-            user(msg, .low)
+        writeToStdout(msg, .low)
+        if publishDebugMessages {
+            Task { await publisher.publishMessage(text, .low) }
         }
-        writeToStdout(msg)
     }
 
     public static func debug(_ context: String, _ text: String) {
@@ -115,7 +114,7 @@ public struct Messages {
         debug(displayTimeForDebugging, "", text)
     }
 
-    private static func writeToStdout(_ s: String) {
+    private static func writeToStdout(_ s: String, _ priority: UserMessage.Priority) {
         print(s)
     }
 
