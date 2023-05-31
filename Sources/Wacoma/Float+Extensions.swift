@@ -26,9 +26,9 @@ extension Float {
 
     public static let logTwo: Self = log(2)
 
-    public func nonNegative() -> Self {
-        return self > 0 ? self : 0
-    }
+//    public func nonNegative() -> Self {
+//        return self > 0 ? self : 0
+//    }
 
     public func fuzz(_ fuzzFactor: Self) -> Self {
         if self > 0 {

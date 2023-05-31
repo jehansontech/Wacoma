@@ -16,6 +16,18 @@ extension BinaryInteger {
     public func clamp(_ min: Self, _ max: Self) -> Self {
         return (self < min) ? min : (self > max ? max : self)
     }
+
+    public func clamp(lowerBound: Self) -> Self {
+        return self < lowerBound ? lowerBound : self
+    }
+
+    public func clamp(upperBound: Self) -> Self {
+        return self > upperBound ? upperBound : self
+    }
+
+    public func nonNegative() -> Self {
+        return self > Self.zero ? self : Self.zero
+    }
 }
 
 extension BinaryFloatingPoint {
@@ -26,6 +38,18 @@ extension BinaryFloatingPoint {
 
     public func clamp(_ min: Self, _ max: Self) -> Self {
         return (self < min) ? min : (self > max ? max : self)
+    }
+
+    public func clamp(lowerBound: Self) -> Self {
+        return self < lowerBound ? lowerBound : self
+    }
+
+    public func clamp(upperBound: Self) -> Self {
+        return self > upperBound ? upperBound : self
+    }
+
+    public func nonNegative() -> Self {
+        return self > Self.zero ? self : Self.zero
     }
 }
 

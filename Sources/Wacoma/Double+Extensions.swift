@@ -25,21 +25,21 @@ extension Double {
 
     public static let logTwo: Self = log(2)
 
-    public func nonNegative() -> Self {
-        return self > 0 ? self : 0
-    }
-
-    public func fuzz(_ scale: Double, _ variability: Double) -> Self {
-        let width = variability * scale
-        return Double.random(in: self-width...self+width)
-    }
+//    public func nonNegative() -> Self {
+//        return self > 0 ? self : 0
+//    }
 
 //    public func clamp(_ min: Self, _ max: Self) -> Self {
 //        return self < min ? min : (self > max ? max : self)
 //    }
+//
+//    public func clamp(_ range: ClosedRange<Self>) -> Self {
+//        return self < range.lowerBound ? range.lowerBound : (self > range.upperBound ? range.upperBound : self)
+//    }
 
-    public func clamp(_ range: ClosedRange<Self>) -> Self {
-        return self < range.lowerBound ? range.lowerBound : (self > range.upperBound ? range.upperBound : self)
+    public func fuzz(_ scale: Double, _ variability: Double) -> Self {
+        let width = variability * scale
+        return Double.random(in: self-width...self+width)
     }
 
     public func fuzz(_ fuzzFactor: Self) -> Self {
@@ -127,7 +127,7 @@ extension Double {
     }
 
 
-    /// Returns ln(x1 - x2) given w1 = ln(x1) and w2 = ln(x2)
+    /// Returns the approximate value of  ln(x1 - x2) given w1 = ln(x1) and w2 = ln(x2)
     /// Uses convention that ln(x) is NaN iff x is 0
     public static func subtractLogs(_ w1: Double, _ w2: Double) -> Double {
         // ln( exp(w1) - exp(w2) ) for w1 finite number and w1 > w2

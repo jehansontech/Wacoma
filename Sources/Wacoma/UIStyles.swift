@@ -19,3 +19,29 @@ public struct GrayTitle: ViewModifier {
             .foregroundColor(.gray)
     }
 }
+
+public struct Hidden: ViewModifier {
+
+    private var condition: Bool
+    
+    public init(_ condition: Bool) {
+        self.condition = condition
+    }
+
+    public func body(content: Content) -> some View {
+        if condition {
+            content.hidden()
+        }
+        else {
+            content
+        }
+    }
+}
+
+extension View {
+
+    public func hidden(_ condition: Bool) -> some View {
+        return self.modifier(Hidden(condition))
+    }
+
+}

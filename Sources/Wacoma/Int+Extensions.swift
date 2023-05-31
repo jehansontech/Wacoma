@@ -19,10 +19,6 @@ public func pow(_ base: Int, _ exponent: Int) -> Int {
 
 extension Int {
 
-    public func nonNegative() -> Self {
-        return self > 0 ? self : 0
-    }
-
     public func positiveDefinite() -> Self {
         return self > 0 ? self : 1
     }
