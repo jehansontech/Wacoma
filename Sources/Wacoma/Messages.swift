@@ -89,7 +89,8 @@ public struct Messages {
 
     public static func user(_ text: String, _ priority: UserMessage.Priority = .normal) {
         Task {
-            await asyncUser(text, priority)
+            writeToStdout(text)
+            _ = await asyncUser(text, priority)
         }
     }
 
@@ -103,7 +104,7 @@ public struct Messages {
         if showDebugToUser {
             user(msg, .low)
         }
-        print(msg)
+        writeToStdout(msg)
     }
 
     public static func debug(_ context: String, _ text: String) {
@@ -112,6 +113,10 @@ public struct Messages {
 
     public static func debug(_ text: String) {
         debug(displayTimeForDebugging, "", text)
+    }
+
+    private static func writeToStdout(_ s: String) {
+        print(s)
     }
 
     private static func makeDisplayTime(_ totalMillis: Int) -> String {
