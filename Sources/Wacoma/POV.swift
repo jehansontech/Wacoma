@@ -195,9 +195,9 @@ public struct POVControllerSettings {
         self.panSensitivity = 2.5
         self.rotationSensitivity = 1.25
         self.flyCoastingThreshold = 0.33
-        self.flyNormalizedAcceleration = 4 // 5.5
+        self.flyNormalizedAcceleration = 4 // WAS: 5.5
         self.flyMinSpeed  = 0.01
-        self.flyMaxSpeed = 5 // 9
+        self.flyMaxSpeed = 5 // WAS: 9
     }
 #elseif os(macOS) // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     public init() {
@@ -205,9 +205,9 @@ public struct POVControllerSettings {
         self.panSensitivity = 2.5
         self.rotationSensitivity = 1.25
         self.flyCoastingThreshold = 0.33
-        self.flyNormalizedAcceleration = 4 // 5.5
+        self.flyNormalizedAcceleration = 4 // WAS: 5.5
         self.flyMinSpeed  = 0.01
-        self.flyMaxSpeed = 5 // 9
+        self.flyMaxSpeed = 5 // WAS: 9
     }
 #endif // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -382,6 +382,17 @@ public class OrbitingPOVController: ObservableObject, POVController {
         }
     }
 
+    public func flyTo(speedFactor: Double, pov destination: CenteredPOV, _ callback: (() -> ())? = nil) {
+        if !frozen && !isFlying {
+            print("old settings: \(settings)")
+            var newSettings = self.settings
+            newSettings.flyNormalizedAcceleration = speedFactor * settings.flyNormalizedAcceleration
+            newSettings.flyMaxSpeed = speedFactor * self.settings.flyMaxSpeed
+            print("new settings: \(newSettings)")
+            self.flightInProgress = CenteredPOVFlight(self.currentPOV, destination, newSettings, callback: callback)
+        }
+    }
+
     public func centerOn(_ newCenter: SIMD3<Float>, _ callback: (() -> ())? = nil) {
         flyTo(pov: CenteredPOV(location: currentPOV.location, center: newCenter, up: currentPOV.up), callback)
     }
@@ -544,6 +555,8 @@ class CenteredPOVFlight {
         self.minSpeed = settings.flyMinSpeed
         self.maxSpeed = settings.flyMaxSpeed
         self.callback = callback
+
+        print("CenteredPOVFlight: normalizedAcceleration: \(normalizedAcceleration), maxSpeed: \(maxSpeed)")
     }
 
     static func calculateTotalDistance(_ povSequence: [POV]) -> Float {
