@@ -384,11 +384,9 @@ public class OrbitingPOVController: ObservableObject, POVController {
 
     public func flyTo(speedFactor: Double, pov destination: CenteredPOV, _ callback: (() -> ())? = nil) {
         if !frozen && !isFlying {
-            print("old settings: \(settings)")
             var newSettings = self.settings
-            newSettings.flyNormalizedAcceleration = speedFactor * settings.flyNormalizedAcceleration
+            // newSettings.flyNormalizedAcceleration = speedFactor * settings.flyNormalizedAcceleration
             newSettings.flyMaxSpeed = speedFactor * self.settings.flyMaxSpeed
-            print("new settings: \(newSettings)")
             self.flightInProgress = CenteredPOVFlight(self.currentPOV, destination, newSettings, callback: callback)
         }
     }
