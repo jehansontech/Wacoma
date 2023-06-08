@@ -138,38 +138,54 @@ public struct NumericSettingViewModel<T: DecimalConverter> {
 
     public let initialStepSize: Decimal
 
+    public let initialLB: Decimal
+
+    public let initialUB: Decimal
+
     public private(set) var sliderLB: Decimal
 
     public private(set) var sliderUB: Decimal
 
     public init(_ transformer: T,
                 _ value: T.ValueType,
-                range: ClosedRange<T.ValueType>,
+                validRange: ClosedRange<T.ValueType>,
+                initialRange: ClosedRange<T.ValueType>? = nil,
                 snapToStep: Bool) {
 
-        // print("NumericSettingViewModel.init value=\(value) range=\(range)")
-        
-        let tmpDecimal = transformer.valueToDecimal(value)
-        let tmpLB = transformer.valueToDecimal(range.lowerBound)
-        let tmpUB = transformer.valueToDecimal(range.upperBound)
+        let trueInitialRange: ClosedRange<T.ValueType>
+        if let tmpInitialRange = initialRange {
+            let trueLB = max(tmpInitialRange.lowerBound, validRange.lowerBound)
+            let trueUB = min(tmpInitialRange.upperBound, validRange.upperBound)
+            trueInitialRange = trueLB...trueUB
+        }
+        else {
+            trueInitialRange = validRange
+        }
 
-        let initialStepSize = transformer.makeStepSize(range)
+        let tmpDecimal = transformer.valueToDecimal(value)
+        let tmpInitialLB = transformer.valueToDecimal(trueInitialRange.lowerBound)
+        let tmpInitialUB = transformer.valueToDecimal(trueInitialRange.upperBound)
+
+        let initialStepSize = transformer.makeStepSize(trueInitialRange)
         let initialStep = Self.getStep(tmpDecimal, initialStepSize)
         let initialDecimal = snapToStep ? initialStep * initialStepSize : tmpDecimal
-        let initialLB = snapToStep ? Self.getStep(tmpLB, initialStepSize) * initialStepSize : tmpLB
-        var initialUB = snapToStep ? Self.getStep(tmpUB, initialStepSize) * initialStepSize : tmpUB
-        if initialUB < tmpUB {
+        let initialLB = snapToStep ? Self.getStep(tmpInitialLB, initialStepSize) * initialStepSize : tmpInitialLB
+        var initialUB = snapToStep ? Self.getStep(tmpInitialUB, initialStepSize) * initialStepSize : tmpInitialUB
+        if initialUB < tmpInitialUB {
             initialUB += initialStepSize
         }
+
         self.transformer = transformer
         self.decimalValue = initialDecimal
-        self.valueLB = initialLB
-        self.valueUB = initialUB
+        self.valueLB = transformer.valueToDecimal(validRange.lowerBound)
+        self.valueUB = transformer.valueToDecimal(validRange.upperBound)
         self.snapToStep = snapToStep
         self.fieldText = transformer.decimalToString(initialDecimal)
         self.stepSize = initialStepSize
         self.initialStepSize = initialStepSize
         self.step = initialStep
+        self.initialLB = initialLB
+        self.initialUB = initialUB
         self.sliderPosition = Self.getSliderPosition(initialDecimal, initialLB, initialUB)
         self.sliderLB = initialLB
         self.sliderUB = initialUB
@@ -236,8 +252,8 @@ public struct NumericSettingViewModel<T: DecimalConverter> {
         if newStepSize != self.stepSize {
             self.stepSize = newStepSize
             self.step = Self.getStep(decimalValue, newStepSize)
-            self.sliderLB = valueLB
-            self.sliderUB = valueUB
+            self.sliderLB = initialLB
+            self.sliderUB = initialUB
             self.sliderPosition = Self.getSliderPosition(decimalValue, sliderLB, sliderUB)
         }
     }
@@ -347,7 +363,8 @@ public struct NumericSettingView<T: DecimalConverter, Content: View>: View {
     }
 
     public init<V>(_ value: Binding<V>,
-                   in range: ClosedRange<V>,
+                   in validRange: ClosedRange<V>,
+                   initialRange: ClosedRange<V>? = nil,
                    snapToStep: Bool = false,
                    initialValueSnapToStep: Bool = true,
                    @ViewBuilder contentBuilder: @escaping (_ model: Binding<NumericSettingViewModel<DecimalIntegerConverter<V>>>) -> Content)
@@ -356,13 +373,15 @@ public struct NumericSettingView<T: DecimalConverter, Content: View>: View {
         self._value = value
         self._model = State(initialValue: NumericSettingViewModel(DecimalIntegerConverter<V>(),
                                                                   value.wrappedValue,
-                                                                  range: range,
+                                                                  validRange: validRange,
+                                                                  initialRange: initialRange,
                                                                   snapToStep: snapToStep))
         self.contentBuilder = contentBuilder
     }
 
     public init<V>(_ value: Binding<V>,
-                   in range: ClosedRange<V>,
+                   in validRange: ClosedRange<V>,
+                   initialRange: ClosedRange<V>? = nil,
                    snapToStep: Bool = false,
                    initialValueSnapToStep: Bool = true,
                    @ViewBuilder contentBuilder: @escaping (_ model: Binding<NumericSettingViewModel<DecimalFloatingPointConverter<V>>>) -> Content)
@@ -371,7 +390,8 @@ public struct NumericSettingView<T: DecimalConverter, Content: View>: View {
         self._value = value
         self._model = State(initialValue: NumericSettingViewModel(DecimalFloatingPointConverter<V>(),
                                                                   value.wrappedValue,
-                                                                  range: range,
+                                                                  validRange: validRange,
+                                                                  initialRange: initialRange,
                                                                   snapToStep: snapToStep))
         self.contentBuilder = contentBuilder
     }
