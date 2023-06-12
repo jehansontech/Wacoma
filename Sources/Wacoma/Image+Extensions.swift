@@ -50,7 +50,7 @@ extension NSImage {
         }
 
         do {
-            try pngData.write(to: destinationURL, constraints: .atomic)
+            try pngData.write(to: destinationURL, options: .atomic)
             return "Image saved to Pictures/\(destinationURL.lastPathComponent)"
         }
         catch {
