@@ -414,7 +414,7 @@ public class GestureHandlers: NSObject, NSGestureRecognizerDelegate {
     }
 
     @objc func button1Click(_ gesture: NSClickGestureRecognizer) {
-        print("button1Click")
+        // print("button1Click")
         if let view = gesture.view {
             switch gesture.state {
             case .ended:

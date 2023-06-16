@@ -16,33 +16,33 @@ extension Color {
         guard
             let colorSpace = rgbColorSpace
         else {
-            print("COLOR PROBLEM: colorSpace = nil")
+            // print("COLOR PROBLEM: colorSpace = nil")
             return .zero
         }
 
         guard
             let myCGColor = self.cgColor
         else {
-            print("COLOR PROBLEM: myCGColor = nil. self=\(self)")
+            // print("COLOR PROBLEM: myCGColor = nil. self=\(self)")
             return .zero
         }
 
         guard
             let cgColor = (myCGColor.colorSpace?.name == colorSpace.name) ? myCGColor : myCGColor.converted(to: colorSpace, intent: .defaultIntent, options: nil)
         else {
-            print("COLOR PROBLEM: cgColor = nil")
+            // print("COLOR PROBLEM: cgColor = nil")
             return .zero
         }
 
         guard
             let components = cgColor.components
         else {
-            print("COLOR PROBLEM: no components")
+            // print("COLOR PROBLEM: no components")
             return .zero
         }
 
         if components.count != 4 {
-            print("COLOR PROBLEM: components.count=\(components.count)")
+            // print("COLOR PROBLEM: components.count=\(components.count)")
             return .zero
         }
 

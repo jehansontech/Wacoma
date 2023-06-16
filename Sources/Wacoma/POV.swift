@@ -145,7 +145,7 @@ public struct FlyingPOV: POV, Codable, Hashable, Equatable, CustomStringConverti
             self.trueUp = trueUp
         }
         catch {
-            print("Problem with POV -- \(error)")
+            // print("Problem with POV -- \(error)")
             self.location = SIMD3<Float>(0, 0, -1)
             self.trueForward = SIMD3<Float>(0, 0, 1)
             self.trueUp = SIMD3<Float>(0, 1, 0)
@@ -554,7 +554,7 @@ class CenteredPOVFlight {
         self.maxSpeed = settings.flyMaxSpeed
         self.callback = callback
 
-        print("CenteredPOVFlight: normalizedAcceleration: \(normalizedAcceleration), maxSpeed: \(maxSpeed)")
+        // print("CenteredPOVFlight: normalizedAcceleration: \(normalizedAcceleration), maxSpeed: \(maxSpeed)")
     }
 
     static func calculateTotalDistance(_ povSequence: [POV]) -> Float {
