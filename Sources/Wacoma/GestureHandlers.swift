@@ -12,10 +12,13 @@ public protocol TapHandler {
 
     /// called when the user executes a primary tap gesture: one-finger tap in iOS, button-1 mouse click in macOS
     /// location is in clip space: (-1, -1) to (+1, +1)
+    /// 
+    @MainActor
     mutating func primaryTap(at location: SIMD2<Float>)
 
     /// called when the user executes a secondary tap gesture: two-finger tap in iOS, button-2 mouse click in macOS
     /// location is in clip space: (-1, -1) to (+1, +1)
+    @MainActor
     mutating func secondaryTap(at location: SIMD2<Float>)
 }
 
@@ -413,6 +416,7 @@ public class GestureHandlers: NSObject, NSGestureRecognizerDelegate {
         }
     }
 
+    @MainActor
     @objc func button1Click(_ gesture: NSClickGestureRecognizer) {
         // print("button1Click")
         if let view = gesture.view {
@@ -425,6 +429,7 @@ public class GestureHandlers: NSObject, NSGestureRecognizerDelegate {
         }
     }
 
+    @MainActor
     @objc func button2Click(_ gesture: NSClickGestureRecognizer) {
         if let view = gesture.view {
             switch gesture.state {
