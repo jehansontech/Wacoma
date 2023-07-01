@@ -14,6 +14,7 @@ fileprivate func makeScalarFormatter() -> Formatter {
     let formatter = NumberFormatter()
     formatter.numberStyle = .decimal
     formatter.usesSignificantDigits = true
+    formatter.minimumSignificantDigits = 3
     formatter.maximumSignificantDigits = 3
     return formatter
 }
