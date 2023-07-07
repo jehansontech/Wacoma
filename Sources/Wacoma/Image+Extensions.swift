@@ -18,9 +18,9 @@ extension UIImage {
     }
 
     public func makeTimestamp() -> String {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "yyyy-MM-dd-HHmmss"
-        return formatter.string(from: Date())
+        let numberFormatters = DateFormatter()
+        numberFormatters.dateFormat = "yyyy-MM-dd-HHmmss"
+        return numberFormatters.string(from: Date())
     }
 
 }
@@ -59,9 +59,9 @@ extension NSImage {
     }
 
     public func makeTimestamp() -> String {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "yyyy-MM-dd-HHmmss"
-        return formatter.string(from: Date())
+        let numberFormatters = DateFormatter()
+        numberFormatters.dateFormat = "yyyy-MM-dd-HHmmss"
+        return numberFormatters.string(from: Date())
     }
 }
 
