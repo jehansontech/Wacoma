@@ -420,7 +420,7 @@ public class GestureHandlers: NSObject, NSGestureRecognizerDelegate {
     @objc func button1Click(_ gesture: NSClickGestureRecognizer) {
         // print("button1Click")
         if let view = gesture.view {
-            switch gesture.state {
+            switch gesture.stepState {
             case .ended:
                 tapHandler?.primaryTap(at: clipPoint(gesture.location(in: view), view.bounds))
             default:
@@ -432,7 +432,7 @@ public class GestureHandlers: NSObject, NSGestureRecognizerDelegate {
     @MainActor
     @objc func button2Click(_ gesture: NSClickGestureRecognizer) {
         if let view = gesture.view {
-            switch gesture.state {
+            switch gesture.stepState {
             case .ended:
                 tapHandler?.secondaryTap(at: clipPoint(gesture.location(in: view), view.bounds))
             default:
@@ -443,7 +443,7 @@ public class GestureHandlers: NSObject, NSGestureRecognizerDelegate {
 
     @objc func longPress(_ gesture: NSPressGestureRecognizer) {
         if let view = gesture.view  {
-            switch gesture.state {
+            switch gesture.stepState {
             case .began:
                 longPressHandler?.longPressBegan(at: clipPoint(gesture.location(in: view), view.bounds))
             case .changed:
@@ -458,7 +458,7 @@ public class GestureHandlers: NSObject, NSGestureRecognizerDelegate {
 
     @objc func drag(_ gesture: NSPanGestureRecognizer) {
         if let view = gesture.view  {
-            switch gesture.state {
+            switch gesture.stepState {
             case .possible:
                 break
             case .began:
@@ -476,7 +476,7 @@ public class GestureHandlers: NSObject, NSGestureRecognizerDelegate {
 
     @objc func pinch(_ gesture: NSMagnificationGestureRecognizer) {
         if let view = gesture.view  {
-            switch gesture.state {
+            switch gesture.stepState {
             case .possible:
                 break
             case .began:
@@ -492,7 +492,7 @@ public class GestureHandlers: NSObject, NSGestureRecognizerDelegate {
 
     @objc func rotate(_ gesture: NSRotationGestureRecognizer) {
         if let view = gesture.view  {
-            switch gesture.state {
+            switch gesture.stepState {
             case .possible:
                 break
             case .began:
