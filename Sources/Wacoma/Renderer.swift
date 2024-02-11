@@ -275,8 +275,58 @@ public struct TouchRay: Codable, Sendable {
         self.cross1 = cross1
         self.cross2 = cross2
     }
-
 }
+
+
+#if os(iOS) // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+extension RenderController {
+
+    public static func clipPoint(_ viewPt: CGPoint, _ viewSize: CGRect) -> SIMD2<Float> {
+        return SIMD2<Float>(clipX(viewPt.x, viewSize.width), clipY(viewPt.y, viewSize.height))
+    }
+
+    public static func clipPoint(_ viewPt0: CGPoint, _ viewPt1: CGPoint, _ viewSize: CGRect) -> SIMD2<Float> {
+        return SIMD2<Float>(clipX((viewPt0.x + viewPt1.x)/2, viewSize.width),
+                            clipY((viewPt0.y + viewPt1.y)/2, viewSize.height))
+    }
+
+    public static func clipX(_ viewX: CGFloat, _ viewWidth: CGFloat) -> Float {
+        return Float(2 * viewX / viewWidth - 1)
+    }
+
+    public static func clipY(_ viewY: CGFloat, _ viewHeight: CGFloat) -> Float {
+        // In iOS, viewY increases toward the TOP of the screen
+        return Float(1 - 2 * viewY / viewHeight)
+    }
+}
+
+#elseif os(macOS) // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+extension RenderController {
+    
+    public static func clipPoint(_ viewPt: CGPoint, _ viewSize: CGRect) -> SIMD2<Float> {
+        return SIMD2<Float>(clipX(viewPt.x, viewSize.width), clipY(viewPt.y, viewSize.height))
+    }
+    
+    public static func clipPoint(_ viewPt0: CGPoint, _ viewPt1: CGPoint, _ viewSize: CGRect) -> SIMD2<Float> {
+        return SIMD2<Float>(clipX((viewPt0.x + viewPt1.x)/2, viewSize.width),
+                            clipY((viewPt0.y + viewPt1.y)/2, viewSize.height))
+    }
+    
+    public static func clipX(_ viewX: CGFloat, _ viewWidth: CGFloat) -> Float {
+        return Float(2 * viewX / viewWidth - 1)
+    }
+    
+    public static func clipY(_ viewY: CGFloat, _ viewHeight: CGFloat) -> Float {
+        // In macOS, viewY increaases toward the BOTTOM of the screen
+        return Float(2 * viewY / viewHeight - 1)
+    }
+}
+
+#endif  // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+
 
 public class Renderer: NSObject, MTKViewDelegate {
 

@@ -188,7 +188,7 @@ public class GestureHandlers: NSObject, UIGestureRecognizerDelegate {
         if let view = gesture.view {
             switch gesture.state {
             case .ended:
-                tapHandler?.primaryTap(at: clipPoint(gesture.location(in: view), view.bounds))
+                tapHandler?.primaryTap(at: RenderController.clipPoint(gesture.location(in: view), view.bounds))
             default:
                 break
             }
@@ -199,7 +199,7 @@ public class GestureHandlers: NSObject, UIGestureRecognizerDelegate {
         if let view = gesture.view {
             switch gesture.state {
             case .ended:
-                tapHandler?.secondaryTap(at: clipPoint(gesture.location(in: view), view.bounds))
+                tapHandler?.secondaryTap(at: RenderController.clipPoint(gesture.location(in: view), view.bounds))
             default:
                 break
             }
@@ -210,11 +210,11 @@ public class GestureHandlers: NSObject, UIGestureRecognizerDelegate {
         if let view = gesture.view {
             switch gesture.state {
             case .began:
-                longPressHandler?.longPressBegan(at: clipPoint(gesture.location(in: view), view.bounds))
+                longPressHandler?.longPressBegan(at: RenderController.clipPoint(gesture.location(in: view), view.bounds))
             case .changed:
-                longPressHandler?.longPressMoved(to: clipPoint(gesture.location(in: view), view.bounds))
+                longPressHandler?.longPressMoved(to: RenderController.clipPoint(gesture.location(in: view), view.bounds))
             case .ended:
-                longPressHandler?.longPressEnded(at: clipPoint(gesture.location(in: view), view.bounds))
+                longPressHandler?.longPressEnded(at: RenderController.clipPoint(gesture.location(in: view), view.bounds))
             default:
                 break
             }
@@ -227,7 +227,7 @@ public class GestureHandlers: NSObject, UIGestureRecognizerDelegate {
             case .possible:
                 break
             case .began:
-                dragHandler?.dragBegan(at: clipPoint(gesture.location(in: view), view.bounds))
+                dragHandler?.dragBegan(at: RenderController.clipPoint(gesture.location(in: view), view.bounds))
             case .changed:
                 let translation = gesture.translation(in: view)
                 // NOTE that factor of -1 on the scroll
@@ -246,9 +246,9 @@ public class GestureHandlers: NSObject, UIGestureRecognizerDelegate {
                 break
             case .began:
                 if gesture.numberOfTouches >= 2 {
-                    pinchHandler?.pinchBegan(at: clipPoint(gesture.location(ofTouch: 0, in: view),
-                                                           gesture.location(ofTouch: 1, in: view),
-                                                           view.bounds))
+                    pinchHandler?.pinchBegan(at: RenderController.clipPoint(gesture.location(ofTouch: 0, in: view),
+                                                                           gesture.location(ofTouch: 1, in: view),
+                                                                           view.bounds))
                 }
             case .changed:
                 pinchHandler?.pinchChanged(scale: Float(gesture.scale))
@@ -265,9 +265,9 @@ public class GestureHandlers: NSObject, UIGestureRecognizerDelegate {
                 break
             case .began:
                 if gesture.numberOfTouches >= 2 {
-                    rotationHandler?.rotationBegan(at: clipPoint(gesture.location(ofTouch: 0, in: view),
-                                                                 gesture.location(ofTouch: 1, in: view),
-                                                                 view.bounds))
+                    rotationHandler?.rotationBegan(at: RenderController.clipPoint(gesture.location(ofTouch: 0, in: view),
+                                                                                 gesture.location(ofTouch: 1, in: view),
+                                                                                 view.bounds))
                 }
             case .changed:
                 rotationHandler?.rotationChanged(radians: Float(gesture.rotation))
@@ -284,24 +284,6 @@ public class GestureHandlers: NSObject, UIGestureRecognizerDelegate {
             return false
         }
         return true
-    }
-
-    private func clipPoint(_ viewPt: CGPoint, _ viewSize: CGRect) -> SIMD2<Float> {
-        return SIMD2<Float>(clipX(viewPt.x, viewSize.width), clipY(viewPt.y, viewSize.height))
-    }
-
-    private func clipPoint(_ viewPt0: CGPoint, _ viewPt1: CGPoint, _ viewSize: CGRect) -> SIMD2<Float> {
-        return SIMD2<Float>(clipX((viewPt0.x + viewPt1.x)/2, viewSize.width),
-                            clipY((viewPt0.y + viewPt1.y)/2, viewSize.height))
-    }
-
-    private func clipX(_ viewX: CGFloat, _ viewWidth: CGFloat) -> Float {
-        return Float(2 * viewX / viewWidth - 1)
-    }
-
-    private func clipY(_ viewY: CGFloat, _ viewHeight: CGFloat) -> Float {
-        // In iOS, viewY increases toward the TOP of the screen
-        return Float(1 - 2 * viewY / viewHeight)
     }
 }
 
@@ -513,24 +495,6 @@ public class GestureHandlers: NSObject, NSGestureRecognizerDelegate {
             return false
         }
         return true
-    }
-
-    private func clipPoint(_ viewPt: CGPoint, _ viewSize: CGRect) -> SIMD2<Float> {
-        return SIMD2<Float>(clipX(viewPt.x, viewSize.width), clipY(viewPt.y, viewSize.height))
-    }
-
-    private func clipPoint(_ viewPt0: CGPoint, _ viewPt1: CGPoint, _ viewSize: CGRect) -> SIMD2<Float> {
-        return SIMD2<Float>(clipX((viewPt0.x + viewPt1.x)/2, viewSize.width),
-                            clipY((viewPt0.y + viewPt1.y)/2, viewSize.height))
-    }
-
-    private func clipX(_ viewX: CGFloat, _ viewWidth: CGFloat) -> Float {
-        return Float(2 * viewX / viewWidth - 1)
-    }
-
-    private func clipY(_ viewY: CGFloat, _ viewHeight: CGFloat) -> Float {
-        // In macOS, viewY increaases toward the BOTTOM of the screen
-        return Float(2 * viewY / viewHeight - 1)
     }
 }
 
