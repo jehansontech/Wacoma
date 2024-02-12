@@ -322,7 +322,7 @@ public class Renderer: NSObject, MTKViewDelegate {
 
     public func mtkView(_ view: MTKView, drawableSizeWillChange newSize: CGSize) {
 
-        print("Renderer.mtkView. view.bounds: \(view.bounds), newSize: \(newSize)")
+        // print("Renderer.mtkView. view.bounds: \(view.bounds), newSize: \(newSize)")
 
         // Docco for this method sez: "Updates the view’s contents upon receiving a change
         // in layout, resolution, or size." And: "Use this method to recompute any view or
@@ -441,7 +441,7 @@ public struct RendererView {
     public func makeMTKView(_ coordinator: Renderer) -> MTKView {
         // "Creates the view object and configures its initial state."
 
-        print("RendererView.makeMTKView")
+        // print("RendererView.makeMTKView")
 
         let mtkView = MTKView()
 
@@ -476,7 +476,7 @@ public struct RendererView {
 
         // EMPIRICAL: I'm seeing this method called once per handful of calls to draw()
 
-        print("RendererView.updateMTKView")
+        // print("RendererView.updateMTKView")
         doUpdate(mtkView, coordinator)
     }
 
