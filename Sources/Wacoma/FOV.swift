@@ -19,8 +19,12 @@ public protocol FOVController {
     /// Visibility decreases linearly with distance from the midpoint.
     var fadeoutDistance: Float { get set }
 
-    /// physical dimensions of the UI view in pixels.
-    var viewSize: CGSize { get set }
+//    /// The physical dimensions of the UI view in pixels.
+//    /// This is NOT the same as the view's size in its local coordinates (which are measured in "points")..
+//    var drawableSize: CGSize { get set }
+//
+//    /// The bounds of the UI view in points.
+//    var viewBounds: CGRect { get set }
 
     /// front of the FOV, i.e.,  forward distance in view coords from the plane of the POV to the nearest renderable point
     var zNear: Float { get set }
@@ -35,17 +39,21 @@ public protocol FOVController {
     /// size of the field of view at the given distance from the POV, in world coordinates,
     func fovSize(_ zDistance: Float) -> CGSize
 
-    /// Sets the POV's properties to the values they should have at the given system time.
-    /// This is called during each rendering cycle as a way to support a POV that changes on its own
+    /// Sets the FOV's properties to the values they should have at the given system time.
+    /// This is called during each rendering cycle as a way to support an FOV that changes on its own
     func update(_ date: Date)
+
+    /// Set the FOV's properties to be consistent with the given view bounds (in points).
+    func update(_ viewBounds: CGRect)
 
 }
 
 extension FOVController {
 
-    var aspectRatio: Float {
-        (viewSize.height > 0) ? Float(viewSize.width) / Float(viewSize.height) : 1
-    }
+//    var aspectRatio: Float {
+//        // OLD (drawableSize.height > 0) ? Float(drawableSize.width) / Float(drawableSize.height) : 1
+//        viewBounds.height > 0 ? Float(viewBounds.width) / Float(viewBounds.height) : 1
+//    }
 
     public var visibleZ: ClosedRange<Float> {
         return max(zNear, fadeoutMidpoint-fadeoutDistance)...min(zFar, fadeoutMidpoint+fadeoutDistance)
@@ -78,7 +86,11 @@ public class PerspectiveFOVController: ObservableObject, FOVController {
 
     @Published public var fadeoutDistance: Float
 
-    public var viewSize = CGSize(width: 1, height: 1) // dummy values > 0 for safety
+//    public var drawableSize = CGSize(width: 1, height: 1) // dummy values > 0 for safety
+//
+//    public var viewBounds = CGRect(x: 0, y: 0, width: 1, height: 1) // dummy values > 0 for safety
+
+    public var aspectRatio: Float
 
     public var zNear: Float
 
@@ -103,6 +115,7 @@ public class PerspectiveFOVController: ObservableObject, FOVController {
                 yFOV: Float = PerspectiveFOVController.defaultYFOV) {
         self.fadeoutMidpoint = fadeoutMidpoint
         self.fadeoutDistance = fadeoutDistance
+        self.aspectRatio = 1 // Dummy value
         self.zNear = zNear
         self.zFar = zFar
         self.yFOV = yFOV
@@ -125,6 +138,10 @@ public class PerspectiveFOVController: ObservableObject, FOVController {
 
     public func update(_ date: Date) {
         // NOP
+    }
+
+    public func update(_ viewBounds: CGRect) {
+        self.aspectRatio = viewBounds.height > 0 ? Float(viewBounds.width) / Float(viewBounds.height) : 1
     }
 
 }

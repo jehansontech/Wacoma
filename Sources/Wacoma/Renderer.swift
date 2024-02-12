@@ -55,6 +55,9 @@ public class RenderController: ObservableObject, DragHandler, PinchHandler, Rota
 
     public var fovController: FOVController
 
+    /// The renderer view's bounds, in points
+    public private(set) var viewBounds: CGRect = CGRect.zero // DUMMY VALUE
+
     /// distance in world coordinates between the POV's location and the plane on which a touch is located.
     /// If zero, then pinching and dragging do not work.
     /// Non-negative.
@@ -72,6 +75,11 @@ public class RenderController: ObservableObject, DragHandler, PinchHandler, Rota
         self.povController = povController
         self.fovController = fovController
         self.backgroundColor = backgroundColor
+    }
+
+    public func update(_ viewBounds: CGRect) {
+        self.viewBounds = viewBounds
+        self.fovController.update(viewBounds)
     }
 
     public func requestSnapshot(_ callback: @escaping ((String) -> Any?)) throws {
@@ -93,52 +101,7 @@ public class RenderController: ObservableObject, DragHandler, PinchHandler, Rota
         }
     }
 
-//    public func touchRay(at touchLocation: SIMD2<Float>) -> TouchRay {
-//        let inverseProjectionMatrix = fovController.projectionMatrix.inverse
-//        let inverseViewMatrix = povController.viewMatrix.inverse
-//
-//        let viewPoint1 = inverseProjectionMatrix * SIMD4<Float>(touchLocation.x, touchLocation.y, 0, 1)
-//        var ray1 = viewPoint1
-//        ray1.z = -1
-//        ray1.w = 0
-//
-//        // FIXME: ray.range is totally wrong.
-//        // I don't know what's going on here.
-//        // * viewPoint1 is the point we touched, transformed into view coordinates.
-//        // * ray1 at first is that same point, but then we set its z and w components.
-//        //   EMPIRICAL: ray1.z is -1 already, but ray1.w is all over the place.
-//        // * I have verified that ray's origin as calculated in the code I copied this from
-//        //   is equal to pov.location:
-//        //   `let rayOrigin = (inverseViewMatrix * SIMD4<Float>(0, 0, 0, 1)).xyz`
-//        // * What I'm looking for are the z-components, in world coordinates,
-//        //   of nearest and farthest visible points
-//        // * I think what I'm returning are the DISTANCES from the glass to those points
-//        let visibleZ = fovController.visibleZ
-//
-//        //        print("touchRay touchLocation: \(touchLocation.prettyString)")
-//        //        print("         viewPoint1: \(viewPoint1.prettyString)")
-//        //        print("         visibleZ: [\(visibleZ.lowerBound), \(visibleZ.upperBound)]")
-//        //
-//        //        let nearPoint = inverseProjectionMatrix * SIMD4<Float>(touchLocation.x, touchLocation.y, fovController.zNear, 1)
-//        //        let farPoint = inverseProjectionMatrix * SIMD4<Float>(touchLocation.x, touchLocation.y, fovController.zFar, 1)
-//        //        print("         nearPoint: \(nearPoint.prettyString)")
-//        //        print("         farPoint: \(farPoint.prettyString)")
-//        //
-//        //        let viewPoint2 = inverseProjectionMatrix * SIMD4<Float>(touchLocation.x, touchLocation.y, visibleZ.lowerBound, 1)
-//        //        let viewPoint3 = inverseProjectionMatrix * SIMD4<Float>(touchLocation.x, touchLocation.y, visibleZ.upperBound, 1)
-//        //        print("         viewPoint2: \(viewPoint2.prettyString)")
-//        //        print("         viewPoint3: \(viewPoint3.prettyString)")
-//        //
-//        //        let worldPoint2 = inverseViewMatrix * viewPoint2
-//        //        let worldPoint3 = inverseViewMatrix * viewPoint3
-//        //        print("         worldPoint2: \(worldPoint2.prettyString)")
-//        //        print("         worldPoint3: \(worldPoint3.prettyString)")
-//
-//        return TouchRay(origin: povController.pov.location,
-//                        direction: normalize(inverseViewMatrix * ray1).xyz,
-//                        range: visibleZ)
-//    }
-
+    /// location and size are both in clip-space coords
     public func touchRay(at location: SIMD2<Float>, size: SIMD2<Float>) -> TouchRay {
         let inverseProjectionMatrix = fovController.projectionMatrix.inverse
         let inverseViewMatrix = povController.viewMatrix.inverse
@@ -181,6 +144,7 @@ public class RenderController: ObservableObject, DragHandler, PinchHandler, Rota
                         cross2: cross2)
     }
 
+    /// location is in clip-space coords
     public func touchPoint(_ location: SIMD2<Float>) -> SIMD3<Float> {
 
         // I want to find the world coordinates of the point where the
@@ -205,7 +169,6 @@ public class RenderController: ObservableObject, DragHandler, PinchHandler, Rota
 
         return touchPoint
     }
-
 
     public func dragBegan(at location: SIMD2<Float>) {
         povController.dragGestureBegan(at: touchPoint(location))
@@ -277,55 +240,40 @@ public struct TouchRay: Codable, Sendable {
     }
 }
 
+extension RenderController {
+
+    public static func clipPoint(_ viewPt: CGPoint, _ viewBounds: CGRect) -> SIMD2<Float> {
+        // FIXME: ASSUMES viewBounds origin is (0,0)
+        return SIMD2<Float>(clipX(viewPt.x, viewBounds.width), clipY(viewPt.y, viewBounds.height))
+    }
+
+    public static func clipPoint(_ viewPt0: CGPoint, _ viewPt1: CGPoint, _ viewBounds: CGRect) -> SIMD2<Float> {
+        // FIXME: ASSUMES viewBounds origin is (0,0)
+        return SIMD2<Float>(clipX((viewPt0.x + viewPt1.x)/2, viewBounds.width),
+                            clipY((viewPt0.y + viewPt1.y)/2, viewBounds.height))
+    }
+
+    private static func clipX(_ viewX: CGFloat, _ viewWidth: CGFloat) -> Float {
+        return Float(2 * viewX / viewWidth - 1)
+    }
 
 #if os(iOS) // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-extension RenderController {
-
-    public static func clipPoint(_ viewPt: CGPoint, _ viewSize: CGRect) -> SIMD2<Float> {
-        return SIMD2<Float>(clipX(viewPt.x, viewSize.width), clipY(viewPt.y, viewSize.height))
-    }
-
-    public static func clipPoint(_ viewPt0: CGPoint, _ viewPt1: CGPoint, _ viewSize: CGRect) -> SIMD2<Float> {
-        return SIMD2<Float>(clipX((viewPt0.x + viewPt1.x)/2, viewSize.width),
-                            clipY((viewPt0.y + viewPt1.y)/2, viewSize.height))
-    }
-
-    public static func clipX(_ viewX: CGFloat, _ viewWidth: CGFloat) -> Float {
-        return Float(2 * viewX / viewWidth - 1)
-    }
-
-    public static func clipY(_ viewY: CGFloat, _ viewHeight: CGFloat) -> Float {
+    private static func clipY(_ viewY: CGFloat, _ viewHeight: CGFloat) -> Float {
         // In iOS, viewY increases toward the TOP of the screen
         return Float(1 - 2 * viewY / viewHeight)
     }
-}
 
 #elseif os(macOS) // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-extension RenderController {
-    
-    public static func clipPoint(_ viewPt: CGPoint, _ viewSize: CGRect) -> SIMD2<Float> {
-        return SIMD2<Float>(clipX(viewPt.x, viewSize.width), clipY(viewPt.y, viewSize.height))
-    }
-    
-    public static func clipPoint(_ viewPt0: CGPoint, _ viewPt1: CGPoint, _ viewSize: CGRect) -> SIMD2<Float> {
-        return SIMD2<Float>(clipX((viewPt0.x + viewPt1.x)/2, viewSize.width),
-                            clipY((viewPt0.y + viewPt1.y)/2, viewSize.height))
-    }
-    
-    public static func clipX(_ viewX: CGFloat, _ viewWidth: CGFloat) -> Float {
-        return Float(2 * viewX / viewWidth - 1)
-    }
-    
-    public static func clipY(_ viewY: CGFloat, _ viewHeight: CGFloat) -> Float {
+    private static func clipY(_ viewY: CGFloat, _ viewHeight: CGFloat) -> Float {
         // In macOS, viewY increaases toward the BOTTOM of the screen
         return Float(2 * viewY / viewHeight - 1)
     }
-}
 
 #endif  // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
+}
 
 
 public class Renderer: NSObject, MTKViewDelegate {
@@ -335,8 +283,6 @@ public class Renderer: NSObject, MTKViewDelegate {
     weak var controller: RenderController!
 
     var gestureHandlers: GestureHandlers
-
-    var viewSize: CGSize
 
     let device: MTLDevice!
 
@@ -349,8 +295,6 @@ public class Renderer: NSObject, MTKViewDelegate {
     public init(_ controller: RenderController, _ gestureHandlers: GestureHandlers?) throws {
         self.controller = controller
         self.gestureHandlers = gestureHandlers ?? GestureHandlers()
-
-        self.viewSize = CGSize(width: 1, height: 1) // dummy values, must be > 0
 
         if let device = MTLCreateSystemDefaultDevice() {
             self.device = device
@@ -376,17 +320,25 @@ public class Renderer: NSObject, MTKViewDelegate {
 
     }
 
-    public func mtkView(_ view: MTKView, drawableSizeWillChange size: CGSize) {
+    public func mtkView(_ view: MTKView, drawableSizeWillChange newSize: CGSize) {
 
-        // Docco sez, "Use this method to recompute any view or projection matrices, or to
-        // regenerate any buffers to be compatible with the view’s new size." However, we're
-        // going to do all that in draw(), because the matrices depend on user-settable properties
-        // that may change anytime, not just when something happens to trigger this method.
+        print("Renderer.mtkView. view.bounds: \(view.bounds), newSize: \(newSize)")
 
-        controller.fovController.viewSize = size
+        // Docco for this method sez: "Updates the view’s contents upon receiving a change
+        // in layout, resolution, or size." And: "Use this method to recompute any view or
+        // projection matrices, or to regenerate any buffers to be compatible with the view’s
+        // new size." However, we're going to do all that in draw() because the matrices
+        // depend on user-settable properties that may change anytime, not just when something
+        // happens to trigger this method.
+
+        // newSize is in pixels, view.bounds is in points.
+        controller.update(view.bounds)
     }
 
     public func draw(in view: MTKView) {
+
+        // print("Renderer.draw")
+
         _ = inFlightSemaphore.wait(timeout: DispatchTime.distantFuture)
 
         // _drawCount += 1
@@ -450,7 +402,8 @@ public class Renderer: NSObject, MTKViewDelegate {
             return cgImage.save()
 
             // Docco sez: "You are responsible for releasing this object by calling CGImageRelease"
-            // but I get a compiler error: "'CGImageRelease' is unavailable: Core Foundation objects are automatically memory managed"
+            // but I get a compiler error: "'CGImageRelease' is unavailable: Core Foundation objects
+            // are automatically memory managed"
             // CGImageRelease(cgImage)
         }
         else {
@@ -488,6 +441,8 @@ public struct RendererView {
     public func makeMTKView(_ coordinator: Renderer) -> MTKView {
         // "Creates the view object and configures its initial state."
 
+        print("RendererView.makeMTKView")
+
         let mtkView = MTKView()
 
         // Stop it from drawing while we're setting things up
@@ -505,7 +460,7 @@ public struct RendererView {
         coordinator.gestureHandlers.connectGestures(mtkView)
 
         //  update and unpause
-        updateMTKView(mtkView, coordinator)
+        doUpdate(mtkView, coordinator)
         mtkView.enableSetNeedsDisplay = false
         mtkView.isPaused = false
 
@@ -513,16 +468,29 @@ public struct RendererView {
     }
 
     public func updateMTKView(_ mtkView: MTKView, _ coordinator: Renderer) {
-        // Docco sez, "Updates the state of the specified view with new information from SwiftUI."
-        // The RendererView struct gets recreated many many times, but makeMTKView should
-        // get executed only once. I think makeMTKView is called the first time this struct is
-        // created and this method is called all the subsequent times.
 
-        // backgroundColor MIGHT have changed
+        // Docco for this method sez, "Updates the state of the specified view with
+        // new information from SwiftUI." This struct gets recreated many many times,
+        // and I think the system calls makeMTKView the first time this is created
+        // but it calls this method all the subsequent times.
+
+        // EMPIRICAL: I'm seeing this method called once per handful of calls to draw()
+
+        print("RendererView.updateMTKView")
+        doUpdate(mtkView, coordinator)
+    }
+
+    private func doUpdate(_ mtkView: MTKView, _ coordinator: Renderer) {
+
+        // RenderController's backgroundColor MIGHT have changed
         mtkView.clearColor = MTLClearColorMake(coordinator.controller.backgroundColor.x,
                                                coordinator.controller.backgroundColor.y,
                                                coordinator.controller.backgroundColor.z,
                                                coordinator.controller.backgroundColor.w)
+
+        // mtkView's bounds are measured in points while its drawableSize is measured in pixels.
+        // They need not match, e.g., on my ipad, bounds: (0.0, 0.0, 1180.0, 820.0), drawableSize: (2360.0, 1640.0)
+        // print("RendererView.doUpdate. view bounds: \(mtkView.bounds), drawableSize: \(mtkView.drawableSize)")
     }
 
     static public func dismantleMTKView(_ mtkView: MTKView, _ coordinator: Renderer) {
@@ -533,6 +501,7 @@ public struct RendererView {
 #if os(iOS) // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 extension RendererView: UIViewRepresentable {
+
     public typealias UIViewType = MTKView
     public typealias Coordinator = Renderer
 
@@ -554,6 +523,7 @@ extension RendererView: UIViewRepresentable {
 #elseif os(macOS) // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 extension RendererView: NSViewRepresentable {
+
     public typealias NSViewType = MTKView
     public typealias Coordinator = Renderer
 
