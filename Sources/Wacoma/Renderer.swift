@@ -795,21 +795,15 @@ public class GestureCoordinator: NSObject, UIGestureRecognizerDelegate {
 //        return true
 //    }
 
-    /// Needed in order to do  simultaneous drag, pinch, rotation.
+    /// Needed in order to permit  simultaneous drag, pinch, twist.
     public func gestureRecognizer(_ first: UIGestureRecognizer, shouldRecognizeSimultaneouslyWith second: UIGestureRecognizer) -> Bool {
-        // WAS: Disallow combos that include dragging, but allow anything else.
-
         // print("GestureCoordinator.gestureRecognizer. first is \(type(of: first)), second is \(type(of: second))")
-
-        // Disallow combos that include tap or long press.
-        if first is UITapGestureRecognizer || first is UILongPressGestureRecognizer {
-            return false
-        }
-
-        // Allow everything else.
-        return true
+        return isPOVGesture(first) && isPOVGesture(second)
     }
 
+    private func isPOVGesture(_ recognizer: UIGestureRecognizer) -> Bool {
+        return recognizer is UIPanGestureRecognizer || recognizer is UIPinchGestureRecognizer || recognizer is UIRotationGestureRecognizer
+    }
 }
 
 #elseif os(macOS) // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
