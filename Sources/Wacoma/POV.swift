@@ -473,6 +473,9 @@ public class OrbitingPOVController: ObservableObject, POVController {
         // A: I'd rather not because it looks jerky. But on iOS we never
         //    get notified when drag ends, so if I check for gesture in progress
         //    after dragging it always returns true.
+        //
+        // If orbit speed is > 0 then it looks like we're flying east over
+        // the figure.
         // ==================================================================
 
         var updatedPOV: CenteredPOV
@@ -486,8 +489,7 @@ public class OrbitingPOVController: ObservableObject, POVController {
 
         if orbitEnabled && !frozen && !isFlying,
            let t0 = _lastUpdateTimestamp {
-            // Multiply by -1 so that positive speed looks like earth's direction of rotation
-            let dPhi = -1 * orbitSpeed * Float(timestamp.timeIntervalSince(t0))
+            let dPhi = orbitSpeed * Float(timestamp.timeIntervalSince(t0))
             let transform = float4x4(translationBy: updatedPOV.center)
             * float4x4(rotationAround: updatedPOV.up, by: dPhi)
             * float4x4(translationBy: -updatedPOV.center)
