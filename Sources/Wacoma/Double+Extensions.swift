@@ -42,7 +42,7 @@ extension Double {
         return Double.random(in: self-width...self+width)
     }
 
-    public func fuzz(_ fuzzFactor: Self) -> Self {
+    public func fuzz(_ fuzzFactor: Double) -> Self {
         if self > 0 {
             let lo = (1 - fuzzFactor) * self
             let hi = (1 + fuzzFactor) * self

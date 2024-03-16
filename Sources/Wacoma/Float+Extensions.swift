@@ -30,16 +30,16 @@ extension Float {
 //        return self > 0 ? self : 0
 //    }
 
-    public func fuzz(_ fuzzFactor: Self) -> Self {
+    public func fuzz(_ fuzzFactor: Double) -> Self {
         if self > 0 {
-            let lo = (1 - fuzzFactor) * self
-            let hi = (1 + fuzzFactor) * self
+            let lo = Float((1 - fuzzFactor) * Double(self))
+            let hi = Float((1 + fuzzFactor) * Double(self))
             return Float.random(in: lo...hi)
 
         }
         else if self < 0 {
-            let hi = (1 - fuzzFactor) * self
-            let lo = (1 + fuzzFactor) * self
+            let hi = Float((1 - fuzzFactor) * Double(self))
+            let lo = Float((1 + fuzzFactor) * Double(self))
             return Float.random(in: lo...hi)
         }
         else {
