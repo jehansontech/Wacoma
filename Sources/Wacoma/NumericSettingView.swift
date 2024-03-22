@@ -101,17 +101,6 @@ public struct DecimalFloatingPointConverter<V: BinaryFloatingPoint>: DecimalConv
         return stepSizeFromWidth(Double(NSDecimalNumber(decimal: width).doubleValue))
     }
 
-    //    public func makeStepSize(_ range: ClosedRange<ValueType>) -> Decimal  {
-    //        let exponent = floor(log10(Double(range.upperBound - range.lowerBound))) - 2 // subtract 2 to get ~100 steps
-    //        let size = pow(10, exponent)
-    //        return Decimal(size)
-    //    }
-    //
-    //            public func makeStepSize(decimalRange: ClosedRange<Decimal>) -> Decimal {
-    //                let width = decimalRange.upperBound - decimalRange.lowerBound
-    //                return stepSizeFromWidth(ValueType(NSDecimalNumber(decimal: width).doubleValue)
-    //                                         }
-
     public func valueToSliderPosition(_ value: ValueType, _ lowerBound: ValueType, _ upperBound: ValueType) -> Double  where ValueType: BinaryFloatingPoint {
         return Double(value - lowerBound)/Double(upperBound - lowerBound)
     }
@@ -121,24 +110,16 @@ public struct DecimalFloatingPointConverter<V: BinaryFloatingPoint>: DecimalConv
         let size = pow(10, exponent)
         return Decimal(size)
     }
-
 }
 
 public struct NumericSettingViewModel<T: DecimalConverter> {
 
-    // IMPL NOTE: Do not use an Int for the step because the arithmetic screws up sometimes.
+    // ========================================================================
+    // IMPL NOTE: Do not use an Int for the stepNumber because the arithmetic
+    // screws up sometimes.
+    // ========================================================================
 
     public let transformer: T
-
-    public private(set) var decimalValue: Decimal
-
-    public var numericValue: T.ValueType {
-        transformer.decimalToValue(decimalValue)
-    }
-
-    public var textValue: String {
-        transformer.decimalToString(decimalValue)
-    }
 
     // TODO: MAYBE convert to ClosedRange
     public let valueLB: Decimal
@@ -165,34 +146,12 @@ public struct NumericSettingViewModel<T: DecimalConverter> {
         }
     }
 
-    public var sliderRange: ClosedRange<Decimal> {
-        sliderLB...sliderUB
-    }
+    public private(set) var decimalValue: Decimal
 
-    public var sliderLBText: String {
-        transformer.decimalToString(sliderLB)
-    }
-
-    public var sliderUBText: String {
-        transformer.decimalToString(sliderUB)
-    }
-
-    public var stepSizeText: String {
-        transformer.decimalToString(stepSize)
-    }
-
-    /// Always an integer value, but it's a Decimal type for convenience
-    // TODO: make private
-    public private(set) var step: Decimal
-
-    // TODO: make private
     public private(set) var stepSize: Decimal
 
-//    public let initialStepSize: Decimal
-//
-//    public let initialLB: Decimal
-//
-//    public let initialUB: Decimal
+    /// Always an integer value, but it's a Decimal type for convenience
+    private var stepNumber: Decimal
 
     // TODO: MAYBE convert to ClosedRange
     public private(set) var sliderLB: Decimal
@@ -201,7 +160,7 @@ public struct NumericSettingViewModel<T: DecimalConverter> {
     public init(_ transformer: T,
                 _ value: T.ValueType,
                 validRange: ClosedRange<T.ValueType>,
-                sliderRange: ClosedRange<T.ValueType>? = nil,
+                initialSliderRange: ClosedRange<T.ValueType>? = nil,
                 snapToStep: Bool) {
 
         // TODO: simplify the below by init'ing stuff to temp values where necessary, then calling setSliderRange
@@ -209,7 +168,7 @@ public struct NumericSettingViewModel<T: DecimalConverter> {
         // TODO: if initial value is outside the given slider range, expand the slider range to cover it.
 
         let trueInitialRange: ClosedRange<T.ValueType>
-        if let tmpInitialRange = sliderRange {
+        if let tmpInitialRange = initialSliderRange {
             let trueLB = max(tmpInitialRange.lowerBound, validRange.lowerBound)
             let trueUB = min(tmpInitialRange.upperBound, validRange.upperBound)
             trueInitialRange = trueLB...trueUB
@@ -238,13 +197,10 @@ public struct NumericSettingViewModel<T: DecimalConverter> {
         self.snapToStep = snapToStep
         self.fieldText = transformer.decimalToString(initialDecimal)
         self.stepSize = initialStepSize
-        self.step = initialStep
+        self.stepNumber = initialStep
         self.sliderPosition = Self.getSliderPosition(initialDecimal, initialLB, initialUB)
         self.sliderLB = initialLB
         self.sliderUB = initialUB
-        // self.initialStepSize = initialStepSize
-        // self.initialLB = initialLB
-        // self.initialUB = initialUB
     }
 
     public mutating func applyFieldText() {
@@ -258,7 +214,7 @@ public struct NumericSettingViewModel<T: DecimalConverter> {
     }
 
     public mutating func applyIncrement(_ steps: Int = 1) {
-        let tmpStep = step + Decimal(steps)
+        let tmpStep = stepNumber + Decimal(steps)
         let tmpDecimal = tmpStep * stepSize
         if tmpDecimal > valueUB {
             applyDecimalAndStep(valueUB, Self.getStep(valueUB, stepSize))
@@ -269,7 +225,7 @@ public struct NumericSettingViewModel<T: DecimalConverter> {
     }
 
     public mutating func applyDecrement(_ steps: Int = 1) {
-        let tmpStep = step - Decimal(steps)
+        let tmpStep = stepNumber - Decimal(steps)
         let tmpDecimal = tmpStep * stepSize
         if tmpDecimal < valueLB {
             applyDecimalAndStep(valueLB, Self.getStep(valueLB, stepSize))
@@ -284,11 +240,11 @@ public struct NumericSettingViewModel<T: DecimalConverter> {
         if snapToStep {
             let tmpStep = Self.getStep(tmpDecimal, stepSize)
             decimalValue = tmpStep * stepSize
-            step = tmpStep
+            stepNumber = tmpStep
         }
         else {
             decimalValue = tmpDecimal
-            step = Self.getStep(decimalValue, stepSize)
+            stepNumber = Self.getStep(decimalValue, stepSize)
         }
 
         fieldText = transformer.decimalToString(decimalValue)
@@ -300,21 +256,16 @@ public struct NumericSettingViewModel<T: DecimalConverter> {
     }
 
     public mutating func rescaleSlider(factor: Decimal) {
-        //        let oldWidth = sliderUB - sliderLB
-        //        let oldCenter = sliderLB + oldWidth / 2
-        //        let newWidth = factor * oldWidth
-        //        setSliderRange((oldCenter - newWidth / 2)...(oldCenter + newWidth / 2))
-
         let oldLowerPart = decimalValue - sliderLB
         let oldUpperPart = sliderUB - decimalValue
         let newLB = decimalValue - factor * oldLowerPart
         let newUB = decimalValue + factor * oldUpperPart
-        setSliderRange(newLB...newUB)
+        setSliderRange(decimalRange: newLB...newUB)
     }
 
-    public mutating func setSliderRange(_ range: ClosedRange<Decimal>) {
-        let tmpLB = range.lowerBound > valueLB ? range.lowerBound : valueLB
-        let tmpUB = range.upperBound < valueUB ? range.upperBound : valueUB
+    public mutating func setSliderRange(decimalRange: ClosedRange<Decimal>) {
+        let tmpLB = max(decimalRange.lowerBound, valueLB)
+        let tmpUB = min(decimalRange.upperBound, valueUB)
 
         let newStepSize = transformer.makeStepSize(decimalRange: tmpLB...tmpUB)
         let newSliderLB = snapToStep ? Self.getStep(tmpLB, newStepSize) * newStepSize : tmpLB
@@ -324,70 +275,24 @@ public struct NumericSettingViewModel<T: DecimalConverter> {
         }
 
         self.stepSize = newStepSize
-        self.step = Self.getStep(decimalValue, newStepSize)
+        self.stepNumber = Self.getStep(decimalValue, newStepSize)
         self.sliderLB = newSliderLB
         self.sliderUB = newSliderUB
         self.sliderPosition = Self.getSliderPosition(decimalValue, newSliderLB, newSliderUB)
     }
 
-//    public mutating func recomputeSliderPosition() {
-//        self.sliderPosition = Self.getSliderPosition(decimalValue, sliderLB, sliderUB)
-//    }
-//
-//    public mutating func resetStepSize() {
-//        let newStepSize = initialStepSize
-//        if newStepSize != self.stepSize {
-//            self.stepSize = newStepSize
-//            self.step = Self.getStep(decimalValue, newStepSize)
-//            self.sliderLB = initialLB
-//            self.sliderUB = initialUB
-//            self.sliderPosition = Self.getSliderPosition(decimalValue, sliderLB, sliderUB)
-//        }
-//    }
-//
-//    public mutating func decreaseStepSize() {
-//        let tmpStepSize = stepSize / 10
-//        let minStepSize = transformer.valueToDecimal(transformer.minimumStepSize)
-//        let newStepSize = tmpStepSize < minStepSize ? minStepSize : tmpStepSize
-//        if newStepSize != self.stepSize {
-//            let tmpSliderPercent = Decimal(floor(100 * sliderPosition))
-//            self.stepSize = newStepSize
-//            self.step = Self.getStep(decimalValue, newStepSize)
-//            self.sliderLB = decimalValue - tmpSliderPercent * newStepSize
-//            self.sliderUB = self.sliderLB + 100 * newStepSize
-//            self.sliderPosition = Self.getSliderPosition(decimalValue, sliderLB, sliderUB)
-//        }
-//    }
-//
-//    public mutating func increaseStepSize() {
-//        let tmpStepSize = stepSize * 10
-//        let maxStepSize = (valueUB - valueLB) / 10
-//        let newStepSize = tmpStepSize > maxStepSize ? maxStepSize : tmpStepSize
-//        if newStepSize != self.stepSize {
-//            let tmpSliderPercent = floor(100 * sliderPosition)
-//            let tmpSliderLB = decimalValue -  Decimal(tmpSliderPercent) * newStepSize
-//            let tmpSliderUB = tmpSliderLB + 100 * newStepSize
-//
-//            self.stepSize = newStepSize
-//            self.step = Self.getStep(decimalValue, newStepSize)
-//            self.sliderLB = tmpSliderLB < valueLB ? valueLB : tmpSliderLB
-//            self.sliderUB = tmpSliderUB > valueUB ? valueUB : tmpSliderUB
-//            self.sliderPosition = Self.getSliderPosition(decimalValue, sliderLB, sliderUB)
-//        }
-//    }
-
     private mutating func applySliderPosition(_ newSliderPosition: Double) {
         let tmpDecimal = sliderLB + Decimal(newSliderPosition) * (sliderUB - sliderLB)
         let newStep = Self.getStep(tmpDecimal, self.stepSize)
         let newDecimal = newStep * stepSize
-        self.step = newStep
+        self.stepNumber = newStep
         self.decimalValue = newDecimal
         self.fieldText = transformer.decimalToString(newDecimal)
     }
 
     private mutating func applyDecimalAndStep(_ newDecimal: Decimal, _ newStep: Decimal) {
         decimalValue = newDecimal
-        step = newStep
+        stepNumber = newStep
         fieldText = transformer.decimalToString(decimalValue)
 
         let newSliderPosition = Self.getSliderPosition(decimalValue, sliderLB, sliderUB)
@@ -404,6 +309,36 @@ public struct NumericSettingViewModel<T: DecimalConverter> {
         return NSDecimalNumber(decimal: (value - lowerBound)/(upperBound - lowerBound)).doubleValue
     }
 }
+
+/// Syntactic sugar
+extension NumericSettingViewModel {
+
+    public var numericValue: T.ValueType {
+        transformer.decimalToValue(decimalValue)
+    }
+
+    public var textValue: String {
+        transformer.decimalToString(decimalValue)
+    }
+
+    public var sliderDecimalRange: ClosedRange<Decimal> {
+        sliderLB...sliderUB
+    }
+
+    public var sliderLBText: String {
+        transformer.decimalToString(sliderLB)
+    }
+
+    public var sliderUBText: String {
+        transformer.decimalToString(sliderUB)
+    }
+
+    public var stepSizeText: String {
+        transformer.decimalToString(stepSize)
+    }
+
+}
+
 
 public struct NumericSettingView<T: DecimalConverter, Content: View>: View {
 
@@ -438,22 +373,12 @@ public struct NumericSettingView<T: DecimalConverter, Content: View>: View {
                 value = tmpValue
             }
         }
-        // THESE DON'T DO ANYTHING b/c model is a @State so it's never changed from outside.
-        //        .onChange(of: model.sliderLB) { newValue in
-        //            // Messages.debug("NumericSettingView", "sliderLB changed. newValue: \(newValue)")
-        //            model.recomputeSliderPosition()
-        //        }
-        //        .onChange(of: model.sliderUB) { newValue in
-        //            // Messages.debug("NumericSettingView", "sliderUB changed. newValue: \(newValue)")
-        //            model.recomputeSliderPosition()
-        //        }
     }
 
     public init<V>(_ value: Binding<V>,
                    in validRange: ClosedRange<V>,
-                   initialRange: ClosedRange<V>? = nil,
+                   initialSliderRange: ClosedRange<V>? = nil,
                    snapToStep: Bool = false,
-                   initialValueSnapToStep: Bool = true,
                    @ViewBuilder contentBuilder: @escaping (_ model: Binding<NumericSettingViewModel<DecimalIntegerConverter<V>>>) -> Content)
     where V: BinaryInteger, T == DecimalIntegerConverter<V> {
 
@@ -461,16 +386,15 @@ public struct NumericSettingView<T: DecimalConverter, Content: View>: View {
         self._model = State(initialValue: NumericSettingViewModel(DecimalIntegerConverter<V>(),
                                                                   value.wrappedValue,
                                                                   validRange: validRange,
-                                                                  sliderRange: initialRange,
+                                                                  initialSliderRange: initialSliderRange,
                                                                   snapToStep: snapToStep))
         self.contentBuilder = contentBuilder
     }
 
     public init<V>(_ value: Binding<V>,
                    in validRange: ClosedRange<V>,
-                   initialRange: ClosedRange<V>? = nil,
+                   initialSliderRange: ClosedRange<V>? = nil,
                    snapToStep: Bool = false,
-                   initialValueSnapToStep: Bool = true,
                    @ViewBuilder contentBuilder: @escaping (_ model: Binding<NumericSettingViewModel<DecimalFloatingPointConverter<V>>>) -> Content)
     where V: BinaryFloatingPoint, T == DecimalFloatingPointConverter<V> {
 
@@ -478,7 +402,7 @@ public struct NumericSettingView<T: DecimalConverter, Content: View>: View {
         self._model = State(initialValue: NumericSettingViewModel(DecimalFloatingPointConverter<V>(),
                                                                   value.wrappedValue,
                                                                   validRange: validRange,
-                                                                  sliderRange: initialRange,
+                                                                  initialSliderRange: initialSliderRange,
                                                                   snapToStep: snapToStep))
         self.contentBuilder = contentBuilder
     }
