@@ -163,44 +163,45 @@ public struct NumericSettingViewModel<T: DecimalConverter> {
                 initialSliderRange: ClosedRange<T.ValueType>? = nil,
                 snapToStep: Bool) {
 
-        // TODO: simplify the below by init'ing stuff to temp values where necessary, then calling setSliderRange
+        // MAYBE: simplify the below by init'ing stuff to temp values where necessary, then calling setSliderRange
 
-        // TODO: if initial value is outside the given slider range, expand the slider range to cover it.
 
-        let trueInitialRange: ClosedRange<T.ValueType>
-        if let tmpInitialRange = initialSliderRange {
-            let trueLB = max(tmpInitialRange.lowerBound, validRange.lowerBound)
-            let trueUB = min(tmpInitialRange.upperBound, validRange.upperBound)
-            trueInitialRange = trueLB...trueUB
+        let adjustedSliderRange: ClosedRange<T.ValueType>
+        if let initialSliderRange {
+            // If slider range extends beyond the valid range, shrink slider range to fit.
+            // If initial value is outside slider range, expand slider range to cover it.
+            let trueLB = min(value, max(initialSliderRange.lowerBound, validRange.lowerBound))
+            let trueUB = max(value, min(initialSliderRange.upperBound, validRange.upperBound))
+            adjustedSliderRange = trueLB...trueUB
         }
         else {
-            trueInitialRange = validRange
+            adjustedSliderRange = validRange
         }
 
         let tmpDecimal = transformer.valueToDecimal(value)
-        let tmpInitialLB = transformer.valueToDecimal(trueInitialRange.lowerBound)
-        let tmpInitialUB = transformer.valueToDecimal(trueInitialRange.upperBound)
+        let tmpSliderLB = transformer.valueToDecimal(adjustedSliderRange.lowerBound)
+        let tmpSliderUB = transformer.valueToDecimal(adjustedSliderRange.upperBound)
 
-        let initialStepSize = transformer.makeStepSize(trueInitialRange)
+        let initialStepSize = transformer.makeStepSize(adjustedSliderRange)
         let initialStep = Self.getStep(tmpDecimal, initialStepSize)
         let initialDecimal = snapToStep ? initialStep * initialStepSize : tmpDecimal
-        let initialLB = snapToStep ? Self.getStep(tmpInitialLB, initialStepSize) * initialStepSize : tmpInitialLB
-        var initialUB = snapToStep ? Self.getStep(tmpInitialUB, initialStepSize) * initialStepSize : tmpInitialUB
-        if initialUB < tmpInitialUB {
-            initialUB += initialStepSize
+        let initialSliderLB = snapToStep ? Self.getStep(tmpSliderLB, initialStepSize) * initialStepSize : tmpSliderLB
+        var initialSliderUB = snapToStep ? Self.getStep(tmpSliderUB, initialStepSize) * initialStepSize : tmpSliderUB
+        if initialSliderUB < tmpSliderUB {
+            initialSliderUB += initialStepSize
         }
 
         self.transformer = transformer
-        self.decimalValue = initialDecimal
         self.valueLB = transformer.valueToDecimal(validRange.lowerBound)
         self.valueUB = transformer.valueToDecimal(validRange.upperBound)
+        self.decimalValue = initialDecimal
         self.snapToStep = snapToStep
         self.fieldText = transformer.decimalToString(initialDecimal)
         self.stepSize = initialStepSize
         self.stepNumber = initialStep
-        self.sliderPosition = Self.getSliderPosition(initialDecimal, initialLB, initialUB)
-        self.sliderLB = initialLB
-        self.sliderUB = initialUB
+        self.sliderPosition = Self.getSliderPosition(initialDecimal, initialSliderLB, initialSliderUB)
+        self.sliderLB = initialSliderLB
+        self.sliderUB = initialSliderUB
     }
 
     public mutating func applyFieldText() {
