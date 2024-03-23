@@ -7,9 +7,12 @@
 import Foundation
 import SwiftUI
 
+fileprivate let noValue = "--"
+
 public typealias NumericValue = Numeric & Comparable
 
 public protocol DecimalConverter {
+
     associatedtype ValueType : NumericValue
 
     var minimumStepSize: ValueType { get }
@@ -18,6 +21,10 @@ public protocol DecimalConverter {
 
     func decimalToValue(_ decimal: Decimal) -> ValueType
 
+    func decimalToString(_ decimal: Decimal) -> String
+
+    func valueToString(_ value: ValueType) -> String
+
     func makeStepSize(_ range: ClosedRange<ValueType>) -> Decimal
 
     func makeStepSize(decimalRange: ClosedRange<Decimal>) -> Decimal
@@ -25,14 +32,6 @@ public protocol DecimalConverter {
 }
 
 extension DecimalConverter {
-
-    public func decimalToString(_ decimal: Decimal) -> String {
-        return "\(decimal)"
-    }
-
-    public func valueToString(_ value: ValueType) -> String {
-        return decimalToString(valueToDecimal(value))
-    }
 
     public func valueToDecimal(_ range: ClosedRange<ValueType>) -> ClosedRange<Decimal> {
         return valueToDecimal(range.lowerBound)...valueToDecimal(range.upperBound)
@@ -53,6 +52,14 @@ public struct DecimalIntegerConverter<V: BinaryInteger>: DecimalConverter {
 
     public func decimalToValue(_ decimal: Decimal) -> ValueType {
         return ValueType(NSDecimalNumber(decimal: decimal).intValue)
+    }
+
+    public func decimalToString(_ decimal: Decimal) -> String {
+        return "\(decimal)"
+    }
+
+    public func valueToString(_ value: ValueType) -> String {
+        return decimalToString(valueToDecimal(value))
     }
 
     public func makeStepSize(_ range: ClosedRange<ValueType>) -> Decimal  {
@@ -91,6 +98,13 @@ public struct DecimalFloatingPointConverter<V: BinaryFloatingPoint>: DecimalConv
         return ValueType(NSDecimalNumber(decimal: decimal).doubleValue)
     }
 
+    public func decimalToString(_ decimal: Decimal) -> String {
+        return "\(decimal)"
+    }
+
+    public func valueToString(_ value: ValueType) -> String {
+        return decimalToString(valueToDecimal(value))
+    }
 
     public func makeStepSize(_ range: ClosedRange<ValueType>) -> Decimal  {
         return stepSizeFromWidth(Double(range.upperBound - range.lowerBound))
