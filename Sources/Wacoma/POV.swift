@@ -884,8 +884,10 @@ struct CenteredPOVRoll2 {
         // Rotate pov.location and .up around the rotation axis
         // - Gets it right if the center of rotation is the center of the screen
         // - If center of rotation is not center of the screen, it does something but not what I expected
-        //
-        //        let transform = float4x4(rotationAround: rotationAxis, by: radians)
+
+        let rotationAxis = initialPOV.center - rotationCenter
+
+        let transform = float4x4(rotationAround: rotationAxis, by: radians)
 
         // Second try:
         // 1. transform the view coords until rotationAxis vector intersects the glass at the center
@@ -906,19 +908,19 @@ struct CenteredPOVRoll2 {
         // a = axis of rotation = cross product of v1 and v2
         // theta = angle to rotate. Found by solving for theta in dot(v1, v2) = |v1| * |v2| * cos(theta
         //
-        // - No different from the first try!
-
-        let v1 = initialPOV.center - initialPOV.location
-        let m1 = simd_length(v1)
-        let v2 = initialPOV.center - rotationCenter
-        let m2 = simd_length(v2)
-        let rotationAxis = simd_cross(v1, v2)
-        let cosTheta = simd_dot(v1, v2) / (m1 * m2)
-        let theta = acos(cosTheta)
-        let zAxis = SIMD3<Float>(0, 0, -1)
-        let transform = float4x4(rotationAround: rotationAxis, by: theta)
-        * float4x4(rotationAround: zAxis, by: radians)
-        * float4x4(rotationAround: rotationAxis, by: -theta)
+        // - Not much different from the first try!
+        //
+        //        let v1 = initialPOV.center - initialPOV.location
+        //        let m1 = simd_length(v1)
+        //        let v2 = initialPOV.center - rotationCenter
+        //        let m2 = simd_length(v2)
+        //        let rotationAxis = simd_cross(v1, v2)
+        //        let cosTheta = simd_dot(v1, v2) / (m1 * m2)
+        //        let theta = acos(cosTheta)
+        //        let zAxis = SIMD3<Float>(0, 0, -1)
+        //        let transform = float4x4(rotationAround: rotationAxis, by: theta)
+        //        * float4x4(rotationAround: zAxis, by: radians)
+        //        * float4x4(rotationAround: rotationAxis, by: -theta)
 
         return CenteredPOV(location: (transform * SIMD4<Float>(initialPOV.location, 1)).xyz,
                            center: initialPOV.center,

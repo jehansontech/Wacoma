@@ -159,17 +159,17 @@ public class RenderController: ObservableObject, DragHandler, PinchHandler, Rota
     /// location is in clip-space coords
     public func touchPointOnGlass(_ clipSpacePoint: SIMD2<Float>) -> SIMD3<Float> {
 
-        // This is total guess
-        
+        // TODO: verify correctness
+
         let inverseProjectionMatrix = fovController.projectionMatrix.inverse
         let inverseViewMatrix = povController.viewMatrix.inverse
 
         var viewSpacePoint = inverseProjectionMatrix * SIMD4<Float>(clipSpacePoint.x, clipSpacePoint.y, 0, 1)
-        print("touchPointOnGlass: clipSpace: \(clipSpacePoint.prettyString) viewSpace: \(viewSpacePoint.prettyString)")
+        // print("touchPointOnGlass: clipSpace: \(clipSpacePoint.prettyString) viewSpace: \(viewSpacePoint.prettyString)")
         // viewSpacePoint.z = 0
         viewSpacePoint.w = 0
         let worldSpacePoint = (inverseViewMatrix * viewSpacePoint).xyz
-        print("touchPointOnGlass: clipSpace: \(clipSpacePoint.prettyString) worldSpace: \(worldSpacePoint.prettyString)")
+        // print("touchPointOnGlass: clipSpace: \(clipSpacePoint.prettyString) worldSpace: \(worldSpacePoint.prettyString)")
         return worldSpacePoint
     }
 

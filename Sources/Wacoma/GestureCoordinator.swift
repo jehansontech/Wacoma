@@ -208,22 +208,24 @@ public class GestureCoordinator: NSObject, UIGestureRecognizerDelegate {
         }
     }
 
-    /// Support for simultaneous gestures.
-    public func gestureRecognizer(_ first: UIGestureRecognizer, shouldRecognizeSimultaneouslyWith second: UIGestureRecognizer) -> Bool {
-        // Disallow combos that include tap or long press.
-        if first is UITapGestureRecognizer || first is UILongPressGestureRecognizer {
-            return false
-        }
-
-        // Disallow combos that include pinch. We only do this because of a bug in POV
-        // controller: pinch interferes with drag and rotation step on each other.
-        if first is UIPinchGestureRecognizer {
-            return false
-        }
-
-        // Allow everything else.
-        return true
-    }
+    // NO: I still have problems with simultaneous drag,pinch,rotate
+    //
+    //    /// Support for simultaneous gestures.
+    //    public func gestureRecognizer(_ first: UIGestureRecognizer, shouldRecognizeSimultaneouslyWith second: UIGestureRecognizer) -> Bool {
+    //        // Disallow combos that include tap or long press.
+    //        if first is UITapGestureRecognizer || first is UILongPressGestureRecognizer {
+    //            return false
+    //        }
+    //
+    //        // Disallow combos that include pinch. We only do this because of a bug in POV
+    //        // controller: pinch interferes with drag and rotation step on each other.
+    //        if first is UIPinchGestureRecognizer {
+    //            return false
+    //        }
+    //
+    //        // Allow everything else.
+    //        return true
+    //    }
 
     private func isPOVGesture(_ recognizer: UIGestureRecognizer) -> Bool {
         return recognizer is UIPanGestureRecognizer || recognizer is UIPinchGestureRecognizer || recognizer is UIRotationGestureRecognizer
@@ -427,22 +429,24 @@ public class GestureCoordinator: NSObject, NSGestureRecognizerDelegate {
         }
     }
 
-    /// Support for simultaneous gestures.
-    public func gestureRecognizer(_ first: NSGestureRecognizer, shouldRecognizeSimultaneouslyWith second: NSGestureRecognizer) -> Bool {
-        // Disallow combos that include tap or long press.
-        if first is NSClickGestureRecognizer || first is NSPressGestureRecognizer {
-            return false
-        }
-
-        // Disallow combos that include pinch. We only do this because of a bug in POV
-        // controller: pinch interferes with drag and rotation step on each other.
-        if first is NSMagnificationGestureRecognizer {
-            return false
-        }
-
-        // Allow everything else.
-        return true
-    }
+    // NO: I still have problems with simultaneous drag,pinch,rotate
+    //
+    //    /// Support for simultaneous gestures.
+    //    public func gestureRecognizer(_ first: NSGestureRecognizer, shouldRecognizeSimultaneouslyWith second: NSGestureRecognizer) -> Bool {
+    //        // Disallow combos that include tap or long press.
+    //        if first is NSClickGestureRecognizer || first is NSPressGestureRecognizer {
+    //            return false
+    //        }
+    //
+    //        // Disallow combos that include pinch. We only do this because of a bug in POV
+    //        // controller: pinch interferes with drag and rotation step on each other.
+    //        if first is NSMagnificationGestureRecognizer {
+    //            return false
+    //        }
+    //
+    //        // Allow everything else.
+    //        return true
+    //    }
 }
 
 #endif  // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
