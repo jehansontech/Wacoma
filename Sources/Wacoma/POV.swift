@@ -269,6 +269,8 @@ extension POVController {
 
 public class OrbitingPOVController: ObservableObject, POVController {
 
+    static let defaultFlightTime: TimeInterval = 1
+
     @Published public var orbitPermitted: Bool {
         didSet {
             if orbitPermitted == false {
@@ -282,14 +284,10 @@ public class OrbitingPOVController: ObservableObject, POVController {
     /// angular rotation rate in radians per second
     @Published public var orbitSpeed: Float
 
-    public var pov: POV {
-        currentPOV
-    }
+    public var pov: POV { currentPOV }
 
-    public var frozen: Bool = false
-
-    /// User-settable but not published because it changes too frequently
-    public var currentPOV = CenteredPOV()
+    /// Not published because it changes too frequently
+    public private(set) var currentPOV = CenteredPOV()
 
     public var defaultPOV = CenteredPOV()
 
@@ -299,7 +297,11 @@ public class OrbitingPOVController: ObservableObject, POVController {
         return markedPOV != nil
     }
 
-    public var isFlying: Bool {
+    public var isActionInProgress: Bool {
+        return flightInProgress != nil || dragInProgress != nil || pinchInProgress != nil || rotationInProgress != nil
+
+    }
+    public var isFlightInProgress: Bool {
         return flightInProgress != nil
     }
 
@@ -319,6 +321,8 @@ public class OrbitingPOVController: ObservableObject, POVController {
 
     private var rotationInProgress: CenteredPOVRoll? = nil
 
+    private var queuedFlights: [CenteredPOVFlight]
+
     public init(pov: CenteredPOV = CenteredPOV(),
                 orbitPermitted: Bool = true,
                 orbitEnabled: Bool = true,
@@ -328,6 +332,7 @@ public class OrbitingPOVController: ObservableObject, POVController {
         self.orbitPermitted = orbitPermitted
         self.orbitEnabled = orbitEnabled && orbitPermitted
         self.orbitSpeed = orbitSpeed
+        self.queuedFlights = [CenteredPOVFlight]()
     }
 
     public func reset() {
@@ -345,68 +350,35 @@ public class OrbitingPOVController: ObservableObject, POVController {
         markedPOV = nil
     }
 
-    public func jumpToDefault() {
-        if !frozen {
-            currentPOV = defaultPOV
-        }
+    public func jump(to pov: CenteredPOV) {
+        queuedFlights.append(CenteredPOVFlight(from: self.currentPOV, to: pov, flightTime: 0))
     }
 
-    public func jumpToMark() {
-        if !frozen {
-            if let mark = markedPOV {
-                currentPOV = mark
-            }
-        }
+    public func fly(to pov: CenteredPOV, flightTime: TimeInterval? = nil) {
+        let trueFlightTime = flightTime ?? Self.defaultFlightTime
+        queuedFlights.append(CenteredPOVFlight(from: self.currentPOV, to: pov, flightTime: trueFlightTime))
     }
 
-    public func jumpTo(pov: CenteredPOV) {
-        if !frozen {
-            // print("OrbitingPOVController.jumpTo -- new pov: \(pov)")
-            currentPOV = pov
-        }
+    public func centerOn(_ newCenter: SIMD3<Float>) {
+        fly(to: CenteredPOV(location: currentPOV.location, center: newCenter, up: currentPOV.up))
     }
 
-    public func flyToDefault(_ callback: (() -> ())? = nil) {
-        flyTo(pov: defaultPOV, callback)
-    }
-
-    public func flyToMark(_ callback: (() -> ())? = nil) {
-        if let povMark = markedPOV {
-            flyTo(pov: povMark, callback)
-        }
-    }
-
-    public func flyTo(pov destination: CenteredPOV, _ callback: (() -> ())? = nil) {
-        if !frozen && !isFlying {
-            self.flightInProgress = CenteredPOVFlight(self.currentPOV, destination, settings, callback: callback)
-        }
-    }
-
-    public func flyTo(speedFactor: Double, pov destination: CenteredPOV, _ callback: (() -> ())? = nil) {
-        if !frozen && !isFlying {
-            var newSettings = self.settings
-            // newSettings.flyNormalizedAcceleration = speedFactor * settings.flyNormalizedAcceleration
-            newSettings.flyMaxSpeed = speedFactor * self.settings.flyMaxSpeed
-            self.flightInProgress = CenteredPOVFlight(self.currentPOV, destination, newSettings, callback: callback)
-        }
-    }
-
-    public func centerOn(_ newCenter: SIMD3<Float>, _ callback: (() -> ())? = nil) {
-        flyTo(pov: CenteredPOV(location: currentPOV.location, center: newCenter, up: currentPOV.up), callback)
-    }
-
-    public func hoverOver(_ point: SIMD3<Float>, _ distance: Float, _ callback: (() -> ())? = nil) {
+    public func hoverOver(_ point: SIMD3<Float>, _ distance: Float = 5) {
         self.orbitEnabled = false
         var displacementRTP = cartesianToSpherical(xyz: point - currentPOV.center)
         displacementRTP.x += distance
         let destination = sphericalToCartesian(rtp: displacementRTP)
-        flyTo(pov: CenteredPOV(location: destination, center: currentPOV.center, up: currentPOV.up), callback)
+        fly(to: CenteredPOV(location: destination, center: currentPOV.center, up: currentPOV.up))
     }
 
     public func dragGestureBegan(at touchPoint: SIMD3<Float>) {
-        if !frozen && !isFlying {
-            self.dragInProgress = CenteredPOVTangentialMove(self.currentPOV, touchPoint, settings)
+        if isFlightInProgress {
+            // print("OrbitingPOVController.dragGestureBegan: aborting because flight is in progress")
+            return
         }
+
+        // print("OrbitingPOVController.dragGestureBegan: beginning drag")
+        self.dragInProgress = CenteredPOVTangentialMove(self.currentPOV, touchPoint, settings)
     }
 
     public func dragGestureChanged(panDistance pan: Float, scrollDistance scroll: Float) {
@@ -423,14 +395,18 @@ public class OrbitingPOVController: ObservableObject, POVController {
     }
 
     public func dragGestureEnded() {
+        // print("OrbitingPOVController.dragGestureEnded")
         self.dragInProgress = nil
     }
 
 
     public func pinchGestureBegan(at pinchCenter: SIMD3<Float>) {
-        if !frozen && !isFlying {
-            self.pinchInProgress = CenteredPOVRadialMove(self.currentPOV, pinchCenter, settings)
+        if isFlightInProgress {
+            // print("OrbitingPOVController.pinchGestureBegan: aborting because flight is in progress")
+            return
         }
+        // print("OrbitingPOVController.pinchGestureBegan: starting pinch")
+        self.pinchInProgress = CenteredPOVRadialMove(self.currentPOV, pinchCenter, settings)
     }
 
     public func pinchGestureChanged(scale: Float) {
@@ -442,13 +418,17 @@ public class OrbitingPOVController: ObservableObject, POVController {
     }
 
     public func pinchGestureEnded() {
+        // print("OrbitingPOVController.pinchGestureEnded")
         pinchInProgress = nil
     }
 
     public func rotationGestureBegan(at rotationCenter: SIMD3<Float>) {
-        if !frozen && !isFlying {
-            self.rotationInProgress = CenteredPOVRoll(self.currentPOV, rotationCenter, settings)
+        if isFlightInProgress {
+            // print("OrbitingPOVController.rotationGestureBegan: aborting because flight is in progress")
+            return
         }
+        // print("OrbitingPOVController.rotationGestureBegan: beginning rotation")
+        self.rotationInProgress = CenteredPOVRoll(self.currentPOV, rotationCenter, settings)
     }
 
     public func rotationGestureChanged(radians: Float) {
@@ -460,46 +440,60 @@ public class OrbitingPOVController: ObservableObject, POVController {
     }
 
     public func rotationGestureEnded() {
+        // print("OrbitingPOVController.rotationGestureEnded")
         self.rotationInProgress = nil
     }
 
     public func update(_ timestamp: Date) {
+        if isGestureInProgress {
+            // print("OrbitingPOVController.update: aborting because gesture is in progress")
+            return
+        }
+        
+        self.currentPOV = makeUpdatedPOV(timestamp)
+        self._lastUpdateTimestamp = timestamp
+
+        // print("OrbitingPOVController.update: Exiting. new POV: \(currentPOV)")
+    }
+
+    private func makeUpdatedPOV(_ timestamp: Date) -> CenteredPOV {
 
         // ==================================================================
         // Q: orbital motion even if we're flying?
-        // A: No, it's confusing
+        // A: Yes, if it looks OK
         //
         // Q: how about if we're handling a gesture?
-        // A: I'd rather not because it looks jerky. But on iOS we never
-        //    get notified when drag ends, so if I check for gesture in progress
-        //    after dragging it always returns true.
+        // A: No, it looks jerky.
         //
         // If orbit speed is > 0 then it looks like we're flying east over
         // the figure.
         // ==================================================================
 
+        if flightInProgress == nil && !queuedFlights.isEmpty {
+            flightInProgress = queuedFlights.removeFirst()
+        }
+
         var updatedPOV: CenteredPOV
-        if let newPOV = flightInProgress?.update(timestamp) {
-            updatedPOV = newPOV
+        if let pov = flightInProgress?.update(timestamp) {
+            updatedPOV = pov
         }
         else {
-            self.flightInProgress = nil
-            updatedPOV = self.currentPOV
+            flightInProgress = nil
+            updatedPOV = currentPOV
         }
 
-        if orbitEnabled && !frozen && !isFlying,
-           let t0 = _lastUpdateTimestamp {
-            let dPhi = orbitSpeed * Float(timestamp.timeIntervalSince(t0))
+        if orbitEnabled, let t0 = _lastUpdateTimestamp {
             let transform = float4x4(translationBy: updatedPOV.center)
-            * float4x4(rotationAround: updatedPOV.up, by: dPhi)
+            * float4x4(rotationAround: updatedPOV.up, by: orbitSpeed * Float(timestamp.timeIntervalSince(t0)))
             * float4x4(translationBy: -updatedPOV.center)
             let newLocation = (transform * SIMD4<Float>(updatedPOV.location, 1)).xyz
-            updatedPOV = CenteredPOV(location: newLocation, center: updatedPOV.center, up: updatedPOV.up)
-        }
-        _lastUpdateTimestamp = timestamp
 
-        // debug("POVController.updatePOV", "new POV = \(updatedPOV)")
-        self.currentPOV = updatedPOV
+            updatedPOV = CenteredPOV(location: newLocation,
+                               center: updatedPOV.center,
+                               up: updatedPOV.up)
+        }
+
+        return updatedPOV
     }
 }
 
@@ -520,112 +514,177 @@ class CenteredPOVFlight {
         case arrived
     }
 
-    // Needed for multi-step flying, only first and last are used at present.
-    let povSequence: [CenteredPOV]
 
-    // Needed for multi-step flying, NOT USED yet.
-    let totalDistance: Float
+    // Chosen because default frame rate is 60/sec
+    static let minFlightTime: TimeInterval = 1/60
 
-    let coastingThreshold: Double
+    static let coastingFraction: Double = 0.33
 
-    let normalizedAcceleration: Double
+    /// Normalized units
+    static let minSpeed: Double = 1/60
 
-    let minSpeed: Double
+    let initialPOV: CenteredPOV
 
-    let maxSpeed: Double
+    let finalPOV: CenteredPOV
 
-    var lastUpdateTime: Date = .distantPast
+    let isJump: Bool
 
-    var normalizedSpeed: Double = 0
+    /// Normalized units
+    let acceleration: Double
 
-    var currentStepIndex: Int = 0
+    /// fractional distance at which we stop accelerating
+    /// Normalized units
+    let accelerationEnd: Double
 
-    /// fraction of the distance in the current step has been covered
-    var currentStepFractionalDistance: Double = 0
+    /// fractional distance at which we start decelerating
+    /// Normalized units
+    let decelerationStart: Double
 
-    var phase: Phase = .new
+    private var phase: Phase = .new
 
-    var callback: (() -> ())?
+    private(set) var lastUpdateTime: Date = .distantPast
 
-    init(_ pov: CenteredPOV, _ destination: CenteredPOV, _ settings: POVControllerSettings, callback:(() -> ())? = nil) {
-        self.povSequence = [pov, destination]
-        self.totalDistance = Self.calculateTotalDistance([pov, destination])
-        self.coastingThreshold = settings.flyCoastingThreshold
-        self.normalizedAcceleration = settings.flyNormalizedAcceleration
-        self.minSpeed = settings.flyMinSpeed
-        self.maxSpeed = settings.flyMaxSpeed
-        self.callback = callback
+    /// Normalized units
+    private(set) var speed: Double = 0
 
-        // print("CenteredPOVFlight: normalizedAcceleration: \(normalizedAcceleration), maxSpeed: \(maxSpeed)")
-    }
+    /// fraction of the total distance that has been covered so far
+    /// Normalized units
+    private(set) var distance: Double = 0
 
-    static func calculateTotalDistance(_ povSequence: [POV]) -> Float {
-        var distance: Float = 0
-        for i in 1..<povSequence.count {
-            distance += simd_distance(povSequence[i-1].location, povSequence[i].location)
+
+    public init(from initialPOV: CenteredPOV,
+                to finalPOV: CenteredPOV,
+                 flightTime: TimeInterval)
+    {
+        self.initialPOV = initialPOV
+        self.finalPOV = finalPOV
+
+        if flightTime <= Self.minFlightTime {
+            self.isJump = true
+            self.acceleration = 0
+            self.accelerationEnd = 0
+            self.decelerationStart = 1
         }
-        return distance
+        else {
+
+            // ======================================================
+            // tA: time spent accelerating
+            // tC: time spent coasting
+            // tD: time spent decenerating
+            // dA: fractional distance traveled while accelerating
+            // dC: fractional distance traveled while coasting
+            // dD: fractional distance traveled while decelerating
+            // a:  acceleration rate
+            // v1: maximum velocity
+            //
+            // tA + tC + tD = flightTime
+            // dA + dC + dD = 1
+            //
+            // tC = coastingFraction * flightTime
+            // tA = tD = (flightTime - tC)/2
+            //
+            // v1 = a * tA
+            //
+            // dA = a * (tA * tA / 2)
+            // dC = v1 * tC = a * (tA * tC)
+            // dD = v1 * tD - (a * tD * tD / 2) = a * (tA * tD - tD * tD / 2)
+            //
+            // 1 = dA + dC + dD
+            //
+            // 1 = a * [ (tA * tA / 2) + (tA * tC) + (tA * tD) - (tD * tD / 2) ]
+            //
+            // a = 1 / [ (tA * tA / 2) + (tA * tC) + (tA * tD) - (tD * tD / 2) ]
+            // ======================================================
+
+            let tC: TimeInterval = Self.coastingFraction * flightTime
+            let tA: TimeInterval = (flightTime - tC) / 2
+            let tD: TimeInterval = flightTime - tA - tC // do this way b/c of roundoff.
+            let invA: Double = (tA * tA / 2.0) + (tA * tC) + (tA * tD) - (tD * tD / 2.0)
+
+            let a = 1.0 / invA
+            let dA = a * tA * tA / 2
+            let dC = a * tA * tC
+
+            self.isJump = false
+            self.acceleration = a
+            self.accelerationEnd = dA
+            self.decelerationStart = dA + dC
+        }
     }
 
-    /// returns nil when finished
+    /// returns nil when the flight finished
     func update(_ timestamp: Date) -> CenteredPOV? {
+
         // debug("POVFlightAction.update", "phase = \(phase)")
-
-        // ===============================================================================
-        // FIXME: This impl ONLY works if povSequence.count == 2 and currentStepIndex == 0
-        // ===============================================================================
-
-        // It's essential that the first time this func is called,
-        // phase = .new and currentStepFractionalDistance = 0
 
         let dt = timestamp.timeIntervalSince(lastUpdateTime)
         lastUpdateTime = timestamp
 
-        currentStepFractionalDistance += normalizedSpeed * dt
-
         switch phase {
         case .new:
-            phase = .accelerating
+            beginFlight()
+            return newPOV()
         case .accelerating:
-            if currentStepFractionalDistance >= coastingThreshold {
-                phase = .coasting
-            }
-            else {
-                normalizedSpeed += normalizedAcceleration * dt
-                if normalizedSpeed > maxSpeed {
-                    normalizedSpeed = maxSpeed
-                    phase = .coasting
-                }
-            }
+            continueAcceleration(dt)
+            return newPOV()
         case .coasting:
-            if currentStepFractionalDistance >= (1 - coastingThreshold) {
-                phase = .decelerating
-            }
+            continueCoasting(dt)
+            return newPOV()
         case .decelerating:
-            if currentStepFractionalDistance >= 1  {
-                currentStepFractionalDistance = 1
-                phase = .arrived
-            }
-            else {
-                normalizedSpeed -= (normalizedAcceleration * dt)
-                if normalizedSpeed < minSpeed {
-                    normalizedSpeed = minSpeed
-                }
-            }
+            continueDeceleration(dt)
+            return newPOV()
         case .arrived:
-            if let callback = callback {
-                // debug("POVFlightAction.update", "executing callback")
-                callback()
-            }
-            // debug("POVFlightAction.update", "returning nil")
             return nil
         }
+    }
 
-        let initialPOV = povSequence[currentStepIndex]
-        let finalPOV = povSequence[currentStepIndex+1]
-        let newLocation = Float(currentStepFractionalDistance) * (finalPOV.location - initialPOV.location) + initialPOV.location
-        let newCenter  = Float(currentStepFractionalDistance) * (finalPOV.center - initialPOV.center) + initialPOV.center
-        let newUp       = Float(currentStepFractionalDistance) * (finalPOV.up - initialPOV.up) + initialPOV.up
+    private func beginFlight() {
+        if isJump {
+            distance = 1
+            phase = .arrived
+        }
+        else {
+            distance = 0
+            speed = 0
+            phase = .accelerating
+        }
+    }
+
+    private func continueAcceleration(_ dt: Double) {
+        distance += speed * dt
+        if distance >= accelerationEnd {
+            phase = .coasting
+        }
+        else {
+            speed += acceleration * dt
+        }
+    }
+
+    private func continueCoasting(_ dt: Double) {
+        distance += speed * dt
+        if distance >= decelerationStart {
+            phase = .decelerating
+        }
+    }
+
+    private func continueDeceleration(_ dt: Double) {
+        distance += speed * dt
+        if distance >= 1  {
+            distance = 1
+            phase = .arrived
+        }
+        else {
+            speed -= acceleration * dt
+            if speed < Self.minSpeed {
+                speed = Self.minSpeed
+            }
+        }
+    }
+
+    private func newPOV() -> CenteredPOV {
+        let newLocation = Float(distance) * (finalPOV.location - initialPOV.location) + initialPOV.location
+        let newCenter   = Float(distance) * (finalPOV.center - initialPOV.center) + initialPOV.center
+        let newUp       = Float(distance) * (finalPOV.up - initialPOV.up) + initialPOV.up
         return CenteredPOV(location: newLocation,
                            center: newCenter,
                            up: newUp)
