@@ -109,6 +109,7 @@ public class RenderController: ObservableObject, DragHandler, PinchHandler, Rota
         }
     }
 
+    /// Returns a TouchRay whose origin is in the center of the screen and whose direction is derived from the given location.
     /// location and size are both in clip-space coords
     public func touchRay(at location: SIMD2<Float>, size: SIMD2<Float>) -> TouchRay {
         let inverseProjectionMatrix = fovController.projectionMatrix.inverse
@@ -130,7 +131,7 @@ public class RenderController: ObservableObject, DragHandler, PinchHandler, Rota
         let ray3 = normalize(inverseViewMatrix * v3).xyz
 
         // Starting at ray origin, make a right triangle in space such that ray1 forms
-        // one leg and the hypoteneuse lies along ray2. axis2is the other leg.
+        // one leg and the hypoteneuse lies along ray2. cross1 is the other leg.
         let cross1 = (ray2 / simd_dot(ray1, ray2)) - ray1
 
         // Similar thing for ray3
@@ -153,8 +154,31 @@ public class RenderController: ObservableObject, DragHandler, PinchHandler, Rota
                         cross2: cross2)
     }
 
+
+    /// Point in world coordinates corresponding to the given point on the glass
     /// location is in clip-space coords
-    public func touchPoint(_ location: SIMD2<Float>) -> SIMD3<Float> {
+    public func touchPointOnGlass(_ clipSpacePoint: SIMD2<Float>) -> SIMD3<Float> {
+
+        // This is total guess
+        
+        let inverseProjectionMatrix = fovController.projectionMatrix.inverse
+        let inverseViewMatrix = povController.viewMatrix.inverse
+
+        var viewSpacePoint = inverseProjectionMatrix * SIMD4<Float>(clipSpacePoint.x, clipSpacePoint.y, 0, 1)
+        print("touchPointOnGlass: clipSpace: \(clipSpacePoint.prettyString) viewSpace: \(viewSpacePoint.prettyString)")
+        // viewSpacePoint.z = 0
+        viewSpacePoint.w = 0
+        let worldSpacePoint = (inverseViewMatrix * viewSpacePoint).xyz
+        print("touchPointOnGlass: clipSpace: \(clipSpacePoint.prettyString) worldSpace: \(worldSpacePoint.prettyString)")
+        return worldSpacePoint
+    }
+
+    /// I THOUGHT this was:
+    /// "Point in world coordinates derived from the given point on the glass and an imputed depth below the screen"
+    /// but I might have been wrong
+    ///
+    /// location is in clip-space coords
+    public func touchPointAtDepth(_ location: SIMD2<Float>) -> SIMD3<Float> {
 
         // I want to find the world coordinates of the point where the
         // touch ray intersects the touch plane
@@ -181,7 +205,7 @@ public class RenderController: ObservableObject, DragHandler, PinchHandler, Rota
 
     public func dragBegan(at location: SIMD2<Float>) {
         // print("RenderController.dragBegan")
-        povController.dragGestureBegan(at: touchPoint(location))
+        povController.dragGestureBegan(at: touchPointAtDepth(location))
     }
 
     public func dragChanged(panFraction: Float, scrollFraction: Float) {
@@ -201,7 +225,7 @@ public class RenderController: ObservableObject, DragHandler, PinchHandler, Rota
     public func pinchBegan(at location: SIMD2<Float>) {
         // print("RenderController.pinchBegan")
         // HACK HACK HACK HACK use center of screen, not touch location
-        povController.pinchGestureBegan(at: touchPoint(.zero))
+        povController.pinchGestureBegan(at: touchPointAtDepth(.zero))
     }
 
     public func pinchChanged(scale: Float) {
@@ -217,7 +241,9 @@ public class RenderController: ObservableObject, DragHandler, PinchHandler, Rota
     public func rotationBegan(at location: SIMD2<Float>) {
         // print("RenderController.rotationBegan")
         // HACK HACK HACK HACK use center of screen, not touch location
-        povController.rotationGestureBegan(at: touchPoint(.zero))
+        // OLD povController.rotationGestureBegan(at: touchPointAtDepth(.zero))
+
+        povController.rotationGestureBegan(at: touchPointOnGlass(location))
     }
 
     public func rotationChanged(radians: Float) {

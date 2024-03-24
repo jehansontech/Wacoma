@@ -727,6 +727,7 @@ struct CenteredPOVTangentialMove {
     let panRotationAxis: SIMD3<Float>
 
     let scrollFactor: Float
+
     let panFactor: Float
 
     init(_ pov: CenteredPOV, _ touchPoint: SIMD3<Float>, _ settings: POVControllerSettings) {
@@ -837,10 +838,13 @@ struct CenteredPOVRadialMove {
 }
 
 
+
+typealias CenteredPOVRoll = CenteredPOVRoll2
+
 ///
 /// This is a rotation of the POV's up vector about its forward vector
 ///
-struct CenteredPOVRoll {
+struct CenteredPOVRoll1 {
 
     let initialPOV: CenteredPOV
     let rotationCenter: SIMD3<Float>
@@ -859,5 +863,65 @@ struct CenteredPOVRoll {
         return CenteredPOV(location: initialPOV.location,
                            center: initialPOV.center,
                            up: newUp)
+    }
+}
+
+struct CenteredPOVRoll2 {
+
+    let initialPOV: CenteredPOV
+    let rotationCenter: SIMD3<Float>
+    let rotationSensitivity: Float
+
+    init(_ pov: CenteredPOV, _ rotationCenter: SIMD3<Float>, _ settings: POVControllerSettings) {
+        self.initialPOV = pov
+        self.rotationCenter = rotationCenter
+        self.rotationSensitivity = settings.rotationSensitivity
+    }
+
+    func rotationChanged(radians: Float) -> CenteredPOV? {
+
+        // First try:
+        // Rotate pov.location and .up around the rotation axis
+        // - Gets it right if the center of rotation is the center of the screen
+        // - If center of rotation is not center of the screen, it does something but not what I expected
+        //
+        //        let transform = float4x4(rotationAround: rotationAxis, by: radians)
+
+        // Second try:
+        // 1. transform the view coords until rotationAxis vector intersects the glass at the center
+        // of the screen.
+        // - That's a rotation around some derived axis (not rotationAxis) by some
+        //   amount (not radians). Maybe I can calculate the matrix in the initer.
+        // - in view coords, initialPOV.location is in the spot where I want to transform the rotationAxis vector to.
+        //   therfore the displacement vector between rotationCenter and pov.location is the key.
+        //
+        // 2. rotate view coords by radians
+        //
+        // 3. do reverse of step 1
+        // I can calculate the matrix in the initer.
+        //
+        // To do step 1:
+        // v1 = displacement vector from pov location to pov center
+        // v2 = displacement vector from touch location to pov center
+        // a = axis of rotation = cross product of v1 and v2
+        // theta = angle to rotate. Found by solving for theta in dot(v1, v2) = |v1| * |v2| * cos(theta
+        //
+        // - No different from the first try!
+
+        let v1 = initialPOV.center - initialPOV.location
+        let m1 = simd_length(v1)
+        let v2 = initialPOV.center - rotationCenter
+        let m2 = simd_length(v2)
+        let rotationAxis = simd_cross(v1, v2)
+        let cosTheta = simd_dot(v1, v2) / (m1 * m2)
+        let theta = acos(cosTheta)
+        let zAxis = SIMD3<Float>(0, 0, -1)
+        let transform = float4x4(rotationAround: rotationAxis, by: theta)
+        * float4x4(rotationAround: zAxis, by: radians)
+        * float4x4(rotationAround: rotationAxis, by: -theta)
+
+        return CenteredPOV(location: (transform * SIMD4<Float>(initialPOV.location, 1)).xyz,
+                           center: initialPOV.center,
+                           up: (transform * SIMD4<Float>(initialPOV.up, 1)).xyz)
     }
 }
