@@ -321,7 +321,7 @@ public class OrbitingPOVController: ObservableObject, POVController {
 
     private var rotationInProgress: CenteredPOVRoll? = nil
 
-    private var queuedFlights: [CenteredPOVFlight]
+    private var queuedFlights: [CenteredPOVFlight.Spec]
 
     public init(pov: CenteredPOV = CenteredPOV(),
                 orbitPermitted: Bool = true,
@@ -332,7 +332,7 @@ public class OrbitingPOVController: ObservableObject, POVController {
         self.orbitPermitted = orbitPermitted
         self.orbitEnabled = orbitEnabled && orbitPermitted
         self.orbitSpeed = orbitSpeed
-        self.queuedFlights = [CenteredPOVFlight]()
+        self.queuedFlights = [CenteredPOVFlight.Spec]()
     }
 
     public func reset() {
@@ -351,12 +351,12 @@ public class OrbitingPOVController: ObservableObject, POVController {
     }
 
     public func jump(to pov: CenteredPOV) {
-        queuedFlights.append(CenteredPOVFlight(from: self.currentPOV, to: pov, flightTime: 0))
+        queuedFlights.append(CenteredPOVFlight.Spec(pov: pov, flightTime: 0))
     }
 
     public func fly(to pov: CenteredPOV, flightTime: TimeInterval? = nil) {
         let trueFlightTime = flightTime ?? Self.defaultFlightTime
-        queuedFlights.append(CenteredPOVFlight(from: self.currentPOV, to: pov, flightTime: trueFlightTime))
+        queuedFlights.append(CenteredPOVFlight.Spec(pov: pov, flightTime: trueFlightTime))
     }
 
     public func centerOn(_ newCenter: SIMD3<Float>) {
@@ -470,7 +470,10 @@ public class OrbitingPOVController: ObservableObject, POVController {
         // ==================================================================
 
         if flightInProgress == nil && !queuedFlights.isEmpty {
-            flightInProgress = queuedFlights.removeFirst()
+            let spec = queuedFlights.removeFirst()
+            flightInProgress = CenteredPOVFlight(from: self.currentPOV,
+                                                 to: spec.pov,
+                                                 flightTime: spec.flightTime)
         }
 
         var updatedPOV: CenteredPOV
@@ -505,6 +508,11 @@ public class OrbitingPOVController: ObservableObject, POVController {
 ///
 ///
 class CenteredPOVFlight {
+
+    struct Spec {
+        var pov: CenteredPOV
+        var flightTime: TimeInterval
+    }
 
     enum Phase: Double {
         case new
