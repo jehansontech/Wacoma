@@ -173,6 +173,7 @@ public struct NumericSettingViewModel<T: DecimalConverter> {
                 maximumRange: ClosedRange<T.ValueType>,
                 snapToStep: Bool) {
 
+        // TODO: init(transformer, range, initialValue, initialSliderRange) // No snap to step
         // ???: simplify the below by init'ing stuff to temp values where necessary, then calling setSliderRange
 
 
@@ -379,6 +380,8 @@ public struct NumericSettingView<T: DecimalConverter, Content: View>: View {
         }
     }
 
+    // TODO: (value, range, initialSliderRange) no snapToStep
+    // Or maybe even (value, range, initialStepSize) and then set up the sliderRange based on 100 steps.
     public init<V>(_ value: Binding<V>,
                    initialRange: ClosedRange<V>? = nil,
                    maximumRange: ClosedRange<V>,
