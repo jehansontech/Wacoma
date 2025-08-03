@@ -16,7 +16,12 @@ public struct FrameWidth {
     public var minimum: CGFloat
     public var maximum: CGFloat
 
-    public init(_ minimum: CGFloat = 0, _ maximum: CGFloat = .infinity) {
+    public init(_ range: ClosedRange<CGFloat>) {
+        self.minimum = range.lowerBound
+        self.maximum = range.upperBound
+    }
+    
+    public init(_ minimum: CGFloat = 0, _ maximum: CGFloat = .greatestFiniteMagnitude) {
         self.minimum = minimum
         self.maximum = maximum
     }
@@ -78,7 +83,12 @@ public struct FrameHeight {
     public var minimum: CGFloat
     public var maximum: CGFloat
 
-    public init(_ minimum: CGFloat = 0, _ maximum: CGFloat = .infinity) {
+    public init(_ range: ClosedRange<CGFloat>) {
+        self.minimum = range.lowerBound
+        self.maximum = range.upperBound
+    }
+
+    public init(_ minimum: CGFloat = 0, _ maximum: CGFloat = .greatestFiniteMagnitude) {
         self.minimum = minimum
         self.maximum = maximum
     }
@@ -144,10 +154,18 @@ public struct FrameSize {
     public var minimumHeight: CGFloat
     public var maximumHeight: CGFloat
 
+    public init(_ width: ClosedRange<CGFloat>,
+                _ height: ClosedRange<CGFloat>) {
+        self.minimumWidth = width.lowerBound
+        self.maximumWidth = width.upperBound
+        self.minimumHeight = height.lowerBound
+        self.maximumHeight = height.upperBound
+    }
+
     public init(_ minimumWidth: CGFloat = 0,
-                _ maximumWidth: CGFloat = .infinity,
+                _ maximumWidth: CGFloat = .greatestFiniteMagnitude,
                 _ minimumHeight: CGFloat = 0,
-                _ maximumHeight: CGFloat = .infinity) {
+                _ maximumHeight: CGFloat = .greatestFiniteMagnitude) {
         self.minimumWidth = minimumWidth
         self.maximumWidth = maximumWidth
         self.minimumHeight = minimumHeight
