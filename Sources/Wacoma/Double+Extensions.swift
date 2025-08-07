@@ -62,7 +62,7 @@ extension Double {
         return abs(x - self) > .epsilon
     }
 
-    /// returns the exponent: for 10 <= x < 100, returns 2. If x == 0 returns 0
+    /// returns the exponent. E..g., for x in [10, 99], returns 2. If x == 0 returns 0
     public static func orderOfMagnitude(_ x: Double) -> Int {
         return (x == 0) ? 0 : Int(floor(log10(abs(x))))
     }

@@ -50,4 +50,10 @@ extension Float {
     public func differentFrom(_ x: Self) -> Bool {
         return abs(x - self) > .epsilon
     }
+
+    /// returns the exponent. E..g., for x in [10, 99], returns 2. If x == 0 returns 0
+    public static func orderOfMagnitude(_ x: Float) -> Int {
+        return (x == 0) ? 0 : Int(floor(log10(abs(x))))
+    }
+
  }
