@@ -12,7 +12,7 @@ fileprivate let scalarFormatter = makeScalarFormatter()
 
 fileprivate func makeScalarFormatter() -> Formatter {
     let formatter = NumberFormatter()
-    formatter.numberStyle = .decimal
+    formatter.numberStyle = .scientific
     formatter.usesSignificantDigits = true
     formatter.minimumSignificantDigits = 1
     formatter.maximumSignificantDigits = 3
