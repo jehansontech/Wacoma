@@ -229,13 +229,8 @@ public struct NumericSettingViewModel<T: DecimalConverter> {
         if newStepSize < minimumStepSize || newStepSize > maximumStepSize {
             return
         }
-
-        // TODO: make sure newSliderLB <= decimalValue
-        var newSliderLB = newStepSize * Self.getStepNumber(sliderRange.lowerBound, self.stepSize)
-
-        // TODO: make sure newSliderUB >= decimalValue
-        var newSliderUB = newStepSize * Self.getStepNumber(sliderRange.upperBound, self.stepSize)
-
+        let newSliderLB = newStepSize * Self.getStepNumber(sliderRange.lowerBound, self.stepSize)
+        let newSliderUB = newStepSize * Self.getStepNumber(sliderRange.upperBound, self.stepSize)
         self.stepSize = newStepSize
         self.stepNumber = Self.getStepNumber(decimalValue, newStepSize)
         self.sliderRange = newSliderLB...newSliderUB
@@ -245,7 +240,7 @@ public struct NumericSettingViewModel<T: DecimalConverter> {
 
     public mutating func applyFieldText() {
         if let newDecimal = Decimal(string: fieldText) {
-            // STET: do not clamp or snap tmpDecimal; allow user to override the constraints.
+            // STET: do not clamp or snap newDecimal; allow user to override the constraints.
             applyDecimalAndStep(newDecimal, Self.getStepNumber(newDecimal, stepSize))
         }
         else {
