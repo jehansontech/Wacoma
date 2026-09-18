@@ -16,7 +16,7 @@ public struct GrayTitle: ViewModifier {
             .multilineTextAlignment(.center)
             .lineSpacing(2)
             .font(.title)
-            .foregroundColor(.gray)
+            .foregroundStyle(.gray)
     }
 }
 
